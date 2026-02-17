@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EchoVizion – Budget Definition</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0d0b1a;
+    --sidebar-bg: #120f24;
+    --card-bg: #1a1630;
+    --card-hover: #201c3a;
+    --purple: #a78bfa;
+    --purple-dark: #7c3aed;
+    --pink: #f472b6;
+    --green: #10b981;
+    --orange: #f59e0b;
+    --red: #ef4444;
+    --gold: #fbbf24;
+    --border: #2a2448;
+    --text-primary: #f1f0ff;
+    --text-secondary: #9ca3af;
+    --text-muted: #6b7280;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* NAV */
+  nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 32px; height: 56px;
+    background: rgba(13,11,26,0.95);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 100;
+    backdrop-filter: blur(12px);
+  }
+
+  .logo {
+    display: flex; align-items: center; gap: 10px;
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 18px;
+  }
+
+  .logo-icon {
+    width: 30px; height: 30px;
+    background: linear-gradient(135deg, var(--purple-dark), var(--pink));
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center; font-size: 14px;
+  }
+
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 14px; font-weight: 500; }
+  .nav-links a.active { color: var(--text-primary); border-bottom: 2px solid var(--purple); padding-bottom: 2px; }
+
+  .nav-right { display: flex; align-items: center; gap: 16px; }
+
+  .notif {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--card-bg); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+    font-size: 14px; position: relative;
+  }
+
+  .notif-dot {
+    position: absolute; top: 6px; right: 6px;
+    width: 6px; height: 6px; border-radius: 50%; background: var(--pink);
+  }
+
+  .avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--purple-dark), var(--pink));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 600; color: white;
+  }
+
+  /* LAYOUT */
+  .layout { display: flex; flex: 1; }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 240px; background: var(--sidebar-bg);
+    border-right: 1px solid var(--border);
+    padding: 24px 16px;
+    position: sticky; top: 56px;
+    height: calc(100vh - 56px);
+    overflow-y: auto;
+    display: flex; flex-direction: column; gap: 24px;
+  }
+
+  .sidebar-label {
+    font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.1em; color: var(--text-muted);
+    font-weight: 500; margin-bottom: 4px;
+  }
+
+  .progress-text {
+    font-size: 13px; color: var(--purple);
+    font-weight: 600; font-family: 'Syne', sans-serif;
+  }
+
+  .progress-bar-wrap {
+    height: 3px; background: var(--border);
+    border-radius: 2px; margin-top: 8px; overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%; width: 36%;
+    background: linear-gradient(90deg, var(--purple-dark), var(--pink));
+    border-radius: 2px; transition: width 0.4s ease;
+  }
+
+  .steps-list { display: flex; flex-direction: column; gap: 2px; }
+
+  .step-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px; border-radius: 8px; cursor: pointer;
+    transition: all 0.15s; border: 1px solid transparent;
+  }
+
+  .step-item.active {
+    background: rgba(124,58,237,0.15);
+    border-color: rgba(167,139,250,0.3);
+  }
+
+  .step-item.completed .step-num { background: var(--green); color: white; }
+  .step-item.completed .step-name { color: var(--text-secondary); }
+
+  .step-num {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600; color: var(--text-muted); flex-shrink: 0;
+  }
+
+  .step-item.active .step-num {
+    background: linear-gradient(135deg, var(--purple-dark), var(--purple));
+    color: white;
+  }
+
+  .step-name { font-size: 13px; color: var(--text-muted); }
+  .step-item.active .step-name { color: var(--text-primary); font-weight: 500; }
+
+  .sidebar-help {
+    margin-top: auto; padding: 14px;
+    background: var(--card-bg); border-radius: 10px; border: 1px solid var(--border);
+  }
+
+  .sidebar-help p { font-size: 12px; color: var(--text-secondary); margin-bottom: 10px; line-height: 1.5; }
+
+  .help-btn {
+    width: 100%; padding: 8px;
+    background: linear-gradient(135deg, var(--purple-dark), #9333ea);
+    border: none; border-radius: 8px; color: white;
+    font-size: 12px; font-weight: 600; cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  /* MAIN */
+  .main { flex: 1; padding: 40px 56px 140px; max-width: 860px; }
+
+  .step-meta {
+    font-size: 12px; color: var(--purple); font-weight: 500;
+    margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.08em;
+  }
+
+  .step-title {
+    font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800;
+    color: var(--text-primary); margin-bottom: 8px;
+  }
+
+  .step-title span { color: var(--purple); }
+
+  .step-subtitle {
+    font-size: 14px; color: var(--text-secondary);
+    margin-bottom: 36px; line-height: 1.7; max-width: 560px;
+  }
+
+  /* CONTEXT TAGS */
+  .context-tags {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 36px; flex-wrap: wrap;
+  }
+
+  .ctx-label { font-size: 12px; color: var(--text-muted); }
+
+  .ctx-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 12px;
+    border-radius: 20px; font-size: 12px; font-weight: 500;
+    background: rgba(124,58,237,0.12);
+    border: 1px solid rgba(167,139,250,0.25);
+    color: var(--purple);
+  }
+
+  /* FORM SECTIONS */
+  .form-section {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px;
+    margin-bottom: 16px;
+    transition: border-color 0.2s;
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px; font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .section-title .section-icon {
+    font-size: 16px; width: 30px; height: 30px;
+    background: rgba(124,58,237,0.15);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .section-subtitle {
+    font-size: 13px; color: var(--text-muted);
+    margin-bottom: 24px; line-height: 1.6;
+    padding-left: 38px;
+  }
+
+  /* ─────────── DUAL RANGE SLIDER ─────────── */
+  .slider-container {
+    position: relative;
+    padding: 12px 0 8px;
+    margin-bottom: 8px;
+  }
+
+  .slider-track {
+    position: relative;
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    margin: 0 8px;
+  }
+
+  .slider-fill {
+    position: absolute;
+    top: 0; height: 100%;
+    background: linear-gradient(90deg, var(--purple-dark), var(--pink));
+    border-radius: 3px;
+    transition: left 0.05s, width 0.05s;
+  }
+
+  .slider-input {
+    position: absolute;
+    top: -7px; left: 0;
+    width: 100%; height: 20px;
+    -webkit-appearance: none;
+    background: transparent;
+    pointer-events: none;
+    outline: none;
+  }
+
+  .slider-input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: white;
+    border: 2px solid var(--purple-dark);
+    box-shadow: 0 2px 8px rgba(124,58,237,0.4);
+    pointer-events: all;
+    cursor: grab;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+
+  .slider-input::-webkit-slider-thumb:active {
+    cursor: grabbing;
+    transform: scale(1.2);
+    box-shadow: 0 4px 16px rgba(124,58,237,0.6);
+  }
+
+  .slider-min-input { z-index: 3; }
+  .slider-max-input { z-index: 4; }
+
+  .slider-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 14px;
+    padding: 0 8px;
+  }
+
+  .slider-tick {
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+  }
+
+  .slider-tick-line {
+    width: 1px; height: 5px; background: var(--border);
+  }
+
+  .slider-tick-label {
+    font-size: 11px; color: var(--text-muted);
+  }
+
+  /* LIVE VALUE DISPLAY */
+  .budget-values {
+    display: flex; align-items: center; gap: 16px; margin-top: 20px;
+  }
+
+  .budget-val-box {
+    flex: 1; background: rgba(255,255,255,0.03);
+    border: 1.5px solid var(--border);
+    border-radius: 10px; padding: 14px 18px;
+    transition: border-color 0.2s;
+  }
+
+  .budget-val-box.active { border-color: rgba(167,139,250,0.4); }
+  .budget-val-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 4px; }
+
+  .budget-val-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px; font-weight: 800;
+    color: var(--text-primary);
+  }
+
+  .budget-sep {
+    font-size: 18px; color: var(--text-muted);
+  }
+
+  /* ─────────── TIER CARDS ─────────── */
+  .tier-grid {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px; margin-top: 24px;
+  }
+
+  .tier-card {
+    border-radius: 12px;
+    padding: 18px 16px;
+    border: 1.5px solid var(--border);
+    background: rgba(255,255,255,0.02);
+    transition: all 0.25s;
+    cursor: default;
+  }
+
+  .tier-card.entry { --tier-color: #10b981; }
+  .tier-card.mid   { --tier-color: #a78bfa; }
+  .tier-card.prem  { --tier-color: #fbbf24; }
+
+  .tier-card.active-tier {
+    border-color: var(--tier-color);
+    background: color-mix(in srgb, var(--tier-color) 8%, transparent);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--tier-color) 25%, transparent);
+  }
+
+  .tier-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 9px; border-radius: 20px;
+    font-size: 11px; font-weight: 600; margin-bottom: 10px;
+    border: 1px solid var(--tier-color);
+    color: var(--tier-color);
+    background: color-mix(in srgb, var(--tier-color) 10%, transparent);
+  }
+
+  .tier-range {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px; font-weight: 700;
+    color: var(--text-primary); margin-bottom: 8px;
+  }
+
+  .tier-desc {
+    font-size: 12px; color: var(--text-muted);
+    line-height: 1.5; margin-bottom: 12px;
+  }
+
+  .tier-features {
+    display: flex; flex-direction: column; gap: 5px;
+  }
+
+  .tier-feature {
+    display: flex; align-items: center; gap: 7px;
+    font-size: 11px; color: var(--text-secondary);
+  }
+
+  .tier-dot {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--tier-color); flex-shrink: 0;
+  }
+
+  /* ─────────── SUGGESTION CARDS ─────────── */
+  .suggestion-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 12px; margin-top: 20px;
+  }
+
+  .suggest-card {
+    background: rgba(255,255,255,0.02);
+    border: 1.5px solid var(--border);
+    border-radius: 12px; padding: 18px;
+    cursor: pointer; transition: all 0.2s;
+    position: relative; overflow: hidden;
+  }
+
+  .suggest-card::before {
+    content: ''; position: absolute; inset: 0;
+    opacity: 0; transition: opacity 0.2s;
+    background: linear-gradient(135deg, rgba(124,58,237,0.06), rgba(244,114,182,0.04));
+  }
+
+  .suggest-card:hover { border-color: var(--purple); }
+  .suggest-card:hover::before { opacity: 1; }
+
+  .suggest-card.selected {
+    border-color: var(--purple);
+    background: rgba(124,58,237,0.1);
+  }
+
+  .suggest-header {
+    display: flex; align-items: flex-start;
+    justify-content: space-between; margin-bottom: 8px;
+  }
+
+  .suggest-icon {
+    width: 38px; height: 38px; border-radius: 10px;
+    background: rgba(124,58,237,0.15);
+    display: flex; align-items: center; justify-content: center; font-size: 18px;
+  }
+
+  .suggest-sel-ring {
+    width: 20px; height: 20px; border-radius: 50%;
+    border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .suggest-card.selected .suggest-sel-ring {
+    background: var(--purple-dark);
+    border-color: var(--purple-dark);
+  }
+
+  .suggest-card.selected .suggest-sel-ring::after {
+    content: '✓'; font-size: 10px; color: white; font-weight: 700;
+  }
+
+  .suggest-name {
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 14px; margin-bottom: 3px;
+  }
+
+  .suggest-range {
+    font-size: 13px; color: var(--purple); font-weight: 600; margin-bottom: 8px;
+  }
+
+  .suggest-desc { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+
+  .suggest-tags {
+    display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px;
+  }
+
+  .suggest-tag {
+    padding: 3px 8px; border-radius: 4px;
+    font-size: 11px; font-weight: 500;
+    background: rgba(124,58,237,0.1);
+    color: var(--purple);
+    border: 1px solid rgba(167,139,250,0.2);
+  }
+
+  /* ─────────── MATCHING IMPACT ─────────── */
+  .matching-bars {
+    display: flex; flex-direction: column; gap: 14px; margin-top: 16px;
+  }
+
+  .match-bar-row {
+    display: grid; grid-template-columns: 120px 1fr 50px; align-items: center; gap: 14px;
+  }
+
+  .match-bar-label { font-size: 12px; color: var(--text-secondary); }
+
+  .match-bar-track {
+    height: 6px; background: var(--border);
+    border-radius: 3px; overflow: hidden;
+  }
+
+  .match-bar-fill {
+    height: 100%; border-radius: 3px;
+    background: linear-gradient(90deg, var(--purple-dark), var(--purple));
+    transition: width 0.6s ease;
+  }
+
+  .match-bar-val {
+    font-size: 12px; font-weight: 600;
+    color: var(--purple); text-align: right;
+    font-family: 'Syne', sans-serif;
+  }
+
+  /* ─────────── FLEXIBILITY NOTE ─────────── */
+  .flex-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px;
+  }
+
+  .flex-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 12px; background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border); border-radius: 10px;
+  }
+
+  .flex-dot { width: 6px; height: 6px; border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
+  .flex-item-text { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+  .flex-item-text strong { color: var(--text-secondary); font-weight: 500; }
+
+  /* FIELD TIP */
+  .field-tip {
+    display: flex; align-items: flex-start; gap: 8px;
+    background: rgba(167,139,250,0.06);
+    border: 1px solid rgba(167,139,250,0.15);
+    border-radius: 8px; padding: 12px 14px; margin-top: 16px;
+  }
+
+  .field-tip p { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+  .field-tip strong { color: var(--purple); }
+
+  /* VALIDATION NOTE */
+  .validation-note {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12px; color: var(--text-muted);
+    margin-bottom: 24px; transition: all 0.3s;
+  }
+
+  .validation-dot { width: 6px; height: 6px; border-radius: 50%; }
+
+  /* FORM FOOTER */
+  .form-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 48px;
+    background: rgba(13,11,26,0.95);
+    border-top: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+    position: fixed; bottom: 0;
+    width: calc(100% - 240px); margin-left: 240px;
+    z-index: 50;
+  }
+
+  .btn-draft {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 18px;
+    background: transparent; border: 1px solid var(--border);
+    border-radius: 8px; color: var(--text-secondary);
+    font-size: 13px; font-weight: 500; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; transition: all 0.2s;
+  }
+
+  .btn-draft:hover { border-color: var(--purple); color: var(--purple); }
+
+  .footer-right { display: flex; gap: 12px; align-items: center; }
+
+  .btn-back {
+    padding: 10px 24px;
+    background: var(--card-bg); border: 1px solid var(--border);
+    border-radius: 8px; color: var(--text-secondary);
+    font-size: 14px; font-weight: 500; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; transition: all 0.2s;
+  }
+
+  .btn-back:hover { color: var(--text-primary); }
+
+  .btn-next {
+    padding: 12px 28px;
+    background: linear-gradient(135deg, var(--purple-dark), #9333ea);
+    border: none; border-radius: 8px;
+    color: white; font-size: 14px; font-weight: 600;
+    cursor: pointer; font-family: 'DM Sans', sans-serif;
+    display: flex; align-items: center; gap: 8px;
+    transition: all 0.25s;
+    box-shadow: 0 4px 14px rgba(124,58,237,0.35);
+    opacity: 0.5; pointer-events: none;
+  }
+
+  .btn-next.ready { opacity: 1; pointer-events: all; }
+  .btn-next.ready:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(124,58,237,0.45); }
+
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">
+    <div class="logo-icon">🎵</div>
+    EchoVizion
+  </div>
+  <ul class="nav-links">
+    <li><a href="#">Projects</a></li>
+    <li><a href="#" class="active">Create Project</a></li>
+    <li><a href="#">Messages</a></li>
+    <li><a href="#">Profile</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="notif">🔔<div class="notif-dot"></div></div>
+    <div class="avatar">V</div>
+  </div>
+</nav>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div>
+      <div class="sidebar-label">Project Status</div>
+      <div class="progress-text">36% Complete</div>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" style="width:36%;"></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="sidebar-label">Steps</div>
+      <div class="steps-list">
+        <div class="step-item completed">
+          <div class="step-num">✓</div>
+          <span class="step-name">Project Details</span>
+        </div>
+        <div class="step-item completed">
+          <div class="step-num">✓</div>
+          <span class="step-name">Creative Direction</span>
+        </div>
+        <div class="step-item completed">
+          <div class="step-num">✓</div>
+          <span class="step-name">Visual Style Selection</span>
+        </div>
+        <div class="step-item active">
+          <div class="step-num">4</div>
+          <span class="step-name">Budget Definition</span>
+        </div>
+        <div class="step-item">
+          <div class="step-num">5</div>
+          <span class="step-name">Inspiration References</span>
+        </div>
+        <div class="step-item">
+          <div class="step-num">6</div>
+          <span class="step-name">Technical Requirements</span>
+        </div>
+        <div class="step-item">
+          <div class="step-num">7</div>
+          <span class="step-name">Talent & Crew Needs</span>
+        </div>
+        <div class="step-item">
+          <div class="step-num">8</div>
+          <span class="step-name">Collaboration Style</span>
+        </div>
+        <div class="step-item">
+          <div class="step-num">9</div>
+          <span class="step-name">Usage Rights</span>
+        </div>
+        <div class="step-item">
+          <div class="step-num">10</div>
+          <span class="step-name">Review & Submit</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-help">
+      <p>Need help setting your budget? We can help you figure out what's right for your project.</p>
+      <button class="help-btn">💬 Contact Support</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="step-meta">Step 4 of 10</div>
+    <h1 class="step-title">Budget <span>Definition</span></h1>
+    <p class="step-subtitle">Set your budget range to help us match you with creatives who fit your investment level. Your budget contributes 10% to your matching algorithm — being realistic helps us find the right fit.</p>
+
+    <div class="context-tags">
+      <span class="ctx-label">Continuing from:</span>
+      <span class="ctx-tag">🎬 Music Video</span>
+      <span class="ctx-tag">🎵 Afro-Reggae / R&B</span>
+      <span class="ctx-tag">🎨 Cinematic Aesthetic</span>
+    </div>
+
+    <!-- SECTION 1: SLIDER -->
+    <div class="form-section">
+      <div class="section-title">
+        <div class="section-icon">💰</div>
+        Select Your Budget Range
+      </div>
+      <p class="section-subtitle">Drag both handles to set your minimum and maximum budget. This helps us match you with creatives in your price range.</p>
+
+      <!-- DUAL RANGE SLIDER -->
+      <div class="slider-container">
+        <div class="slider-track" id="slider-track">
+          <div class="slider-fill" id="slider-fill"></div>
+          <input type="range" class="slider-input slider-min-input" id="slider-min"
+            min="0" max="100" value="10" step="1"
+            oninput="updateSlider()">
+          <input type="range" class="slider-input slider-max-input" id="slider-max"
+            min="0" max="100" value="40" step="1"
+            oninput="updateSlider()">
+        </div>
+
+        <div class="slider-labels">
+          <div class="slider-tick"><div class="slider-tick-line"></div><div class="slider-tick-label">$0</div></div>
+          <div class="slider-tick"><div class="slider-tick-line"></div><div class="slider-tick-label">$10K</div></div>
+          <div class="slider-tick"><div class="slider-tick-line"></div><div class="slider-tick-label">$30K</div></div>
+          <div class="slider-tick"><div class="slider-tick-line"></div><div class="slider-tick-label">$80K</div></div>
+          <div class="slider-tick"><div class="slider-tick-line"></div><div class="slider-tick-label">$100K+</div></div>
+        </div>
+      </div>
+
+      <!-- LIVE VALUE DISPLAY -->
+      <div class="budget-values">
+        <div class="budget-val-box" id="min-box">
+          <div class="budget-val-label">Minimum</div>
+          <div class="budget-val-num" id="min-display">$5,000</div>
+        </div>
+        <div class="budget-sep">→</div>
+        <div class="budget-val-box" id="max-box">
+          <div class="budget-val-label">Maximum</div>
+          <div class="budget-val-num" id="max-display">$15,000</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 2: TIER OVERVIEW -->
+    <div class="form-section">
+      <div class="section-title">
+        <div class="section-icon">📊</div>
+        Budget Tier Overview
+      </div>
+      <p class="section-subtitle">Your current budget range falls into a tier that determines the quality and experience level of creatives we match you with.</p>
+
+      <div class="tier-grid">
+        <!-- ENTRY -->
+        <div class="tier-card entry" id="tier-entry">
+          <div class="tier-badge">🌱 Entry Level</div>
+          <div class="tier-range">$0 – $5,000</div>
+          <div class="tier-desc">For emerging artists and DIY projects. Minimal equipment, basic crew.</div>
+          <div class="tier-features">
+            <div class="tier-feature"><div class="tier-dot"></div>Independent Directors</div>
+            <div class="tier-feature"><div class="tier-dot"></div>Basic Equipment</div>
+            <div class="tier-feature"><div class="tier-dot"></div>1–2 Day Shoot</div>
+          </div>
+        </div>
+
+        <!-- MID -->
+        <div class="tier-card mid active-tier" id="tier-mid">
+          <div class="tier-badge">🚀 Mid Range</div>
+          <div class="tier-range">$5,000 – $20,000</div>
+          <div class="tier-desc">Professional quality with experienced creatives and cinematic production value.</div>
+          <div class="tier-features">
+            <div class="tier-feature"><div class="tier-dot"></div>Pro Directors & Crew</div>
+            <div class="tier-feature"><div class="tier-dot"></div>Cinema-Grade Equipment</div>
+            <div class="tier-feature"><div class="tier-dot"></div>3–5 Day Shoot</div>
+            <div class="tier-feature"><div class="tier-dot"></div>Color Grading</div>
+          </div>
+        </div>
+
+        <!-- PREMIUM -->
+        <div class="tier-card prem" id="tier-prem">
+          <div class="tier-badge">⭐ Premium</div>
+          <div class="tier-range">$20,000+</div>
+          <div class="tier-desc">High-end production with top-tier talent, specialized equipment, elaborate sets.</div>
+          <div class="tier-features">
+            <div class="tier-feature"><div class="tier-dot"></div>Award-Winning Crew</div>
+            <div class="tier-feature"><div class="tier-dot"></div>Premium Equipment</div>
+            <div class="tier-feature"><div class="tier-dot"></div>Multi-Day Shoot</div>
+            <div class="tier-feature"><div class="tier-dot"></div>VFX & Custom Sets</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACTIVE TIER STATUS -->
+      <div class="field-tip" style="margin-top:16px;">
+        <span>✨</span>
+        <p id="active-tier-msg">Your <strong>$5,000 – $15,000</strong> budget puts you in the <strong>Mid Range</strong> tier — we'll match you with professional directors and cinematic production teams.</p>
+      </div>
+    </div>
+
+    <!-- SECTION 3: SUGGESTED BUDGET TYPES -->
+    <div class="form-section">
+      <div class="section-title">
+        <div class="section-icon">💡</div>
+        Suggested Budget for Your Project
+      </div>
+      <p class="section-subtitle">Based on your music video project and selected aesthetic, here are common budget approaches. Select one to apply it as your range.</p>
+
+      <div class="suggestion-grid">
+        <div class="suggest-card selected" id="sug-full" onclick="selectSuggestion('sug-full', 5000, 20000)">
+          <div class="suggest-header">
+            <div class="suggest-icon">🎬</div>
+            <div class="suggest-sel-ring"></div>
+          </div>
+          <div class="suggest-name">Full Music Video</div>
+          <div class="suggest-range">$5,000 – $20,000</div>
+          <div class="suggest-desc">Complete cinematic production — performance, narrative, or concept-driven. Includes full crew, locations, and post-production.</div>
+          <div class="suggest-tags">
+            <span class="suggest-tag">Director + Crew</span>
+            <span class="suggest-tag">Locations</span>
+            <span class="suggest-tag">Color Grade</span>
+            <span class="suggest-tag">Edit</span>
+          </div>
+        </div>
+
+        <div class="suggest-card" id="sug-vertical" onclick="selectSuggestion('sug-vertical', 2000, 8000)">
+          <div class="suggest-header">
+            <div class="suggest-icon">📱</div>
+            <div class="suggest-sel-ring"></div>
+          </div>
+          <div class="suggest-name">Vertical Content Bundle</div>
+          <div class="suggest-range">$2,000 – $8,000</div>
+          <div class="suggest-desc">Optimized for TikTok, Reels, and YouTube Shorts. Multiple vertical cuts, high-engagement hooks, and platform-ready edits.</div>
+          <div class="suggest-tags">
+            <span class="suggest-tag">Reels</span>
+            <span class="suggest-tag">TikTok</span>
+            <span class="suggest-tag">Shorts</span>
+          </div>
+        </div>
+
+        <div class="suggest-card" id="sug-lyric" onclick="selectSuggestion('sug-lyric', 800, 3000)">
+          <div class="suggest-header">
+            <div class="suggest-icon">🎤</div>
+            <div class="suggest-sel-ring"></div>
+          </div>
+          <div class="suggest-name">Lyric / Visualizer Video</div>
+          <div class="suggest-range">$800 – $3,000</div>
+          <div class="suggest-desc">Motion graphics or animated lyric video. Great for pre-release or alongside a full music video. Lower overhead, fast turnaround.</div>
+          <div class="suggest-tags">
+            <span class="suggest-tag">Motion Graphics</span>
+            <span class="suggest-tag">Animation</span>
+          </div>
+        </div>
+
+        <div class="suggest-card" id="sug-custom" onclick="selectSuggestion('sug-custom', null, null)">
+          <div class="suggest-header">
+            <div class="suggest-icon">🎛️</div>
+            <div class="suggest-sel-ring"></div>
+          </div>
+          <div class="suggest-name">Custom / I'll Set My Own</div>
+          <div class="suggest-range">You decide</div>
+          <div class="suggest-desc">Use the slider to define your own minimum and maximum range. Best if you have a specific number from a quote or past experience.</div>
+          <div class="suggest-tags">
+            <span class="suggest-tag">Manual Input</span>
+            <span class="suggest-tag">Full Control</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 4: MATCHING IMPACT -->
+    <div class="form-section">
+      <div class="section-title">
+        <div class="section-icon">🎯</div>
+        How Budget Affects Matching
+      </div>
+      <p class="section-subtitle">Your budget contributes 10% weight to our matching algorithm alongside 9 other factors.</p>
+
+      <div class="matching-bars">
+        <div class="match-bar-row">
+          <div class="match-bar-label">Creative Style Fit</div>
+          <div class="match-bar-track"><div class="match-bar-fill" style="width:40%;background:linear-gradient(90deg,var(--purple-dark),var(--purple));"></div></div>
+          <div class="match-bar-val">40%</div>
+        </div>
+        <div class="match-bar-row">
+          <div class="match-bar-label">Genre Experience</div>
+          <div class="match-bar-track"><div class="match-bar-fill" style="width:20%;background:linear-gradient(90deg,#7c3aed,#a78bfa);"></div></div>
+          <div class="match-bar-val">20%</div>
+        </div>
+        <div class="match-bar-row">
+          <div class="match-bar-label">Availability</div>
+          <div class="match-bar-track"><div class="match-bar-fill" style="width:15%;background:linear-gradient(90deg,#9333ea,#c084fc);"></div></div>
+          <div class="match-bar-val">15%</div>
+        </div>
+        <div class="match-bar-row">
+          <div class="match-bar-label">Location Proximity</div>
+          <div class="match-bar-track"><div class="match-bar-fill" style="width:15%;background:linear-gradient(90deg,#9333ea,#c084fc);"></div></div>
+          <div class="match-bar-val">15%</div>
+        </div>
+        <div class="match-bar-row" id="budget-bar-row">
+          <div class="match-bar-label" style="color:var(--purple);font-weight:600;">Budget Alignment</div>
+          <div class="match-bar-track"><div class="match-bar-fill" style="width:10%;background:linear-gradient(90deg,var(--pink),var(--purple));"></div></div>
+          <div class="match-bar-val" style="color:var(--pink);">10%</div>
+        </div>
+      </div>
+
+      <div class="field-tip" style="margin-top:20px;">
+        <span>💡</span>
+        <p>Higher budgets unlock more experienced creatives. You can always <strong>negotiate pricing directly</strong> with your matched creative — the final cost is always between you and them.</p>
+      </div>
+    </div>
+
+    <!-- SECTION 5: FLEXIBILITY -->
+    <div class="form-section">
+      <div class="section-title">
+        <div class="section-icon">🔄</div>
+        Budget Flexibility
+      </div>
+      <p class="section-subtitle">Your budget range is not set in stone. The final price is always negotiable with your matched creative. Many factors can influence the final cost including:</p>
+
+      <div class="flex-grid">
+        <div class="flex-item">
+          <div class="flex-dot" style="background:var(--pink);"></div>
+          <div class="flex-item-text"><strong>Project Complexity</strong> — Concept, locations, and number of shoot days</div>
+        </div>
+        <div class="flex-item">
+          <div class="flex-dot" style="background:var(--orange);"></div>
+          <div class="flex-item-text"><strong>Timeline & Deadlines</strong> — Rush fees may apply for urgent turnarounds</div>
+        </div>
+        <div class="flex-item">
+          <div class="flex-dot" style="background:var(--purple);"></div>
+          <div class="flex-item-text"><strong>Location Logistics</strong> — Travel, permits, and location fees</div>
+        </div>
+        <div class="flex-item">
+          <div class="flex-dot" style="background:var(--green);"></div>
+          <div class="flex-item-text"><strong>Usage Rights Needed</strong> — Licensing scope can affect creative rates</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VALIDATION NOTE -->
+    <div class="validation-note" id="validation-note">
+      <div class="validation-dot" style="background:var(--green);"></div>
+      <span id="val-text" style="color:var(--green);">Budget range set — ready to continue</span>
+    </div>
+
+    <div style="height:40px;"></div>
+  </main>
+</div>
+
+<!-- FORM FOOTER -->
+<div class="form-footer">
+  <button class="btn-draft">💾 Save as Draft</button>
+  <div class="footer-right">
+    <span id="footer-status" style="font-size:13px;color:var(--green);">✅ Budget range selected</span>
+    <button class="btn-back">← Back</button>
+    <button class="btn-next ready" id="next-btn" onclick="goNext()">Next: Inspiration →</button>
+  </div>
+</div>
+
+<script>
+  // ─── SCALE ──────────────────────────────────────────────
+  // Maps slider 0–100 to dollar values using a curve
+  const SCALE = [
+    0, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500,   // 0–9
+    5000, 5500, 6000, 6500, 7000, 7500, 8000, 8500, 9000, 9500, // 10–19
+    10000, 11000, 12000, 13000, 14000, 15000, 16000, 17000, 18000, 19000, // 20–29
+    20000, 22000, 24000, 26000, 28000, 30000, 32000, 34000, 36000, 38000, // 30–39
+    40000, 43000, 46000, 49000, 52000, 55000, 58000, 61000, 64000, 67000, // 40–49
+    70000, 73000, 76000, 79000, 82000, 85000, 88000, 91000, 94000, 97000, // 50–59
+    100000, 105000, 110000, 115000, 120000, 130000, 140000, 150000, 160000, 170000, // 60–69
+    180000, 190000, 200000, 220000, 240000, 260000, 280000, 300000, 320000, 340000, // 70–79
+    360000, 380000, 400000, 430000, 460000, 500000, 550000, 600000, 700000, 800000, // 80–89
+    900000, 950000, 960000, 970000, 980000, 990000, 995000, 998000, 999000, 1000000 // 90–99
+  ];
+
+  function scaleVal(v) {
+    const i = Math.min(Math.floor(v), 99);
+    return SCALE[i];
+  }
+
+  function fmt(n) {
+    if (n >= 1000000) return '$1M+';
+    if (n >= 100000) return '$' + (n / 1000).toFixed(0) + 'K';
+    if (n >= 1000) return '$' + (n / 1000).toFixed(1).replace('.0','') + 'K';
+    return '$' + n.toLocaleString();
+  }
+
+  function updateSlider() {
+    const minSlider = document.getElementById('slider-min');
+    const maxSlider = document.getElementById('slider-max');
+
+    let minVal = parseInt(minSlider.value);
+    let maxVal = parseInt(maxSlider.value);
+
+    // Keep min < max with gap
+    if (minVal >= maxVal - 2) {
+      if (event && event.target === minSlider) {
+        minVal = maxVal - 2;
+        minSlider.value = minVal;
+      } else {
+        maxVal = minVal + 2;
+        maxSlider.value = maxVal;
+      }
+    }
+
+    // Update fill
+    const fill = document.getElementById('slider-fill');
+    fill.style.left = minVal + '%';
+    fill.style.width = (maxVal - minVal) + '%';
+
+    // Update displays
+    const minDollar = scaleVal(minVal);
+    const maxDollar = scaleVal(maxVal);
+
+    document.getElementById('min-display').textContent = fmt(minDollar);
+    document.getElementById('max-display').textContent = fmt(maxDollar);
+
+    // Update tier highlight
+    updateTierHighlight(minDollar, maxDollar);
+  }
+
+  function updateTierHighlight(minD, maxD) {
+    const midpoint = (minD + maxD) / 2;
+
+    // Determine tier
+    let tier = 'mid';
+    if (midpoint < 5000) tier = 'entry';
+    else if (midpoint >= 20000) tier = 'prem';
+
+    // Remove all active
+    ['tier-entry','tier-mid','tier-prem'].forEach(id => {
+      document.getElementById(id).classList.remove('active-tier');
+    });
+
+    // Add active to correct one
+    const map = { entry: 'tier-entry', mid: 'tier-mid', prem: 'tier-prem' };
+    document.getElementById(map[tier]).classList.add('active-tier');
+
+    // Update message
+    const tierNames = { entry: 'Entry Level', mid: 'Mid Range', prem: 'Premium' };
+    const tierDescs = {
+      entry: 'great for emerging artists and smaller DIY projects.',
+      mid: "we'll match you with professional directors and cinematic production teams.",
+      prem: "you'll be matched with our most experienced award-winning creatives."
+    };
+
+    document.getElementById('active-tier-msg').innerHTML =
+      `Your <strong>${fmt(scaleVal(parseInt(document.getElementById('slider-min').value)))} – ${fmt(scaleVal(parseInt(document.getElementById('slider-max').value)))}</strong> budget puts you in the <strong>${tierNames[tier]}</strong> tier — ${tierDescs[tier]}`;
+  }
+
+  // ─── SUGGESTION SELECTION ───────────────────────────────
+  function selectSuggestion(id, minDollar, maxDollar) {
+    document.querySelectorAll('.suggest-card').forEach(c => c.classList.remove('selected'));
+    document.getElementById(id).classList.add('selected');
+
+    if (minDollar !== null && maxDollar !== null) {
+      // Find closest slider values
+      function findIndex(target) {
+        let closest = 0;
+        let minDiff = Infinity;
+        for (let i = 0; i < SCALE.length; i++) {
+          const diff = Math.abs(SCALE[i] - target);
+          if (diff < minDiff) { minDiff = diff; closest = i; }
+        }
+        return closest;
+      }
+
+      const minIdx = findIndex(minDollar);
+      const maxIdx = findIndex(maxDollar);
+
+      document.getElementById('slider-min').value = minIdx;
+      document.getElementById('slider-max').value = maxIdx;
+      updateSlider();
+    }
+  }
+
+  // ─── NEXT ───────────────────────────────────────────────
+  function goNext() {
+    alert('Proceeding to Inspiration References...');
+  }
+
+  // Init
+  updateSlider();
+</script>
+
+</body>
+</html>

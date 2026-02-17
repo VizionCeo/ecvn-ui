@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EchoVizion – Creative Direction</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0d0b1a;
+    --sidebar-bg: #120f24;
+    --card-bg: #1a1630;
+    --card-hover: #201c3a;
+    --purple: #a78bfa;
+    --purple-dark: #7c3aed;
+    --pink: #f472b6;
+    --green: #10b981;
+    --orange: #f59e0b;
+    --red: #ef4444;
+    --border: #2a2448;
+    --text-primary: #f1f0ff;
+    --text-secondary: #9ca3af;
+    --text-muted: #6b7280;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+  }
+
+  /* NAV */
+  nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 32px; height: 56px;
+    background: rgba(13,11,26,0.95);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 100;
+    backdrop-filter: blur(12px);
+  }
+
+  .logo {
+    display: flex; align-items: center; gap: 10px;
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 18px;
+  }
+
+  .logo-icon {
+    width: 30px; height: 30px;
+    background: linear-gradient(135deg, var(--purple-dark), var(--pink));
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center; font-size: 14px;
+  }
+
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 14px; font-weight: 500; }
+  .nav-links a.active { color: var(--text-primary); border-bottom: 2px solid var(--purple); padding-bottom: 2px; }
+
+  .nav-right { display: flex; align-items: center; gap: 16px; }
+  .notif { width: 32px; height: 32px; border-radius: 50%; background: var(--card-bg); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 14px; position: relative; cursor: pointer; }
+  .notif-dot { position: absolute; top: 6px; right: 6px; width: 6px; height: 6px; border-radius: 50%; background: var(--pink); }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--purple-dark), var(--pink)); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: white; }
+
+  /* LAYOUT */
+  .layout { display: flex; flex: 1; }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 240px; background: var(--sidebar-bg);
+    border-right: 1px solid var(--border);
+    padding: 24px 16px;
+    position: sticky; top: 56px;
+    height: calc(100vh - 56px);
+    overflow-y: auto;
+    display: flex; flex-direction: column; gap: 20px;
+  }
+
+  .sidebar-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); font-weight: 500; margin-bottom: 4px; }
+  .progress-text { font-size: 13px; color: var(--purple); font-weight: 600; font-family: 'Syne', sans-serif; }
+  .progress-bar-wrap { height: 3px; background: var(--border); border-radius: 2px; margin-top: 8px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; width: 45%; background: linear-gradient(90deg, var(--purple-dark), var(--pink)); border-radius: 2px; }
+
+  .steps-list { display: flex; flex-direction: column; gap: 2px; }
+
+  .step-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 9px 12px; border-radius: 8px; cursor: pointer;
+    transition: all 0.15s; border: 1px solid transparent;
+  }
+
+  .step-item.active { background: rgba(124,58,237,0.15); border-color: rgba(167,139,250,0.3); }
+  .step-item.completed .step-num { background: var(--green); color: white; }
+  .step-item.completed .step-name { color: var(--text-secondary); }
+
+  .step-num {
+    width: 22px; height: 22px; border-radius: 50%; background: var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600; color: var(--text-muted); flex-shrink: 0;
+  }
+
+  .step-item.active .step-num { background: linear-gradient(135deg, var(--purple-dark), var(--purple)); color: white; }
+  .step-name { font-size: 13px; color: var(--text-muted); }
+  .step-item.active .step-name { color: var(--text-primary); font-weight: 500; }
+
+  .sidebar-help { margin-top: auto; padding: 14px; background: var(--card-bg); border-radius: 10px; border: 1px solid var(--border); }
+  .sidebar-help p { font-size: 12px; color: var(--text-secondary); margin-bottom: 10px; line-height: 1.5; }
+  .help-btn { width: 100%; padding: 8px; background: linear-gradient(135deg, var(--purple-dark), #9333ea); border: none; border-radius: 8px; color: white; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+
+  /* MAIN */
+  .main { flex: 1; padding: 40px 56px 140px; max-width: 860px; }
+
+  .step-meta { font-size: 12px; color: var(--purple); font-weight: 500; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.08em; }
+
+  .step-title { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px; }
+  .step-title span { color: var(--purple); }
+
+  .step-subtitle { font-size: 14px; color: var(--text-secondary); margin-bottom: 36px; line-height: 1.7; max-width: 560px; }
+
+  /* CONTEXT TAGS */
+  .context-tags { display: flex; align-items: center; gap: 8px; margin-bottom: 36px; flex-wrap: wrap; }
+  .ctx-label { font-size: 12px; color: var(--text-muted); }
+  .ctx-tag { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; background: rgba(124,58,237,0.12); border: 1px solid rgba(167,139,250,0.25); color: var(--purple); }
+
+  /* SECTIONS */
+  .form-section { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 28px; margin-bottom: 16px; transition: border-color 0.2s; }
+  .form-section:focus-within { border-color: rgba(167,139,250,0.4); }
+
+  .section-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+  .section-icon { font-size: 16px; width: 30px; height: 30px; background: rgba(124,58,237,0.15); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+  .section-subtitle { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.6; padding-left: 38px; }
+
+  /* ─── VISION TEXTAREA ─────────────────────── */
+  .vision-header {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    margin-bottom: 14px;
+  }
+
+  .match-weight-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 12px; border-radius: 20px;
+    font-size: 12px; font-weight: 600;
+    background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(244,114,182,0.15));
+    border: 1px solid rgba(167,139,250,0.35);
+    color: var(--purple);
+  }
+
+  .match-weight-badge .mw-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--purple-dark), var(--pink));
+  }
+
+  .vision-label { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 3px; font-family: 'Syne', sans-serif; }
+  .vision-hint { font-size: 12px; color: var(--text-muted); }
+
+  .vision-textarea {
+    width: 100%;
+    min-height: 180px;
+    background: rgba(255,255,255,0.03);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    color: var(--text-primary);
+    font-size: 14px; font-family: 'DM Sans', sans-serif;
+    padding: 16px 18px;
+    outline: none; resize: vertical;
+    line-height: 1.7;
+    transition: all 0.2s;
+  }
+
+  .vision-textarea::placeholder { color: var(--text-muted); font-style: italic; line-height: 1.7; }
+
+  .vision-textarea:focus {
+    border-color: var(--purple);
+    background: rgba(167,139,250,0.04);
+    box-shadow: 0 0 0 3px rgba(167,139,250,0.1);
+  }
+
+  .textarea-footer {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 8px;
+  }
+
+  .textarea-hint { font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 5px; }
+  .char-count { font-size: 11px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+  .char-count.good { color: var(--green); }
+  .char-count.warn { color: var(--orange); }
+
+  .min-req {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 11px; color: var(--orange);
+    margin-top: 6px;
+  }
+
+  .min-req.met { color: var(--green); }
+
+  /* ─── PROMPT CARDS ─────────────────────────── */
+  .prompts-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .prompt-card {
+    background: rgba(255,255,255,0.02);
+    border: 1.5px solid var(--border);
+    border-radius: 12px; padding: 16px;
+    cursor: pointer; transition: all 0.2s;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+
+  .prompt-card:hover {
+    border-color: var(--purple);
+    background: rgba(124,58,237,0.07);
+    transform: translateY(-1px);
+  }
+
+  .prompt-card-header { display: flex; align-items: center; gap: 10px; }
+
+  .prompt-icon {
+    width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 16px;
+  }
+
+  .prompt-name { font-size: 13px; font-weight: 600; color: var(--text-primary); font-family: 'Syne', sans-serif; }
+  .prompt-hint { font-size: 12px; color: var(--text-muted); line-height: 1.5; padding-left: 42px; }
+
+  .prompt-add {
+    margin-left: auto;
+    font-size: 11px; color: var(--purple); font-weight: 500;
+    opacity: 0; transition: opacity 0.15s;
+    white-space: nowrap;
+  }
+
+  .prompt-card:hover .prompt-add { opacity: 1; }
+
+  /* Used state */
+  .prompt-card.used {
+    border-color: rgba(16,185,129,0.35);
+    background: rgba(16,185,129,0.06);
+    opacity: 0.75;
+  }
+  .prompt-card.used:hover {
+    border-color: rgba(239,68,68,0.4);
+    background: rgba(239,68,68,0.06);
+    opacity: 1;
+    transform: none;
+  }
+  .prompt-card.used .prompt-name { color: var(--text-secondary); }
+  .prompt-card.used .prompt-add {
+    opacity: 1;
+    color: var(--green);
+    font-size: 11px;
+  }
+  .prompt-card.used:hover .prompt-add {
+    color: #ef4444;
+  }
+  .prompt-card.used .prompt-icon {
+    opacity: 0.6;
+  }
+  /* Tooltip-style on used hover */
+  .prompt-card.used:hover .prompt-name::after {
+    content: ' — click to remove';
+    font-size: 11px;
+    font-weight: 400;
+    color: #ef4444;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  /* ─── MOOD KEYWORDS ─────────────────────────── */
+  .keyword-input-row {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
+  }
+
+  .keyword-input {
+    flex: 1; padding: 11px 16px;
+    background: rgba(255,255,255,0.04);
+    border: 1.5px solid var(--border);
+    border-radius: 10px; color: var(--text-primary);
+    font-size: 14px; font-family: 'DM Sans', sans-serif;
+    outline: none; transition: all 0.2s;
+  }
+
+  .keyword-input::placeholder { color: var(--text-muted); }
+  .keyword-input:focus { border-color: var(--purple); background: rgba(167,139,250,0.05); box-shadow: 0 0 0 3px rgba(167,139,250,0.1); }
+
+  .keyword-add-btn {
+    width: 38px; height: 38px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--purple-dark), #9333ea);
+    border: none; color: white; font-size: 18px; font-weight: 300;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s; flex-shrink: 0;
+  }
+
+  .keyword-add-btn:hover { transform: scale(1.05); box-shadow: 0 4px 12px rgba(124,58,237,0.4); }
+
+  .popular-label { font-size: 11px; color: var(--text-muted); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.07em; font-weight: 500; }
+
+  .keyword-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  .keyword-pill {
+    padding: 5px 14px; border-radius: 20px;
+    font-size: 12px; font-weight: 500;
+    background: var(--card-bg); border: 1px solid var(--border);
+    color: var(--text-secondary); cursor: pointer; transition: all 0.15s;
+    user-select: none;
+  }
+
+  .keyword-pill:hover { border-color: var(--purple); color: var(--purple); background: rgba(124,58,237,0.08); }
+  .keyword-pill.selected { background: rgba(124,58,237,0.15); border-color: var(--purple); color: var(--purple); }
+
+  .selected-keywords { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; min-height: 0; }
+
+  .sel-keyword {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 12px; border-radius: 20px;
+    font-size: 12px; font-weight: 500;
+    background: rgba(124,58,237,0.2);
+    border: 1px solid rgba(167,139,250,0.4);
+    color: var(--purple);
+  }
+
+  .sel-keyword button {
+    background: none; border: none; color: var(--purple);
+    font-size: 14px; cursor: pointer; line-height: 1; padding: 0;
+    opacity: 0.7; transition: opacity 0.15s;
+  }
+
+  .sel-keyword button:hover { opacity: 1; }
+
+  /* ─── EXAMPLE CARDS ─────────────────────────── */
+  .examples-list { display: flex; flex-direction: column; gap: 12px; }
+
+  .example-card {
+    background: rgba(255,255,255,0.02);
+    border: 1.5px solid var(--border);
+    border-radius: 12px; padding: 18px 20px;
+    cursor: pointer; transition: all 0.2s;
+    position: relative; overflow: hidden;
+  }
+
+  .example-card::before {
+    content: ''; position: absolute;
+    left: 0; top: 0; bottom: 0; width: 3px;
+    border-radius: 3px 0 0 3px;
+    background: linear-gradient(180deg, var(--ex-color-a), var(--ex-color-b));
+  }
+
+  .example-card:hover { border-color: rgba(167,139,250,0.35); background: rgba(255,255,255,0.035); transform: translateX(2px); }
+
+  .example-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+
+  .ex-icon {
+    width: 36px; height: 36px; border-radius: 9px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 17px;
+    background: color-mix(in srgb, var(--ex-color-a) 15%, transparent);
+    border: 1px solid color-mix(in srgb, var(--ex-color-a) 30%, transparent);
+  }
+
+  .ex-meta { flex: 1; }
+  .ex-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 2px; }
+  .ex-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  .ex-tag {
+    font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 500;
+    background: rgba(255,255,255,0.06); color: var(--text-secondary);
+  }
+
+  .ex-use-btn {
+    padding: 5px 14px; border-radius: 6px;
+    background: rgba(124,58,237,0.12);
+    border: 1px solid rgba(167,139,250,0.25);
+    color: var(--purple); font-size: 12px; font-weight: 500;
+    cursor: pointer; white-space: nowrap; transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .ex-use-btn:hover { background: rgba(124,58,237,0.2); border-color: var(--purple); }
+
+  .ex-text { font-size: 13px; color: var(--text-secondary); line-height: 1.6; padding-left: 48px; }
+
+  /* ─── TIPS SECTION ─────────────────────────── */
+  .tips-list { display: flex; flex-direction: column; gap: 10px; }
+
+  .tip-row { display: flex; align-items: flex-start; gap: 12px; }
+
+  .tip-check {
+    width: 20px; height: 20px; border-radius: 50%;
+    background: rgba(16,185,129,0.15);
+    border: 1px solid rgba(16,185,129,0.3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; flex-shrink: 0; margin-top: 1px;
+  }
+
+  .tip-text { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+  .tip-text strong { color: var(--text-primary); font-weight: 600; }
+  .tip-text em { color: var(--text-muted); font-style: italic; }
+
+  /* ─── MATCH IMPACT ──────────────────────────── */
+  .impact-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .impact-card {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px;
+    display: flex; align-items: flex-start; gap: 12px;
+  }
+
+  .impact-icon {
+    width: 34px; height: 34px; border-radius: 8px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 16px;
+    background: rgba(124,58,237,0.12);
+  }
+
+  .impact-name { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 3px; font-family: 'Syne', sans-serif; }
+  .impact-desc { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+
+  /* FIELD TIP */
+  .field-tip { display: flex; align-items: flex-start; gap: 10px; background: rgba(167,139,250,0.06); border: 1px solid rgba(167,139,250,0.15); border-radius: 8px; padding: 12px 14px; margin-top: 16px; }
+  .field-tip p { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+  .field-tip strong { color: var(--purple); }
+
+  /* VALIDATION */
+  .validation-note { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); margin-bottom: 24px; }
+  .validation-dot { width: 6px; height: 6px; border-radius: 50%; }
+
+  /* FORM FOOTER */
+  .form-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 48px;
+    background: rgba(13,11,26,0.95);
+    border-top: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+    position: fixed; bottom: 0;
+    width: calc(100% - 240px); margin-left: 240px;
+    z-index: 50;
+  }
+
+  .btn-draft { display: flex; align-items: center; gap: 8px; padding: 10px 18px; background: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .btn-draft:hover { border-color: var(--purple); color: var(--purple); }
+
+  .footer-right { display: flex; gap: 12px; align-items: center; }
+
+  .btn-back { padding: 10px 24px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .btn-back:hover { color: var(--text-primary); }
+
+  .btn-next {
+    padding: 12px 28px;
+    background: linear-gradient(135deg, var(--purple-dark), #9333ea);
+    border: none; border-radius: 8px; color: white;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    display: flex; align-items: center; gap: 8px;
+    transition: all 0.25s;
+    box-shadow: 0 4px 14px rgba(124,58,237,0.35);
+    opacity: 0.45; pointer-events: none;
+  }
+
+  .btn-next.ready { opacity: 1; pointer-events: all; }
+  .btn-next.ready:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(124,58,237,0.45); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">
+    <div class="logo-icon">🎵</div>
+    EchoVizion
+  </div>
+  <ul class="nav-links">
+    <li><a href="#">Projects</a></li>
+    <li><a href="#" class="active">Create Project</a></li>
+    <li><a href="#">Messages</a></li>
+    <li><a href="#">Profile</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="notif">🔔<div class="notif-dot"></div></div>
+    <div class="avatar">V</div>
+  </div>
+</nav>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div>
+      <div class="sidebar-label">Project Creation</div>
+      <div class="progress-text">Step 5 of 10 · 45%</div>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill"></div></div>
+    </div>
+
+    <div class="steps-list">
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Project Details</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Budget Definition</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Visual Style Selection</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Inspiration References</span></div>
+      <div class="step-item active"><div class="step-num">5</div><span class="step-name">Creative Direction</span></div>
+      <div class="step-item"><div class="step-num">6</div><span class="step-name">Technical Requirements</span></div>
+      <div class="step-item"><div class="step-num">7</div><span class="step-name">Talent & Crew Needs</span></div>
+      <div class="step-item"><div class="step-num">8</div><span class="step-name">Collaboration Style</span></div>
+      <div class="step-item"><div class="step-num">9</div><span class="step-name">Usage Rights</span></div>
+      <div class="step-item"><div class="step-num">10</div><span class="step-name">Review & Submit</span></div>
+    </div>
+
+    <div class="sidebar-help">
+      <p>Not sure what to write? Try one of our example creative directions to spark ideas.</p>
+      <button class="help-btn">💬 Contact Support</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="step-meta">Step 5 of 10</div>
+    <h1 class="step-title"><span>Creative</span> Direction</h1>
+    <p class="step-subtitle">Share your creative vision in detail. This is the most important part of your brief — it carries 50% weight in our matching algorithm and shapes every proposal you receive.</p>
+
+    <div class="context-tags">
+      <span class="ctx-label">Your project:</span>
+      <span class="ctx-tag">🎬 Music Video</span>
+      <span class="ctx-tag">🎵 Afro-Reggae / R&B</span>
+      <span class="ctx-tag">💰 $5K – $15K</span>
+    </div>
+
+    <!-- SECTION 1: MAIN VISION TEXTAREA -->
+    <div class="form-section">
+      <div class="vision-header">
+        <div>
+          <div class="vision-label">Your Creative Vision</div>
+          <div class="vision-hint">Describe your vision in as much detail as possible — themes, emotions, story elements, visual concepts, any ideas you have.</div>
+        </div>
+        <div class="match-weight-badge">
+          <div class="mw-dot"></div>
+          50% Match Weight
+        </div>
+      </div>
+
+      <textarea
+        class="vision-textarea"
+        id="vision-text"
+        maxlength="5000"
+        placeholder="Example: I envision a surreal, dreamlike music video that blends cyberpunk aesthetics with organic nature elements. The video should feel like a journey through a neon-lit forest where technology and nature coexist — exploring themes of connection and disconnection in the digital age. I want intimate close-ups contrasted with wide atmospheric shots, a color palette of deep purples and electric blues, with warm amber tones that break through the digital cold…"
+        oninput="handleVision(this)"
+      ></textarea>
+
+      <div class="textarea-footer">
+        <div>
+          <span class="textarea-hint">
+            <span id="min-req-icon">🟡</span>
+            <span id="min-req-text" style="color:var(--orange);">Minimum 50 characters required</span>
+          </span>
+        </div>
+        <span class="char-count" id="vision-count">0 / 5000</span>
+      </div>
+    </div>
+
+    <!-- SECTION 2: WRITING PROMPTS -->
+    <div class="form-section">
+      <div class="section-title">
+        <div class="section-icon">✍️</div>
+        Need Help Getting Started?
+      </div>
+      <p class="section-subtitle">Click any prompt below to add a starter question to your vision. Answer it in your own words to build up your description.</p>
+
+      <div class="prompts-grid">
+        <div class="prompt-card" id="pcard-themes" onclick="addPrompt('themes')">
+          <div class="prompt-card-header">
+            <div class="prompt-icon" style="background:rgba(244,114,182,0.12);border:1px solid rgba(244,114,182,0.25);">💜</div>
+            <div class="prompt-name">Themes & Emotions</div>
+            <span class="prompt-add" id="padd-themes">+ Add →</span>
+
+          </div>
+          <div class="prompt-hint">What emotions or themes do you want to explore? e.g., love, isolation, triumph, spiritual awakening</div>
+        </div>
+
+        <div class="prompt-card" id="pcard-visual" onclick="addPrompt('visual')">
+          <div class="prompt-card-header">
+            <div class="prompt-icon" style="background:rgba(167,139,250,0.12);border:1px solid rgba(167,139,250,0.25);">🎨</div>
+            <div class="prompt-name">Visual Concepts</div>
+            <span class="prompt-add" id="padd-visual">+ Add →</span>
+          </div>
+          <div class="prompt-hint">Describe specific visual lines, settings, or imagery you envision — locations, lighting, color worlds</div>
+        </div>
+
+        <div class="prompt-card" id="pcard-story" onclick="addPrompt('story')">
+          <div class="prompt-card-header">
+            <div class="prompt-icon" style="background:rgba(251,191,36,0.12);border:1px solid rgba(251,191,36,0.25);">📖</div>
+            <div class="prompt-name">Story & Narrative</div>
+            <span class="prompt-add" id="padd-story">+ Add →</span>
+          </div>
+          <div class="prompt-hint">Is there a story or narrative you want to tell? A character arc, journey, or abstract progression?</div>
+        </div>
+
+        <div class="prompt-card" id="pcard-mood" onclick="addPrompt('mood')">
+          <div class="prompt-card-header">
+            <div class="prompt-icon" style="background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.25);">🌊</div>
+            <div class="prompt-name">Mood & Atmosphere</div>
+            <span class="prompt-add" id="padd-mood">+ Add →</span>
+          </div>
+          <div class="prompt-hint">What's the overall mood? Dark, uplifting, mysterious, energetic? How should the viewer feel watching it?</div>
+        </div>
+
+        <div class="prompt-card" id="pcard-camera" onclick="addPrompt('camera')">
+          <div class="prompt-card-header">
+            <div class="prompt-icon" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);">🎥</div>
+            <div class="prompt-name">Camera & Movement</div>
+            <span class="prompt-add" id="padd-camera">+ Add →</span>
+          </div>
+          <div class="prompt-hint">Any specific camera work, angles, or movement styles? Handheld, smooth glides, drone shots, close-ups?</div>
+        </div>
+
+        <div class="prompt-card" id="pcard-performance" onclick="addPrompt('performance')">
+          <div class="prompt-card-header">
+            <div class="prompt-icon" style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.2);">⭐</div>
+            <div class="prompt-name">Performance Style</div>
+            <span class="prompt-add" id="padd-performance">+ Add →</span>
+          </div>
+          <div class="prompt-hint">How do you want to be portrayed? Performance-based, narrative, abstract, behind the scenes?</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 3: MOOD KEYWORDS -->
+    <div class="form-section">
+      <div class="section-title">
+        <div class="section-icon">🏷️</div>
+        Mood Keywords
+        <span style="font-size:11px;color:var(--text-muted);font-weight:400;margin-left:4px;">(Optional)</span>
+      </div>
+      <p class="section-subtitle">Add quick mood descriptors to complement your written vision. These help refine matching precision.</p>
+
+      <div class="keyword-input-row">
+        <input
+          type="text"
+          class="keyword-input"
+          id="keyword-input"
+          placeholder="Type a mood keyword and press Enter…"
+          onkeydown="handleKeywordInput(event)"
+        >
+        <button class="keyword-add-btn" onclick="addKeywordFromInput()">+</button>
+      </div>
+
+      <div class="popular-label">Popular Mood Keywords</div>
+      <div class="keyword-pills">
+        <div class="keyword-pill" onclick="toggleKeyword(this, 'Cinematic')">Cinematic</div>
+        <div class="keyword-pill" onclick="toggleKeyword(this, 'Dreamy')">Dreamy</div>
+        <div class="keyword-pill" onclick="toggleKeyword(this, 'Energetic')">Energetic</div>
+        <div class="keyword-pill" onclick="toggleKeyword(this, 'Dark')">Dark</div>
+        <div class="keyword-pill" onclick="toggleKeyword(this, 'Intimate')">Intimate</div>
+        <div class="keyword-pill" onclick="toggleKeyword(this, 'Vibrant')">Vibrant</div>
+        <div class="keyword-pill" onclick="toggleKeyword(this, 'Moody')">Moody</div>
+        <div class="keyword-pill" onclick="toggleKeyword(this, 'Surreal')">Surreal</div>
+        <div class="keyword-pill" onclick="toggleKeyword(this, 'Nostalgic')">Nostalgic</div>
+        <div class="keyword-pill" onclick="toggleKeyword(this, 'Futuristic')">Futuristic</div>
+        <div class="keyword-pill" onclick="toggleKeyword(this, 'Romantic')">Romantic</div>
+        <div class="keyword-pill" onclick="toggleKeyword(this, 'Gritty')">Gritty</div>
+        <div class="keyword-pill" onclick="toggleKeyword(this, 'Ethereal')">Ethereal</div>
+        <div class="keyword-pill" onclick="toggleKeyword(this, 'Bold')">Bold</div>
+        <div class="keyword-pill" onclick="toggleKeyword(this, 'Minimalist')">Minimalist</div>
+        <div class="keyword-pill" onclick="toggleKeyword(this, 'Chaotic')">Chaotic</div>
+      </div>
+
+      <!-- SELECTED KEYWORDS -->
+      <div class="selected-keywords" id="selected-keywords"></div>
+    </div>
+
+    <!-- SECTION 4: EXAMPLE DIRECTIONS -->
+    <div class="form-section">
+      <div class="section-title">
+        <div class="section-icon">💡</div>
+        Example Creative Directions
+      </div>
+      <p class="section-subtitle">Be inspired by these well-written creative visions from other artists. Click "Use as Template" to load one into your vision field.</p>
+
+      <div class="examples-list">
+
+        <div class="example-card" style="--ex-color-a:#a78bfa;--ex-color-b:#f472b6;">
+          <div class="example-header">
+            <div class="ex-icon">🌆</div>
+            <div class="ex-meta">
+              <div class="ex-title">Cyberpunk Romance</div>
+              <div class="ex-tags">
+                <span class="ex-tag">Electronic / Pop</span>
+                <span class="ex-tag">Mid Range Budget</span>
+              </div>
+            </div>
+            <button class="ex-use-btn" onclick="useExample('cyberpunk')">Use as Template</button>
+          </div>
+          <div class="ex-text">
+            I envision a neon-soaked love story set in a dystopian future. The video should blend intimate close-ups with wide cityscapes, using a color palette of electric blues, hot pinks, and deep shadows. The mood is bittersweet — two people in love surrounded by a cold, indifferent world. I want the camera to feel restless and alive, always moving, always searching.
+          </div>
+        </div>
+
+        <div class="example-card" style="--ex-color-a:#10b981;--ex-color-b:#06b6d4;">
+          <div class="example-header">
+            <div class="ex-icon">🌿</div>
+            <div class="ex-meta">
+              <div class="ex-title">Nature & Rebirth</div>
+              <div class="ex-tags">
+                <span class="ex-tag">Folk / Indie</span>
+                <span class="ex-tag">Entry Budget</span>
+              </div>
+            </div>
+            <button class="ex-use-btn" onclick="useExample('nature')">Use as Template</button>
+          </div>
+          <div class="ex-text">
+            A journey through natural landscapes representing personal transformation. I want slow, contemplative camera movements through forests, mountains, and open water. The color grade should feel warm and organic — golden hour light, film grain, soft focus. No dialogue, no narrative — just emotion carried through movement and environment.
+          </div>
+        </div>
+
+        <div class="example-card" style="--ex-color-a:#f59e0b;--ex-color-b:#ef4444;">
+          <div class="example-header">
+            <div class="ex-icon">🔥</div>
+            <div class="ex-meta">
+              <div class="ex-title">High Energy Performance</div>
+              <div class="ex-tags">
+                <span class="ex-tag">Hip-Hop / Trap</span>
+                <span class="ex-tag">Mid-Range Budget</span>
+              </div>
+            </div>
+            <button class="ex-use-btn" onclick="useExample('hype')">Use as Template</button>
+          </div>
+          <div class="ex-text">
+            Bold, unapologetic performance video with dynamic camera work and rapid cuts. I want multiple locations — warehouse, rooftop, streets. Elaborate choreography, striking visual effects, and a color palette that pops on mobile screens. The energy should feel like a live concert captured on film. Every shot needs to hit as hard as the beat.
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SECTION 5: WRITING TIPS -->
+    <div class="form-section" style="background:rgba(16,185,129,0.04);border-color:rgba(16,185,129,0.2);">
+      <div class="section-title">
+        <div class="section-icon" style="background:rgba(16,185,129,0.15);">✅</div>
+        Tips for Writing Great Creative Direction
+      </div>
+
+      <div class="tips-list">
+        <div class="tip-row">
+          <div class="tip-check" style="color:var(--green);">✓</div>
+          <div class="tip-text"><strong>Be specific.</strong> Instead of "dark and moody," try <em>"real-inspired with high contrast shadows and single-source lighting"</em></div>
+        </div>
+        <div class="tip-row">
+          <div class="tip-check" style="color:var(--green);">✓</div>
+          <div class="tip-text"><strong>Use references.</strong> Mention films, music videos, or artists that capture your vision — creatives speak this language fluently</div>
+        </div>
+        <div class="tip-row">
+          <div class="tip-check" style="color:var(--green);">✓</div>
+          <div class="tip-text"><strong>Describe emotions.</strong> How should viewers feel? What journey do you want to take them on through this video?</div>
+        </div>
+        <div class="tip-row">
+          <div class="tip-check" style="color:var(--green);">✓</div>
+          <div class="tip-text"><strong>Include technical details.</strong> Camera angles, color palette, lighting styles, pacing — even a rough idea helps creatives scope accurately</div>
+        </div>
+        <div class="tip-row">
+          <div class="tip-check" style="color:var(--green);">✓</div>
+          <div class="tip-text"><strong>Explain the why.</strong> Share the meaning behind your vision and what you want to communicate — the best creatives connect with intention</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 6: MATCH IMPACT -->
+    <div class="form-section">
+      <div class="section-title">
+        <div class="section-icon">🎯</div>
+        How This Impacts Your Matches
+      </div>
+      <p class="section-subtitle" style="margin-bottom:16px;">Your creative direction is the single most powerful factor in finding the right creative partner.</p>
+
+      <div class="impact-grid">
+        <div class="impact-card">
+          <div class="impact-icon">⚖️</div>
+          <div>
+            <div class="impact-name">50% Algorithm Weight</div>
+            <div class="impact-desc">Your creative direction is the most important factor in matching you to creatives who genuinely fit your vision</div>
+          </div>
+        </div>
+        <div class="impact-card">
+          <div class="impact-icon">🔍</div>
+          <div>
+            <div class="impact-name">Keyword Matching</div>
+            <div class="impact-desc">We analyze your description to match you with creatives who have portfolios with similar aesthetic preferences</div>
+          </div>
+        </div>
+        <div class="impact-card">
+          <div class="impact-icon">🖼️</div>
+          <div>
+            <div class="impact-name">Style Alignment</div>
+            <div class="impact-desc">Your vision is matched with creatives whose portfolio demonstrates a close alignment with your described aesthetic</div>
+          </div>
+        </div>
+        <div class="impact-card">
+          <div class="impact-icon">🤝</div>
+          <div>
+            <div class="impact-name">Better Collaboration</div>
+            <div class="impact-desc">Clear direction sets expectations early and leads to more successful, on-brief creative partnerships and fewer revisions</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VALIDATION NOTE -->
+    <div class="validation-note" id="validation-note">
+      <div class="validation-dot" id="val-dot" style="background:var(--orange);"></div>
+      <span id="val-text" style="color:var(--orange);">Write at least 50 characters to continue</span>
+    </div>
+
+    <div style="height:40px;"></div>
+  </main>
+</div>
+
+<!-- FOOTER -->
+<div class="form-footer">
+  <button class="btn-draft">💾 Save as Draft</button>
+  <div class="footer-right">
+    <span id="footer-status" style="font-size:13px;color:var(--text-muted);">Start writing your vision above</span>
+    <button class="btn-back">← Back</button>
+    <button class="btn-next" id="next-btn">Next: Visual Style →</button>
+  </div>
+</div>
+
+<script>
+  // ─── EXAMPLES ───────────────────────────────────────
+  const examples = {
+    cyberpunk: `I envision a neon-soaked love story set in a dystopian future. The video should blend intimate close-ups with wide cityscapes, using a color palette of electric blues, hot pinks, and deep shadows. The mood is bittersweet — two people in love surrounded by a cold, indifferent world. I want the camera to feel restless and alive, always moving, always searching. Inspired by the visual language of Blade Runner 2049 and FKA twigs' visual world.`,
+    nature: `A journey through natural landscapes representing personal transformation. I want slow, contemplative camera movements through forests, mountains, and open water. The color grade should feel warm and organic — golden hour light, film grain, soft focus. No dialogue, no narrative — just emotion carried through movement and environment. The viewer should feel a sense of peace, grief, and renewal simultaneously.`,
+    hype: `Bold, unapologetic performance video with dynamic camera work and rapid cuts. I want multiple locations — warehouse, rooftop, streets at night. Elaborate choreography, striking visual effects, and a color palette that pops on mobile screens. The energy should feel like a live concert captured on film. Every shot needs to hit as hard as the beat. Inspired by Kendrick Lamar's "HUMBLE." and Travis Scott's "SICKO MODE" visuals.`
+  };
+
+  // ─── PROMPTS ─────────────────────────────────────────
+  const promptText = {
+    themes: '\n\n[THEMES & EMOTIONS] What emotions or themes do you want to explore? ',
+    visual: '\n\n[VISUAL CONCEPTS] Describe specific visual settings, imagery, or locations you envision: ',
+    story: '\n\n[STORY & NARRATIVE] Is there a story or narrative arc you want to tell? ',
+    mood: '\n\n[MOOD & ATMOSPHERE] What is the overall mood and how should viewers feel? ',
+    camera: '\n\n[CAMERA & MOVEMENT] Any specific camera work, angles, or movement styles? ',
+    performance: '\n\n[PERFORMANCE STYLE] How do you want to be portrayed in the video? '
+  };
+
+  const usedPrompts = new Set();
+
+  function addPrompt(key) {
+    const ta = document.getElementById('vision-text');
+    const card = document.getElementById(`pcard-${key}`);
+    const addSpan = document.getElementById(`padd-${key}`);
+
+    if (usedPrompts.has(key)) {
+      // Toggle OFF — remove the prompt block from textarea
+      const marker = promptText[key];
+      // Remove from wherever it appears in the text
+      // Find from the marker to the next marker or end
+      const allMarkers = Object.values(promptText);
+      let text = ta.value;
+      const markerIdx = text.indexOf(marker);
+      if (markerIdx !== -1) {
+        // Find end: next marker start or end of string
+        let endIdx = text.length;
+        for (const m of allMarkers) {
+          if (m === marker) continue;
+          const nextIdx = text.indexOf(m, markerIdx + marker.length);
+          if (nextIdx !== -1 && nextIdx < endIdx) endIdx = nextIdx;
+        }
+        text = text.slice(0, markerIdx) + text.slice(endIdx);
+        ta.value = text.trimEnd();
+      }
+      usedPrompts.delete(key);
+      card.classList.remove('used');
+      addSpan.textContent = '+ Add →';
+    } else {
+      // Add prompt
+      ta.value += promptText[key];
+      usedPrompts.add(key);
+      card.classList.add('used');
+      addSpan.textContent = '✓ Added — click to remove';
+    }
+
+    ta.focus();
+    ta.scrollTop = ta.scrollHeight;
+    handleVision(ta);
+  }
+
+  function useExample(key) {
+    const ta = document.getElementById('vision-text');
+    if (ta.value.trim().length > 0) {
+      if (!confirm('This will replace your current vision text. Continue?')) return;
+    }
+    ta.value = examples[key];
+    ta.focus();
+    handleVision(ta);
+  }
+
+  // ─── TEXTAREA LOGIC ──────────────────────────────────
+  function handleVision(ta) {
+    const len = ta.value.length;
+    const trimmed = ta.value.trim().length;
+
+    // char count
+    const counter = document.getElementById('vision-count');
+    counter.textContent = `${len.toLocaleString()} / 5,000`;
+    counter.className = 'char-count' + (trimmed >= 50 ? ' good' : '');
+
+    // min requirement
+    const reqIcon = document.getElementById('min-req-icon');
+    const reqText = document.getElementById('min-req-text');
+    if (trimmed >= 50) {
+      reqIcon.textContent = '🟢';
+      reqText.textContent = 'Great — ready to continue';
+      reqText.style.color = 'var(--green)';
+    } else {
+      reqIcon.textContent = '🟡';
+      reqText.textContent = `Minimum 50 characters required (${trimmed} so far)`;
+      reqText.style.color = 'var(--orange)';
+    }
+
+    updateFooter(trimmed >= 50);
+  }
+
+  function updateFooter(ready) {
+    const btn = document.getElementById('next-btn');
+    const status = document.getElementById('footer-status');
+    const dot = document.getElementById('val-dot');
+    const valText = document.getElementById('val-text');
+
+    if (ready) {
+      btn.classList.add('ready');
+      status.textContent = '✅ Vision complete — ready to continue';
+      status.style.color = 'var(--green)';
+      dot.style.background = 'var(--green)';
+      valText.textContent = 'Creative vision complete';
+      valText.style.color = 'var(--green)';
+    } else {
+      btn.classList.remove('ready');
+      status.textContent = 'Write your creative vision to continue';
+      status.style.color = 'var(--text-muted)';
+      dot.style.background = 'var(--orange)';
+      valText.textContent = 'Write at least 50 characters to continue';
+      valText.style.color = 'var(--orange)';
+    }
+  }
+
+  // ─── KEYWORDS ───────────────────────────────────────
+  const selectedKeywords = new Set();
+
+  function toggleKeyword(pill, word) {
+    if (selectedKeywords.has(word)) {
+      selectedKeywords.delete(word);
+      pill.classList.remove('selected');
+      removeSelectedTag(word);
+    } else {
+      selectedKeywords.add(word);
+      pill.classList.add('selected');
+      addSelectedTag(word);
+    }
+  }
+
+  function addSelectedTag(word) {
+    const container = document.getElementById('selected-keywords');
+    const tag = document.createElement('span');
+    tag.className = 'sel-keyword';
+    tag.id = 'kw-' + word.replace(/\s/g, '_');
+    tag.innerHTML = `${word} <button onclick="removeKeyword('${word}')">×</button>`;
+    container.appendChild(tag);
+  }
+
+  function removeSelectedTag(word) {
+    const el = document.getElementById('kw-' + word.replace(/\s/g, '_'));
+    if (el) el.remove();
+  }
+
+  function removeKeyword(word) {
+    selectedKeywords.delete(word);
+    removeSelectedTag(word);
+    // unselect pill if exists
+    document.querySelectorAll('.keyword-pill').forEach(p => {
+      if (p.textContent.trim() === word) p.classList.remove('selected');
+    });
+  }
+
+  function addKeywordFromInput() {
+    const input = document.getElementById('keyword-input');
+    const word = input.value.trim();
+    if (!word || selectedKeywords.has(word)) { input.value = ''; return; }
+    selectedKeywords.add(word);
+    addSelectedTag(word);
+    input.value = '';
+    input.focus();
+  }
+
+  function handleKeywordInput(e) {
+    if (e.key === 'Enter') { e.preventDefault(); addKeywordFromInput(); }
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EchoVizion – Collaboration Style</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0d0b1a;
+    --sidebar-bg: #120f24;
+    --card-bg: #1a1630;
+    --purple: #a78bfa;
+    --purple-dark: #7c3aed;
+    --pink: #f472b6;
+    --green: #10b981;
+    --orange: #f59e0b;
+    --teal: #06b6d4;
+    --border: #2a2448;
+    --text-primary: #f1f0ff;
+    --text-secondary: #9ca3af;
+    --text-muted: #6b7280;
+  }
+
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; }
+
+  /* NAV */
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 0 32px; height: 56px; background: rgba(13,11,26,0.95); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(12px); }
+  .logo { display: flex; align-items: center; gap: 10px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 18px; }
+  .logo-icon { width: 30px; height: 30px; background: linear-gradient(135deg, var(--purple-dark), var(--pink)); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 14px; font-weight: 500; }
+  .nav-links a.active { color: var(--text-primary); border-bottom: 2px solid var(--purple); padding-bottom: 2px; }
+  .nav-right { display: flex; align-items: center; gap: 16px; }
+  .notif { width: 32px; height: 32px; border-radius: 50%; background: var(--card-bg); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 14px; position: relative; cursor: pointer; }
+  .notif-dot { position: absolute; top: 6px; right: 6px; width: 6px; height: 6px; border-radius: 50%; background: var(--pink); }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--purple-dark), var(--pink)); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: white; }
+
+  .layout { display: flex; flex: 1; }
+
+  /* SIDEBAR */
+  .sidebar { width: 240px; background: var(--sidebar-bg); border-right: 1px solid var(--border); padding: 24px 16px; position: sticky; top: 56px; height: calc(100vh - 56px); overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+  .sidebar-proj-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); font-weight: 500; margin-bottom: 2px; }
+  .sidebar-step-label { font-size: 13px; color: var(--purple); font-weight: 600; font-family: 'Syne', sans-serif; margin-bottom: 10px; }
+  .progress-bar-wrap { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; margin-bottom: 6px; }
+  .progress-bar-fill { height: 100%; width: 80%; background: linear-gradient(90deg, var(--purple-dark), var(--pink)); border-radius: 2px; }
+  .progress-pct { font-size: 12px; color: var(--text-muted); }
+  .progress-pct strong { color: var(--text-secondary); font-weight: 500; }
+  .steps-list { display: flex; flex-direction: column; gap: 2px; }
+  .step-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; cursor: pointer; border: 1px solid transparent; transition: all 0.15s; }
+  .step-item.active { background: rgba(124,58,237,0.15); border-color: rgba(167,139,250,0.3); }
+  .step-item.completed .step-num { background: var(--purple-dark); color: white; }
+  .step-item.completed .step-name { color: var(--text-secondary); }
+  .step-num { width: 22px; height: 22px; border-radius: 50%; background: var(--border); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: var(--text-muted); flex-shrink: 0; }
+  .step-item.active .step-num { background: linear-gradient(135deg, var(--purple-dark), var(--purple)); color: white; }
+  .step-name { font-size: 13px; color: var(--text-muted); }
+  .step-item.active .step-name { color: var(--text-primary); font-weight: 500; }
+  .sidebar-help { margin-top: auto; padding: 14px; background: var(--card-bg); border-radius: 10px; border: 1px solid var(--border); }
+  .sidebar-help p { font-size: 12px; color: var(--text-secondary); margin-bottom: 10px; line-height: 1.5; }
+  .help-btn { width: 100%; padding: 8px; background: linear-gradient(135deg, var(--purple-dark), #9333ea); border: none; border-radius: 8px; color: white; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+
+  /* MAIN */
+  .main { flex: 1; padding: 36px 48px 140px; max-width: 860px; }
+
+  .page-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 10px; }
+  .page-header-icon { width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, var(--purple-dark), var(--pink)); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  .step-meta { font-size: 12px; color: var(--purple); font-weight: 500; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.08em; }
+  .step-title { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; color: var(--text-primary); }
+  .step-subtitle { font-size: 13px; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.7; max-width: 640px; }
+
+  /* WHY THIS MATTERS */
+  .why-banner {
+    display: flex; align-items: flex-start; gap: 14px;
+    background: linear-gradient(135deg, rgba(124,58,237,0.08), rgba(244,114,182,0.05));
+    border: 1px solid rgba(167,139,250,0.2);
+    border-radius: 12px; padding: 18px 20px; margin-bottom: 24px;
+  }
+  .why-icon { width: 34px; height: 34px; border-radius: 9px; background: rgba(124,58,237,0.15); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .why-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+  .why-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.7; }
+
+  /* SECTION */
+  .section-label { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+  .section-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 16px; }
+
+  /* ─── OPTION CARDS ──────────────────────────── */
+  .options-stack { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+
+  .option-card {
+    background: var(--card-bg);
+    border: 2px solid var(--border);
+    border-radius: 14px; padding: 22px 24px;
+    cursor: pointer; transition: all 0.22s;
+    position: relative; overflow: hidden;
+  }
+
+  .option-card::before {
+    content: ''; position: absolute; inset: 0;
+    opacity: 0; transition: opacity 0.22s;
+    border-radius: 12px;
+  }
+
+  .option-card:hover { border-color: rgba(167,139,250,0.4); transform: translateY(-1px); }
+
+  /* Per-card accent colors */
+  .option-card[data-style="full"]::before    { background: linear-gradient(135deg, rgba(167,139,250,0.08), rgba(124,58,237,0.04)); }
+  .option-card[data-style="trust"]::before   { background: linear-gradient(135deg, rgba(16,185,129,0.07), rgba(6,182,212,0.04)); }
+  .option-card[data-style="handson"]::before { background: linear-gradient(135deg, rgba(244,114,182,0.07), rgba(245,158,11,0.04)); }
+
+  .option-card.selected { transform: none; }
+  .option-card[data-style="full"].selected    { border-color: var(--purple); box-shadow: 0 0 0 1px rgba(167,139,250,0.2), 0 8px 32px rgba(124,58,237,0.15); }
+  .option-card[data-style="trust"].selected   { border-color: var(--green); box-shadow: 0 0 0 1px rgba(16,185,129,0.2), 0 8px 32px rgba(16,185,129,0.12); }
+  .option-card[data-style="handson"].selected { border-color: var(--pink); box-shadow: 0 0 0 1px rgba(244,114,182,0.2), 0 8px 32px rgba(244,114,182,0.1); }
+  .option-card.selected::before { opacity: 1; }
+
+  /* OPTION HEADER */
+  .option-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 10px; }
+
+  .option-icon {
+    width: 42px; height: 42px; border-radius: 11px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 20px;
+    transition: all 0.2s;
+  }
+  .option-card[data-style="full"] .option-icon    { background: rgba(167,139,250,0.12); border: 1px solid rgba(167,139,250,0.25); }
+  .option-card[data-style="trust"] .option-icon   { background: rgba(16,185,129,0.1);  border: 1px solid rgba(16,185,129,0.25);  }
+  .option-card[data-style="handson"] .option-icon { background: rgba(244,114,182,0.1); border: 1px solid rgba(244,114,182,0.25); }
+
+  .option-card[data-style="full"].selected .option-icon    { background: rgba(167,139,250,0.2); border-color: var(--purple); }
+  .option-card[data-style="trust"].selected .option-icon   { background: rgba(16,185,129,0.18); border-color: var(--green); }
+  .option-card[data-style="handson"].selected .option-icon { background: rgba(244,114,182,0.18); border-color: var(--pink); }
+
+  .option-title-col { flex: 1; }
+  .option-title { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px; }
+  .option-tagline { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+
+  /* RADIO RING */
+  .option-radio {
+    width: 22px; height: 22px; border-radius: 50%;
+    border: 2px solid var(--border); flex-shrink: 0; margin-top: 2px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .option-card[data-style="full"].selected .option-radio    { border-color: var(--purple); background: var(--purple-dark); }
+  .option-card[data-style="trust"].selected .option-radio   { border-color: var(--green); background: rgba(16,185,129,0.8); }
+  .option-card[data-style="handson"].selected .option-radio { border-color: var(--pink); background: rgba(244,114,182,0.75); }
+  .option-card.selected .option-radio::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: white; }
+
+  /* WHAT THIS MEANS — revealed on select */
+  .option-details {
+    max-height: 0; overflow: hidden;
+    transition: max-height 0.35s ease, opacity 0.25s ease;
+    opacity: 0;
+  }
+  .option-card.selected .option-details { max-height: 400px; opacity: 1; }
+
+  .option-divider { height: 1px; background: var(--border); margin: 16px 0; opacity: 0.6; }
+
+  .wtm-label {
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 10px;
+  }
+
+  .wtm-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+
+  .wtm-row { display: flex; align-items: flex-start; gap: 10px; }
+  .wtm-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+  .option-card[data-style="full"] .wtm-dot    { background: var(--purple); }
+  .option-card[data-style="trust"] .wtm-dot   { background: var(--green); }
+  .option-card[data-style="handson"] .wtm-dot { background: var(--pink); }
+  .wtm-text { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+
+  /* BEST FOR BADGE */
+  .best-for {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500;
+  }
+  .option-card[data-style="full"] .best-for    { background: rgba(167,139,250,0.1); border: 1px solid rgba(167,139,250,0.25); color: var(--purple); }
+  .option-card[data-style="trust"] .best-for   { background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.25); color: var(--green); }
+  .option-card[data-style="handson"] .best-for { background: rgba(244,114,182,0.08); border: 1px solid rgba(244,114,182,0.25); color: var(--pink); }
+
+  /* ─── HOW THIS AFFECTS MATCHES ──────────────── */
+  .match-section { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 24px; margin-bottom: 14px; }
+  .match-header { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .match-header-icon { width: 28px; height: 28px; border-radius: 7px; background: rgba(124,58,237,0.15); display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .match-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--text-primary); }
+  .match-desc { font-size: 13px; color: var(--text-secondary); margin-bottom: 20px; line-height: 1.6; padding-left: 38px; }
+
+  .match-cards { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+  .match-card {
+    border-radius: 12px; padding: 16px; border: 1px solid var(--border);
+    background: rgba(255,255,255,0.02); transition: all 0.2s;
+  }
+
+  .match-card.highlighted-full    { border-color: rgba(167,139,250,0.45); background: rgba(167,139,250,0.07); }
+  .match-card.highlighted-trust   { border-color: rgba(16,185,129,0.4);   background: rgba(16,185,129,0.06);  }
+  .match-card.highlighted-handson { border-color: rgba(244,114,182,0.4);  background: rgba(244,114,182,0.06); }
+
+  .mc-icon { font-size: 22px; margin-bottom: 8px; }
+  .mc-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 5px; }
+  .mc-desc { font-size: 12px; color: var(--text-muted); line-height: 1.6; }
+
+  /* ─── FLEXIBILITY NOTE ───────────────────────── */
+  .flex-section {
+    display: flex; align-items: flex-start; gap: 14px;
+    background: rgba(245,158,11,0.05); border: 1px solid rgba(245,158,11,0.2);
+    border-radius: 12px; padding: 18px 20px; margin-bottom: 14px;
+  }
+  .flex-icon { width: 34px; height: 34px; border-radius: 9px; background: rgba(245,158,11,0.12); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .flex-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+  .flex-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 8px; }
+  .flex-tip { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: var(--orange); background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2); border-radius: 6px; padding: 4px 10px; }
+
+  /* VALIDATION */
+  .validation-note { display: flex; align-items: center; gap: 8px; font-size: 12px; margin-bottom: 24px; margin-top: 8px; }
+  .validation-dot { width: 6px; height: 6px; border-radius: 50%; }
+
+  /* FOOTER */
+  .form-footer { display: flex; align-items: center; justify-content: space-between; padding: 20px 48px; background: rgba(13,11,26,0.95); border-top: 1px solid var(--border); backdrop-filter: blur(12px); position: fixed; bottom: 0; width: calc(100% - 240px); margin-left: 240px; z-index: 50; }
+  .btn-draft { display: flex; align-items: center; gap: 8px; padding: 10px 18px; background: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .btn-draft:hover { border-color: var(--purple); color: var(--purple); }
+  .footer-right { display: flex; gap: 12px; align-items: center; }
+  .btn-back { padding: 10px 24px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .btn-back:hover { color: var(--text-primary); }
+  .btn-next { padding: 12px 28px; background: linear-gradient(135deg, var(--purple-dark), #9333ea); border: none; border-radius: 8px; color: white; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; display: flex; align-items: center; gap: 8px; transition: all 0.25s; box-shadow: 0 4px 14px rgba(124,58,237,0.35); opacity: 0.45; pointer-events: none; }
+  .btn-next.ready { opacity: 1; pointer-events: all; }
+  .btn-next.ready:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(124,58,237,0.45); }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">
+    <div class="logo-icon">🎵</div>
+    EchoVizion
+  </div>
+  <ul class="nav-links">
+    <li><a href="#">Projects</a></li>
+    <li><a href="#" class="active">Create Project</a></li>
+    <li><a href="#">Messages</a></li>
+    <li><a href="#">Profile</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="notif">🔔<div class="notif-dot"></div></div>
+    <div class="avatar">V</div>
+  </div>
+</nav>
+
+<div class="layout">
+
+  <aside class="sidebar">
+    <div>
+      <div class="sidebar-proj-label">Project Creation</div>
+      <div class="sidebar-step-label">Step 8/10</div>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill"></div></div>
+      <div class="progress-pct"><strong>80% Complete</strong></div>
+    </div>
+    <div class="steps-list">
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Project Details</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Budget Definition</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Creative Direction</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Visual Style Selection</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Inspiration References</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Technical Requirements</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Talent & Crew Needs</span></div>
+      <div class="step-item active"><div class="step-num">8</div><span class="step-name">Collaboration Style</span></div>
+      <div class="step-item"><div class="step-num">9</div><span class="step-name">Location & Travel</span></div>
+      <div class="step-item"><div class="step-num">10</div><span class="step-name">Review & Submit</span></div>
+    </div>
+    <div class="sidebar-help">
+      <p>There's no right or wrong answer — pick what honestly describes how you like to work.</p>
+      <button class="help-btn">💬 Contact Support</button>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <div class="page-header">
+      <div class="page-header-icon">🤝</div>
+      <div>
+        <div class="step-meta">Step 8 of 10</div>
+        <h1 class="step-title">Collaboration Style</h1>
+      </div>
+    </div>
+
+    <p class="step-subtitle">How involved do you want to be in the creative process? Setting clear expectations upfront ensures a smooth collaboration and results that align with your vision.</p>
+
+    <!-- WHY THIS MATTERS -->
+    <div class="why-banner">
+      <div class="why-icon">💡</div>
+      <div>
+        <div class="why-title">Why This Matters</div>
+        <div class="why-desc">Your collaboration style preference helps match you with creatives who work best with your approach. Some directors thrive with artistic freedom, while others excel at bringing your detailed vision to life. There's no right or wrong answer — just what works best for you and your project.</div>
+      </div>
+    </div>
+
+    <!-- CHOOSE YOUR APPROACH -->
+    <div class="section-label">Choose Your Collaboration Approach</div>
+    <div class="section-sub">Select the one that best describes how you prefer to work with creative directors</div>
+
+    <div class="options-stack">
+
+      <!-- OPTION 1: FULL COLLABORATION -->
+      <div class="option-card" data-style="full" id="opt-full" onclick="selectOption('full')">
+        <div class="option-header">
+          <div class="option-icon">🤝</div>
+          <div class="option-title-col">
+            <div class="option-title">Full Collaboration</div>
+            <div class="option-tagline">I want to be actively involved throughout the entire creative process — contributing ideas, reviewing progress, and making joint decisions while trusting the director's expertise.</div>
+          </div>
+          <div class="option-radio" id="radio-full"></div>
+        </div>
+
+        <div class="option-details" id="details-full">
+          <div class="option-divider"></div>
+          <div class="wtm-label">What this means in practice</div>
+          <div class="wtm-list">
+            <div class="wtm-row"><div class="wtm-dot"></div><div class="wtm-text">Regular check-ins and progress reviews throughout pre-production and production</div></div>
+            <div class="wtm-row"><div class="wtm-dot"></div><div class="wtm-text">Joint decision-making on creative direction, casting, locations, and key visual choices</div></div>
+            <div class="wtm-row"><div class="wtm-dot"></div><div class="wtm-text">Active feedback loop — you review concepts and cuts early, not just at the end</div></div>
+            <div class="wtm-row"><div class="wtm-dot"></div><div class="wtm-text">Balance between your vision and the director's creative expertise — a true partnership</div></div>
+          </div>
+          <div class="best-for">🎯 Best for: Artists who value partnership and shared creative ownership</div>
+        </div>
+      </div>
+
+      <!-- OPTION 2: TRUST THE CREATIVE -->
+      <div class="option-card" data-style="trust" id="opt-trust" onclick="selectOption('trust')">
+        <div class="option-header">
+          <div class="option-icon">✨</div>
+          <div class="option-title-col">
+            <div class="option-title">Trust the Creative</div>
+            <div class="option-tagline">I'll share my vision and inspiration upfront, then give the director creative freedom to execute. I trust their expertise and prefer to review work at key milestones rather than day-to-day decisions.</div>
+          </div>
+          <div class="option-radio" id="radio-trust"></div>
+        </div>
+
+        <div class="option-details" id="details-trust">
+          <div class="option-divider"></div>
+          <div class="wtm-label">What this means in practice</div>
+          <div class="wtm-list">
+            <div class="wtm-row"><div class="wtm-dot"></div><div class="wtm-text">Initial creative briefing followed by director-led development and production</div></div>
+            <div class="wtm-row"><div class="wtm-dot"></div><div class="wtm-text">Review and approval at major milestones only — concept deck, rough cut, final cut</div></div>
+            <div class="wtm-row"><div class="wtm-dot"></div><div class="wtm-text">Director has autonomy for creative decisions within the scope of your brief</div></div>
+            <div class="wtm-row"><div class="wtm-dot"></div><div class="wtm-text">Less frequent communication — more trust in the process between touchpoints</div></div>
+          </div>
+          <div class="best-for">✨ Best for: Artists who value creative freedom and trust expert execution</div>
+        </div>
+      </div>
+
+      <!-- OPTION 3: HANDS-ON DIRECTOR -->
+      <div class="option-card" data-style="handson" id="opt-handson" onclick="selectOption('handson')">
+        <div class="option-header">
+          <div class="option-icon">🎯</div>
+          <div class="option-title-col">
+            <div class="option-title">Hands-On Director</div>
+            <div class="option-tagline">I have a very specific vision and want to be involved in all aspects of production. I need a creative who can expertly execute my detailed direction while contributing their technical expertise and problem-solving skills.</div>
+          </div>
+          <div class="option-radio" id="radio-handson"></div>
+        </div>
+
+        <div class="option-details" id="details-handson">
+          <div class="option-divider"></div>
+          <div class="wtm-label">What this means in practice</div>
+          <div class="wtm-list">
+            <div class="wtm-row"><div class="wtm-dot"></div><div class="wtm-text">You provide detailed creative direction, references, and specific requirements upfront</div></div>
+            <div class="wtm-row"><div class="wtm-dot"></div><div class="wtm-text">Frequent communication and approval at every stage of the process</div></div>
+            <div class="wtm-row"><div class="wtm-dot"></div><div class="wtm-text">Creative focuses on technical execution and problem-solving within your direction</div></div>
+            <div class="wtm-row"><div class="wtm-dot"></div><div class="wtm-text">You maintain creative control throughout with expert technical support</div></div>
+          </div>
+          <div class="best-for">🎯 Best for: Artists with a clear vision who need expert technical execution</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- HOW THIS AFFECTS MATCHING -->
+    <div class="match-section">
+      <div class="match-header">
+        <div class="match-header-icon">📊</div>
+        <div class="match-title">How This Affects Your Matches</div>
+      </div>
+      <div class="match-desc">We'll prioritize matching you with creatives who excel at your preferred collaboration style — ensuring both parties have aligned expectations and working preferences from the start.</div>
+
+      <div class="match-cards">
+        <div class="match-card" id="mc-full">
+          <div class="mc-icon">🤝</div>
+          <div class="mc-title">Full Collaboration</div>
+          <div class="mc-desc">Match with directors who thrive on partnership and value artist input throughout the process — they actively want your feedback at every stage</div>
+        </div>
+        <div class="match-card" id="mc-trust">
+          <div class="mc-icon">✨</div>
+          <div class="mc-title">Trust the Creative</div>
+          <div class="mc-desc">Match with visionary directors who excel with creative freedom and deliver innovative results — they work best when given room to interpret your brief</div>
+        </div>
+        <div class="match-card" id="mc-handson">
+          <div class="mc-icon">🎯</div>
+          <div class="mc-title">Hands-On Director</div>
+          <div class="mc-desc">Match with technical experts who excel at executing detailed visions with precision — they're skilled at bringing exactly what you describe to life</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FLEXIBILITY NOTE -->
+    <div class="flex-section">
+      <div class="flex-icon">🔄</div>
+      <div>
+        <div class="flex-title">Flexibility & Communication</div>
+        <div class="flex-desc">While we use this preference for matching, the best collaborations often involve flexibility from both sides. Once matched, you and your creative can discuss and refine the working relationship to suit your specific project needs and personalities.</div>
+        <div class="flex-tip">💡 Remember: This is a starting point, not a rigid contract</div>
+      </div>
+    </div>
+
+    <!-- VALIDATION -->
+    <div class="validation-note">
+      <div class="validation-dot" id="val-dot" style="background:var(--orange);"></div>
+      <span id="val-text" style="color:var(--orange);">Select a collaboration style to continue</span>
+    </div>
+
+    <div style="height:40px;"></div>
+  </main>
+</div>
+
+<div class="form-footer">
+  <button class="btn-draft">💾 Save as Draft</button>
+  <div class="footer-right">
+    <span id="footer-status" style="font-size:13px;color:var(--text-muted);">No style selected yet</span>
+    <button class="btn-back">← Back</button>
+    <button class="btn-next" id="next-btn" onclick="goNext()">Next: Location & Travel →</button>
+  </div>
+</div>
+
+<script>
+  const labels = {
+    full: 'Full Collaboration',
+    trust: 'Trust the Creative',
+    handson: 'Hands-On Director'
+  };
+
+  const matchHighlight = {
+    full: 'highlighted-full',
+    trust: 'highlighted-trust',
+    handson: 'highlighted-handson'
+  };
+
+  let current = null;
+
+  function selectOption(style) {
+    // Deselect previous
+    if (current) {
+      document.getElementById(`opt-${current}`).classList.remove('selected');
+      document.getElementById(`mc-${current}`).classList.remove(matchHighlight[current]);
+    }
+
+    // If clicking the same one, deselect
+    if (current === style) {
+      current = null;
+      updateUI(null);
+      return;
+    }
+
+    // Select new
+    current = style;
+    document.getElementById(`opt-${style}`).classList.add('selected');
+    document.getElementById(`mc-${style}`).classList.add(matchHighlight[style]);
+    updateUI(style);
+  }
+
+  function updateUI(style) {
+    const btn = document.getElementById('next-btn');
+    const status = document.getElementById('footer-status');
+    const dot = document.getElementById('val-dot');
+    const valText = document.getElementById('val-text');
+
+    if (style) {
+      btn.classList.add('ready');
+      status.textContent = `✅ ${labels[style]} selected`;
+      status.style.color = 'var(--green)';
+      dot.style.background = 'var(--green)';
+      valText.textContent = `"${labels[style]}" — you're all set to continue`;
+      valText.style.color = 'var(--green)';
+    } else {
+      btn.classList.remove('ready');
+      status.textContent = 'No style selected yet';
+      status.style.color = 'var(--text-muted)';
+      dot.style.background = 'var(--orange)';
+      valText.textContent = 'Select a collaboration style to continue';
+      valText.style.color = 'var(--orange)';
+    }
+  }
+
+  function goNext() {
+    if (current) alert(`Saved: "${labels[current]}" — proceeding to Location & Travel…`);
+  }
+</script>
+
+</body>
+</html>

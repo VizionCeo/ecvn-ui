@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EchoVizion – Visual Style Selection</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0d0b1a;
+    --sidebar-bg: #120f24;
+    --card-bg: #1a1630;
+    --purple: #a78bfa;
+    --purple-dark: #7c3aed;
+    --pink: #f472b6;
+    --green: #10b981;
+    --orange: #f59e0b;
+    --border: #2a2448;
+    --text-primary: #f1f0ff;
+    --text-secondary: #9ca3af;
+    --text-muted: #6b7280;
+  }
+
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; }
+
+  /* NAV */
+  nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 32px; height: 56px;
+    background: rgba(13,11,26,0.95); border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 100; backdrop-filter: blur(12px);
+  }
+  .logo { display: flex; align-items: center; gap: 10px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 18px; }
+  .logo-icon { width: 30px; height: 30px; background: linear-gradient(135deg, var(--purple-dark), var(--pink)); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 14px; font-weight: 500; }
+  .nav-links a.active { color: var(--text-primary); border-bottom: 2px solid var(--purple); padding-bottom: 2px; }
+  .nav-right { display: flex; align-items: center; gap: 16px; }
+  .notif { width: 32px; height: 32px; border-radius: 50%; background: var(--card-bg); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 14px; position: relative; cursor: pointer; }
+  .notif-dot { position: absolute; top: 6px; right: 6px; width: 6px; height: 6px; border-radius: 50%; background: var(--pink); }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--purple-dark), var(--pink)); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: white; }
+
+  /* LAYOUT */
+  .layout { display: flex; flex: 1; }
+
+  /* SIDEBAR */
+  .sidebar { width: 240px; background: var(--sidebar-bg); border-right: 1px solid var(--border); padding: 24px 16px; position: sticky; top: 56px; height: calc(100vh - 56px); overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+  .sidebar-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); font-weight: 500; margin-bottom: 4px; }
+  .progress-text { font-size: 13px; color: var(--purple); font-weight: 600; font-family: 'Syne', sans-serif; }
+  .progress-bar-wrap { height: 3px; background: var(--border); border-radius: 2px; margin-top: 8px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; width: 40%; background: linear-gradient(90deg, var(--purple-dark), var(--pink)); border-radius: 2px; }
+  .steps-list { display: flex; flex-direction: column; gap: 2px; }
+  .step-item { display: flex; align-items: center; gap: 12px; padding: 9px 12px; border-radius: 8px; cursor: pointer; transition: all 0.15s; border: 1px solid transparent; }
+  .step-item.active { background: rgba(124,58,237,0.15); border-color: rgba(167,139,250,0.3); }
+  .step-item.completed .step-num { background: var(--green); color: white; }
+  .step-item.completed .step-name { color: var(--text-secondary); }
+  .step-num { width: 22px; height: 22px; border-radius: 50%; background: var(--border); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: var(--text-muted); flex-shrink: 0; }
+  .step-item.active .step-num { background: linear-gradient(135deg, var(--purple-dark), var(--purple)); color: white; }
+  .step-name { font-size: 13px; color: var(--text-muted); }
+  .step-item.active .step-name { color: var(--text-primary); font-weight: 500; }
+  .sidebar-help { margin-top: auto; padding: 14px; background: var(--card-bg); border-radius: 10px; border: 1px solid var(--border); }
+  .sidebar-help p { font-size: 12px; color: var(--text-secondary); margin-bottom: 10px; line-height: 1.5; }
+  .help-btn { width: 100%; padding: 8px; background: linear-gradient(135deg, var(--purple-dark), #9333ea); border: none; border-radius: 8px; color: white; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+
+  /* MAIN */
+  .main { flex: 1; padding: 40px 56px 140px; max-width: 900px; }
+  .step-meta { font-size: 12px; color: var(--purple); font-weight: 500; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.08em; }
+  .step-title { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px; }
+  .step-title span { color: var(--purple); }
+  .step-subtitle { font-size: 14px; color: var(--text-secondary); margin-bottom: 36px; line-height: 1.7; max-width: 620px; }
+
+  /* CONTEXT TAGS */
+  .context-tags { display: flex; align-items: center; gap: 8px; margin-bottom: 36px; flex-wrap: wrap; }
+  .ctx-label { font-size: 12px; color: var(--text-muted); }
+  .ctx-tag { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; background: rgba(124,58,237,0.12); border: 1px solid rgba(167,139,250,0.25); color: var(--purple); }
+
+  /* SECTIONS */
+  .form-section { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 28px; margin-bottom: 16px; }
+  .section-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+  .section-icon { font-size: 16px; width: 30px; height: 30px; background: rgba(124,58,237,0.15); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .section-subtitle { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.6; padding-left: 38px; }
+
+  /* ─── SEARCH ──────────────── */
+  .search-wrap {
+    position: relative; margin-bottom: 28px;
+  }
+  .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 15px; color: var(--text-muted); pointer-events: none; }
+  .search-input {
+    width: 100%; padding: 13px 16px 13px 44px;
+    background: rgba(255,255,255,0.04);
+    border: 1.5px solid var(--border);
+    border-radius: 10px; color: var(--text-primary);
+    font-size: 14px; font-family: 'DM Sans', sans-serif;
+    outline: none; transition: all 0.2s;
+  }
+  .search-input::placeholder { color: var(--text-muted); }
+  .search-input:focus { border-color: var(--purple); background: rgba(167,139,250,0.05); box-shadow: 0 0 0 3px rgba(167,139,250,0.1); }
+
+  /* ─── SELECTED TAGS TRAY ──── */
+  .selected-tray {
+    background: rgba(255,255,255,0.02);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin-bottom: 16px;
+    min-height: 80px;
+    transition: border-color 0.2s;
+  }
+  .selected-tray.has-items { border-color: rgba(167,139,250,0.35); }
+
+  .tray-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .tray-label { font-size: 13px; font-weight: 600; color: var(--text-primary); font-family: 'Syne', sans-serif; }
+
+  .tray-count {
+    padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600;
+    background: rgba(124,58,237,0.15); border: 1px solid rgba(167,139,250,0.3); color: var(--purple);
+    font-family: 'Syne', sans-serif;
+  }
+
+  .tray-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 16px 0; gap: 6px; }
+  .tray-empty-icon { font-size: 22px; opacity: 0.4; }
+  .tray-empty-text { font-size: 12px; color: var(--text-muted); }
+
+  .tray-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  .tray-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 12px; border-radius: 20px;
+    font-size: 12px; font-weight: 500;
+    background: rgba(124,58,237,0.18);
+    border: 1px solid rgba(167,139,250,0.4);
+    color: var(--purple); transition: all 0.15s;
+    animation: pillIn 0.15s ease;
+  }
+
+  @keyframes pillIn { from { opacity: 0; transform: scale(0.85); } to { opacity: 1; transform: scale(1); } }
+
+  .tray-pill button { background: none; border: none; color: rgba(167,139,250,0.6); font-size: 14px; cursor: pointer; line-height: 1; padding: 0; transition: color 0.15s; }
+  .tray-pill button:hover { color: var(--pink); }
+  .tray-clear { font-size: 11px; color: var(--text-muted); cursor: pointer; text-decoration: underline; transition: color 0.15s; }
+  .tray-clear:hover { color: var(--pink); }
+
+  /* ─── MATCH WEIGHT BANNER ─── */
+  .match-banner {
+    display: flex; align-items: flex-start; gap: 14px;
+    background: linear-gradient(135deg, rgba(124,58,237,0.12), rgba(244,114,182,0.08));
+    border: 1px solid rgba(167,139,250,0.25);
+    border-radius: 12px; padding: 18px 20px; margin-bottom: 16px;
+  }
+  .match-banner-icon { width: 36px; height: 36px; border-radius: 9px; background: linear-gradient(135deg, var(--purple-dark), var(--pink)); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .match-banner-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 3px; }
+  .match-banner-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 10px; }
+  .match-banner-tip { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: var(--purple); background: rgba(124,58,237,0.12); border: 1px solid rgba(167,139,250,0.2); border-radius: 6px; padding: 4px 10px; }
+
+  /* ─── SUGGESTED PILLS ───── */
+  .suggested-section { margin-bottom: 28px; }
+  .suggested-label { display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; font-family: 'Syne', sans-serif; }
+  .suggested-sublabel { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; }
+  .suggested-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  .sug-pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 6px 14px; border-radius: 20px;
+    font-size: 12px; font-weight: 500;
+    background: rgba(124,58,237,0.1);
+    border: 1px solid rgba(167,139,250,0.35);
+    color: var(--purple); cursor: pointer; transition: all 0.15s;
+  }
+  .sug-pill:hover { background: rgba(124,58,237,0.2); transform: translateY(-1px); }
+  .sug-pill.selected { background: rgba(124,58,237,0.22); border-color: var(--purple); }
+  .sug-pill .sug-plus { font-size: 14px; font-weight: 300; opacity: 0.7; }
+  .sug-pill.selected .sug-plus { content: '✓'; }
+
+  /* ─── TAG CATEGORIES ─────── */
+  .all-tags-section { }
+  .all-tags-header { margin-bottom: 20px; }
+  .all-tags-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 3px; }
+  .all-tags-sub { font-size: 12px; color: var(--text-muted); }
+
+  .tag-category { margin-bottom: 24px; }
+
+  .cat-label {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.09em;
+    text-transform: uppercase; color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+
+  .cat-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+  .tag-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  .tag-pill {
+    padding: 6px 14px; border-radius: 20px;
+    font-size: 13px; font-weight: 400;
+    background: rgba(255,255,255,0.04);
+    border: 1.5px solid var(--border);
+    color: var(--text-secondary);
+    cursor: pointer; transition: all 0.15s; user-select: none;
+  }
+
+  .tag-pill:hover { border-color: rgba(167,139,250,0.4); color: var(--purple); background: rgba(124,58,237,0.07); transform: translateY(-1px); }
+
+  .tag-pill.selected {
+    background: rgba(124,58,237,0.18);
+    border-color: var(--purple);
+    color: var(--purple);
+  }
+
+  .tag-pill.hidden { display: none; }
+
+  /* DIVIDER */
+  .cat-divider { height: 1px; background: var(--border); margin-bottom: 24px; opacity: 0.5; }
+
+  /* VALIDATION */
+  .validation-note { display: flex; align-items: center; gap: 8px; font-size: 12px; margin-bottom: 24px; }
+  .validation-dot { width: 6px; height: 6px; border-radius: 50%; }
+
+  /* FORM FOOTER */
+  .form-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 48px;
+    background: rgba(13,11,26,0.95); border-top: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+    position: fixed; bottom: 0;
+    width: calc(100% - 240px); margin-left: 240px; z-index: 50;
+  }
+  .btn-draft { display: flex; align-items: center; gap: 8px; padding: 10px 18px; background: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .btn-draft:hover { border-color: var(--purple); color: var(--purple); }
+  .footer-right { display: flex; gap: 12px; align-items: center; }
+  .btn-back { padding: 10px 24px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .btn-back:hover { color: var(--text-primary); }
+  .btn-next { padding: 12px 28px; background: linear-gradient(135deg, var(--purple-dark), #9333ea); border: none; border-radius: 8px; color: white; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; display: flex; align-items: center; gap: 8px; transition: all 0.25s; box-shadow: 0 4px 14px rgba(124,58,237,0.35); opacity: 0.45; pointer-events: none; }
+  .btn-next.ready { opacity: 1; pointer-events: all; }
+  .btn-next.ready:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(124,58,237,0.45); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">
+    <div class="logo-icon">🎵</div>
+    EchoVizion
+  </div>
+  <ul class="nav-links">
+    <li><a href="#">Projects</a></li>
+    <li><a href="#" class="active">Create Project</a></li>
+    <li><a href="#">Messages</a></li>
+    <li><a href="#">Profile</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="notif">🔔<div class="notif-dot"></div></div>
+    <div class="avatar">V</div>
+  </div>
+</nav>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div>
+      <div class="sidebar-label">Project Creation</div>
+      <div class="progress-text">Step 4 of 10 · 40%</div>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill"></div></div>
+    </div>
+
+    <div class="steps-list">
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Project Details</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Budget Definition</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Creative Direction</span></div>
+      <div class="step-item active"><div class="step-num">4</div><span class="step-name">Visual Style Selection</span></div>
+      <div class="step-item"><div class="step-num">5</div><span class="step-name">Inspiration References</span></div>
+      <div class="step-item"><div class="step-num">6</div><span class="step-name">Technical Requirements</span></div>
+      <div class="step-item"><div class="step-num">7</div><span class="step-name">Talent & Crew Needs</span></div>
+      <div class="step-item"><div class="step-num">8</div><span class="step-name">Collaboration Style</span></div>
+      <div class="step-item"><div class="step-num">9</div><span class="step-name">Usage Rights</span></div>
+      <div class="step-item"><div class="step-num">10</div><span class="step-name">Review & Submit</span></div>
+    </div>
+
+    <div class="sidebar-help">
+      <p>Not sure which styles to pick? Select what resonates and skip what doesn't — there are no wrong answers.</p>
+      <button class="help-btn">💬 Contact Support</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="step-meta">Step 4 of 10</div>
+    <h1 class="step-title">Visual <span>Style Selection</span></h1>
+    <p class="step-subtitle">Select style tags that define your aesthetic preferences. These tags contribute 25% to our matching algorithm and help us connect you with creatives who share your visual sensibilities. Select as many as you like.</p>
+
+    <div class="context-tags">
+      <span class="ctx-label">Your project:</span>
+      <span class="ctx-tag">🎬 Music Video</span>
+      <span class="ctx-tag">🎵 Afro-Reggae / R&B</span>
+      <span class="ctx-tag">💜 Cinematic · Surreal</span>
+    </div>
+
+    <!-- SEARCH -->
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input
+        type="text" class="search-input" id="search-input"
+        placeholder="Search for style tags (e.g., cyberpunk, minimalist, retro)…"
+        oninput="handleSearch(this.value)"
+      >
+    </div>
+
+    <!-- SELECTED TRAY -->
+    <div class="selected-tray" id="selected-tray">
+      <div class="tray-header">
+        <span class="tray-label">Selected Style Tags</span>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="tray-clear" id="tray-clear" onclick="clearAll()" style="display:none;">Clear all</span>
+          <span class="tray-count" id="tray-count">0 selected</span>
+        </div>
+      </div>
+      <div class="tray-empty" id="tray-empty">
+        <div class="tray-empty-icon">👆</div>
+        <div class="tray-empty-text">Click on style tags below to add them to your selection</div>
+      </div>
+      <div class="tray-pills" id="tray-pills" style="display:none;"></div>
+    </div>
+
+    <!-- MATCH WEIGHT BANNER -->
+    <div class="match-banner">
+      <div class="match-banner-icon">🎯</div>
+      <div>
+        <div class="match-banner-title">Matching Algorithm Weight: 25%</div>
+        <div class="match-banner-desc">Your selected style tags directly influence creative matching. We analyze these against creative portfolios to find aesthetic alignment and ensure visual compatibility between you and your matched creatives.</div>
+        <div class="match-banner-tip">💡 Tip: Select 5–15 tags for optimal matching results</div>
+      </div>
+    </div>
+
+    <!-- SUGGESTED TAGS -->
+    <div class="form-section">
+      <div class="section-title">
+        <div class="section-icon">✨</div>
+        Suggested Based on Your Creative Direction
+      </div>
+      <p class="section-subtitle">We've analyzed your creative vision and suggest these style tags as a starting point.</p>
+
+      <div class="suggested-pills" id="suggested-pills">
+        <div class="sug-pill" onclick="toggleSuggestedPill(this, 'Cyberpunk')"><span class="sug-plus">+</span> Cyberpunk</div>
+        <div class="sug-pill" onclick="toggleSuggestedPill(this, 'Neon Aesthetic')"><span class="sug-plus">+</span> Neon Aesthetic</div>
+        <div class="sug-pill" onclick="toggleSuggestedPill(this, 'Futuristic')"><span class="sug-plus">+</span> Futuristic</div>
+        <div class="sug-pill" onclick="toggleSuggestedPill(this, 'Atmospheric')"><span class="sug-plus">+</span> Atmospheric</div>
+        <div class="sug-pill" onclick="toggleSuggestedPill(this, 'Moody')"><span class="sug-plus">+</span> Moody</div>
+        <div class="sug-pill" onclick="toggleSuggestedPill(this, 'Surreal')"><span class="sug-plus">+</span> Surreal</div>
+        <div class="sug-pill" onclick="toggleSuggestedPill(this, 'Cinematic')"><span class="sug-plus">+</span> Cinematic</div>
+        <div class="sug-pill" onclick="toggleSuggestedPill(this, 'Dreamy')"><span class="sug-plus">+</span> Dreamy</div>
+      </div>
+    </div>
+
+    <!-- ALL STYLE TAGS -->
+    <div class="form-section">
+      <div class="section-title">
+        <div class="section-icon">🏷️</div>
+        All Style Tags
+      </div>
+      <p class="section-subtitle">Browse and select from our complete collection of style tags. Categories are organized by visual dimension.</p>
+
+      <div id="all-tags">
+
+        <!-- AESTHETIC STYLES -->
+        <div class="tag-category" data-cat="aesthetic">
+          <div class="cat-label"><div class="cat-dot" style="background:#a78bfa;"></div>Aesthetic Styles</div>
+          <div class="tag-pills">
+            <div class="tag-pill" onclick="toggleTag(this, 'Minimalist')">Minimalist</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Maximalist')">Maximalist</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Abstract')">Abstract</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Surreal')">Surreal</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Realistic')">Realistic</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Hyperrealistic')">Hyperrealistic</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Stylized')">Stylized</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Avant-Garde')">Avant-Garde</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Experimental')">Experimental</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Contemporary')">Contemporary</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Classic')">Classic</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Vintage')">Vintage</div>
+          </div>
+        </div>
+        <div class="cat-divider"></div>
+
+        <!-- ERA & TIME PERIOD -->
+        <div class="tag-category" data-cat="era">
+          <div class="cat-label"><div class="cat-dot" style="background:#f59e0b;"></div>Era & Time Period</div>
+          <div class="tag-pills">
+            <div class="tag-pill" onclick="toggleTag(this, 'Retro')">Retro</div>
+            <div class="tag-pill" onclick="toggleTag(this, '80s Aesthetic')">80s Aesthetic</div>
+            <div class="tag-pill" onclick="toggleTag(this, '90s Aesthetic')">90s Aesthetic</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Y2K')">Y2K</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Futuristic')">Futuristic</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Retro-Futuristic')">Retro-Futuristic</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Nostalgic')">Nostalgic</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Timeless')">Timeless</div>
+          </div>
+        </div>
+        <div class="cat-divider"></div>
+
+        <!-- GENRE & THEME -->
+        <div class="tag-category" data-cat="genre">
+          <div class="cat-label"><div class="cat-dot" style="background:#f472b6;"></div>Genre & Theme</div>
+          <div class="tag-pills">
+            <div class="tag-pill" onclick="toggleTag(this, 'Cyberpunk')">Cyberpunk</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Sci-Fi')">Sci-Fi</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Fantasy')">Fantasy</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Horror')">Horror</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Noir')">Noir</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Western')">Western</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Urban')">Urban</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Nature')">Nature</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Dystopian')">Dystopian</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Utopian')">Utopian</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Romantic')">Romantic</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Psychedelic')">Psychedelic</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Afrofuturism')">Afrofuturism</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Spiritual')">Spiritual</div>
+          </div>
+        </div>
+        <div class="cat-divider"></div>
+
+        <!-- MOOD & ATMOSPHERE -->
+        <div class="tag-category" data-cat="mood">
+          <div class="cat-label"><div class="cat-dot" style="background:#10b981;"></div>Mood & Atmosphere</div>
+          <div class="tag-pills">
+            <div class="tag-pill" onclick="toggleTag(this, 'Dark')">Dark</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Bright')">Bright</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Moody')">Moody</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Atmospheric')">Atmospheric</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Dreamy')">Dreamy</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Ethereal')">Ethereal</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Gritty')">Gritty</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Intimate')">Intimate</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Epic')">Epic</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Melancholic')">Melancholic</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Uplifting')">Uplifting</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Mysterious')">Mysterious</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Playful')">Playful</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Serious')">Serious</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Raw')">Raw</div>
+          </div>
+        </div>
+        <div class="cat-divider"></div>
+
+        <!-- VISUAL CHARACTERISTICS -->
+        <div class="tag-category" data-cat="visual">
+          <div class="cat-label"><div class="cat-dot" style="background:#06b6d4;"></div>Visual Characteristics</div>
+          <div class="tag-pills">
+            <div class="tag-pill" onclick="toggleTag(this, 'High Contrast')">High Contrast</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Low Contrast')">Low Contrast</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Saturated')">Saturated</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Desaturated')">Desaturated</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Monochrome')">Monochrome</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Black & White')">Black & White</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Colorful')">Colorful</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Pastel')">Pastel</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Neon Aesthetic')">Neon Aesthetic</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Gradient')">Gradient</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Geometric')">Geometric</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Organic')">Organic</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Textured')">Textured</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Smooth')">Smooth</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Grainy')">Grainy</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Sharp')">Sharp</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Soft Focus')">Soft Focus</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Film Grain')">Film Grain</div>
+          </div>
+        </div>
+        <div class="cat-divider"></div>
+
+        <!-- PRODUCTION STYLE -->
+        <div class="tag-category" data-cat="production">
+          <div class="cat-label"><div class="cat-dot" style="background:#ef4444;"></div>Production Style</div>
+          <div class="tag-pills">
+            <div class="tag-pill" onclick="toggleTag(this, 'Cinematic')">Cinematic</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Documentary')">Documentary</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Performance')">Performance</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Narrative')">Narrative</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Conceptual')">Conceptual</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Fast-Paced')">Fast-Paced</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Slow Motion')">Slow Motion</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'One Shot')">One Shot</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Animation')">Animation</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Mixed Media')">Mixed Media</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Stop Motion')">Stop Motion</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Handheld')">Handheld</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Steady Cam')">Steady Cam</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Drone Shots')">Drone Shots</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'VFX Heavy')">VFX Heavy</div>
+          </div>
+        </div>
+        <div class="cat-divider"></div>
+
+        <!-- LIGHTING STYLE -->
+        <div class="tag-category" data-cat="lighting">
+          <div class="cat-label"><div class="cat-dot" style="background:#fbbf24;"></div>Lighting Style</div>
+          <div class="tag-pills">
+            <div class="tag-pill" onclick="toggleTag(this, 'Natural Light')">Natural Light</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Studio Lighting')">Studio Lighting</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Low Light')">Low Light</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Golden Hour')">Golden Hour</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Chiaroscuro')">Chiaroscuro</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Backlit')">Backlit</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Dramatic Lighting')">Dramatic Lighting</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Soft Lighting')">Soft Lighting</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Practical Lights')">Practical Lights</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Neon Lighting')">Neon Lighting</div>
+            <div class="tag-pill" onclick="toggleTag(this, 'Single Source')">Single Source</div>
+          </div>
+        </div>
+
+      </div><!-- end #all-tags -->
+    </div>
+
+    <!-- VALIDATION -->
+    <div class="validation-note" id="validation-note">
+      <div class="validation-dot" id="val-dot" style="background:var(--orange);"></div>
+      <span id="val-text" style="color:var(--orange);">Select at least 1 style tag to continue</span>
+    </div>
+
+    <div style="height:40px;"></div>
+  </main>
+</div>
+
+<!-- FOOTER -->
+<div class="form-footer">
+  <button class="btn-draft">💾 Save as Draft</button>
+  <div class="footer-right">
+    <span id="footer-status" style="font-size:13px;color:var(--text-muted);">No tags selected yet</span>
+    <button class="btn-back">← Back</button>
+    <button class="btn-next" id="next-btn" onclick="goNext()">Next: Inspiration References →</button>
+  </div>
+</div>
+
+<script>
+  // ─── STATE ─────────────────────────────────────────
+  const selected = new Set();
+
+  // ─── TOGGLE FROM CATEGORY TAGS ─────────────────────
+  function toggleTag(pill, name) {
+    if (selected.has(name)) {
+      selected.delete(name);
+      pill.classList.remove('selected');
+      removeTrayPill(name);
+    } else {
+      selected.add(name);
+      pill.classList.add('selected');
+      addTrayPill(name);
+    }
+    // sync suggested pills
+    syncSuggestedPill(name, selected.has(name));
+    updateUI();
+  }
+
+  // ─── TOGGLE SUGGESTED PILL ─────────────────────────
+  function toggleSuggestedPill(pill, name) {
+    if (selected.has(name)) {
+      selected.delete(name);
+      pill.classList.remove('selected');
+      pill.querySelector('.sug-plus').textContent = '+';
+      removeTrayPill(name);
+      // deselect in main tags
+      syncMainPill(name, false);
+    } else {
+      selected.add(name);
+      pill.classList.add('selected');
+      pill.querySelector('.sug-plus').textContent = '✓';
+      addTrayPill(name);
+      syncMainPill(name, true);
+    }
+    updateUI();
+  }
+
+  function syncSuggestedPill(name, isSelected) {
+    document.querySelectorAll('#suggested-pills .sug-pill').forEach(p => {
+      if (p.textContent.replace(/[+✓\s]/g,'').trim() === name) {
+        p.classList.toggle('selected', isSelected);
+        p.querySelector('.sug-plus').textContent = isSelected ? '✓' : '+';
+      }
+    });
+  }
+
+  function syncMainPill(name, isSelected) {
+    document.querySelectorAll('.tag-pill').forEach(p => {
+      if (p.dataset.name === name || p.textContent.trim() === name) {
+        p.classList.toggle('selected', isSelected);
+      }
+    });
+  }
+
+  // ─── TRAY MANAGEMENT ───────────────────────────────
+  function addTrayPill(name) {
+    const container = document.getElementById('tray-pills');
+    const pill = document.createElement('span');
+    pill.className = 'tray-pill';
+    pill.id = 'tray-' + slugify(name);
+    pill.innerHTML = `${name} <button onclick="removePillByName('${name}')">×</button>`;
+    container.appendChild(pill);
+    showTray();
+  }
+
+  function removeTrayPill(name) {
+    const el = document.getElementById('tray-' + slugify(name));
+    if (el) el.remove();
+    if (selected.size === 0) hideTray();
+  }
+
+  function removePillByName(name) {
+    selected.delete(name);
+    removeTrayPill(name);
+    // deselect everywhere
+    syncMainPill(name, false);
+    syncSuggestedPill(name, false);
+    updateUI();
+  }
+
+  function showTray() {
+    document.getElementById('tray-empty').style.display = 'none';
+    document.getElementById('tray-pills').style.display = 'flex';
+    document.getElementById('selected-tray').classList.add('has-items');
+    document.getElementById('tray-clear').style.display = 'inline';
+  }
+
+  function hideTray() {
+    document.getElementById('tray-empty').style.display = 'flex';
+    document.getElementById('tray-pills').style.display = 'none';
+    document.getElementById('selected-tray').classList.remove('has-items');
+    document.getElementById('tray-clear').style.display = 'none';
+  }
+
+  function clearAll() {
+    selected.clear();
+    document.getElementById('tray-pills').innerHTML = '';
+    document.querySelectorAll('.tag-pill.selected').forEach(p => p.classList.remove('selected'));
+    document.querySelectorAll('.sug-pill.selected').forEach(p => {
+      p.classList.remove('selected');
+      p.querySelector('.sug-plus').textContent = '+';
+    });
+    hideTray();
+    updateUI();
+  }
+
+  // ─── UI UPDATES ────────────────────────────────────
+  function updateUI() {
+    const count = selected.size;
+    const countEl = document.getElementById('tray-count');
+    const status = document.getElementById('footer-status');
+    const btn = document.getElementById('next-btn');
+    const dot = document.getElementById('val-dot');
+    const valText = document.getElementById('val-text');
+
+    countEl.textContent = `${count} selected`;
+
+    if (count === 0) {
+      status.textContent = 'No tags selected yet';
+      status.style.color = 'var(--text-muted)';
+      btn.classList.remove('ready');
+      dot.style.background = 'var(--orange)';
+      valText.textContent = 'Select at least 1 style tag to continue';
+      valText.style.color = 'var(--orange)';
+    } else if (count < 5) {
+      status.textContent = `${count} tag${count > 1 ? 's' : ''} selected — add more for better matches`;
+      status.style.color = 'var(--orange)';
+      btn.classList.add('ready');
+      dot.style.background = 'var(--orange)';
+      valText.textContent = `${count} tag${count > 1 ? 's' : ''} selected — 5–15 recommended for best results`;
+      valText.style.color = 'var(--orange)';
+    } else {
+      status.textContent = `✅ ${count} tags selected`;
+      status.style.color = 'var(--green)';
+      btn.classList.add('ready');
+      dot.style.background = 'var(--green)';
+      valText.textContent = count >= 15 ? `${count} tags selected — great variety!` : `${count} tags selected — looking good`;
+      valText.style.color = 'var(--green)';
+    }
+  }
+
+  // ─── SEARCH ────────────────────────────────────────
+  function handleSearch(query) {
+    const q = query.toLowerCase().trim();
+    const pills = document.querySelectorAll('.tag-pill');
+
+    pills.forEach(pill => {
+      if (!q) {
+        pill.classList.remove('hidden');
+      } else {
+        const match = pill.textContent.toLowerCase().includes(q);
+        pill.classList.toggle('hidden', !match);
+      }
+    });
+
+    // Hide empty category headers
+    document.querySelectorAll('.tag-category').forEach(cat => {
+      const visible = [...cat.querySelectorAll('.tag-pill')].some(p => !p.classList.contains('hidden'));
+      cat.style.display = visible ? '' : 'none';
+    });
+    document.querySelectorAll('.cat-divider').forEach(d => {
+      d.style.display = q ? 'none' : '';
+    });
+  }
+
+  // ─── UTILS ─────────────────────────────────────────
+  function slugify(str) { return str.replace(/[^a-z0-9]/gi, '_').toLowerCase(); }
+
+  function goNext() {
+    if (selected.size > 0) alert('Proceeding to Inspiration References…');
+  }
+</script>
+
+</body>
+</html>

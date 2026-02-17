@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EchoVizion - Experience & Location</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0d0b1a;
+    --sidebar-bg: #120f24;
+    --card-bg: #1a1630;
+    --card-hover: #201c3a;
+    --purple: #a78bfa;
+    --purple-dark: #7c3aed;
+    --pink: #f472b6;
+    --green: #10b981;
+    --orange: #f59e0b;
+    --border: #2a2448;
+    --text-primary: #f1f0ff;
+    --text-secondary: #9ca3af;
+    --text-muted: #6b7280;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* NAV */
+  nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 32px; height: 56px;
+    background: rgba(13,11,26,0.95);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 100;
+    backdrop-filter: blur(12px);
+  }
+
+  .logo {
+    display: flex; align-items: center; gap: 10px;
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 18px;
+  }
+
+  .logo-icon {
+    width: 30px; height: 30px;
+    background: linear-gradient(135deg, var(--purple-dark), var(--pink));
+    border-radius: 8px; display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+  }
+
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 14px; font-weight: 500; }
+  .nav-links a.active { color: var(--text-primary); border-bottom: 2px solid var(--purple); padding-bottom: 2px; }
+
+  .avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--purple-dark), var(--pink));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 600; color: white;
+  }
+
+  .layout { display: flex; flex: 1; }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 240px; background: var(--sidebar-bg);
+    border-right: 1px solid var(--border);
+    padding: 24px 16px;
+    position: sticky; top: 56px;
+    height: calc(100vh - 56px);
+    overflow-y: auto;
+    display: flex; flex-direction: column; gap: 24px;
+  }
+
+  .sidebar-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); font-weight: 500; margin-bottom: 4px; }
+  .progress-text { font-size: 13px; color: var(--purple); font-weight: 600; font-family: 'Syne', sans-serif; }
+
+  .progress-bar-wrap { height: 3px; background: var(--border); border-radius: 2px; margin-top: 8px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; width: 45%; background: linear-gradient(90deg, var(--purple-dark), var(--pink)); border-radius: 2px; }
+
+  .steps-list { display: flex; flex-direction: column; gap: 2px; }
+
+  .step-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px; border-radius: 8px; cursor: pointer; transition: all 0.15s;
+  }
+
+  .step-item.active { background: rgba(124,58,237,0.15); border: 1px solid rgba(167,139,250,0.3); }
+  .step-item.completed .step-num { background: var(--green); color: white; font-size: 12px; }
+  .step-item.completed .step-name { color: var(--text-secondary); }
+
+  .step-num {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600; color: var(--text-muted); flex-shrink: 0;
+  }
+
+  .step-item.active .step-num { background: linear-gradient(135deg, var(--purple-dark), var(--purple)); color: white; }
+  .step-name { font-size: 13px; color: var(--text-muted); }
+  .step-item.active .step-name { color: var(--text-primary); font-weight: 500; }
+
+  .sidebar-help { margin-top: auto; padding: 14px; background: var(--card-bg); border-radius: 10px; border: 1px solid var(--border); }
+  .sidebar-help p { font-size: 12px; color: var(--text-secondary); margin-bottom: 10px; line-height: 1.5; }
+  .help-btn { width: 100%; padding: 8px; background: linear-gradient(135deg, var(--purple-dark), #9333ea); border: none; border-radius: 8px; color: white; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+
+  /* MAIN */
+  .main { flex: 1; padding: 40px 56px 140px; max-width: 900px; }
+
+  .step-meta { font-size: 12px; color: var(--purple); font-weight: 500; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.08em; }
+
+  .step-title { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px; }
+  .step-title span { color: var(--purple); }
+
+  .step-subtitle { font-size: 14px; color: var(--text-secondary); margin-bottom: 32px; line-height: 1.7; max-width: 560px; }
+
+  /* CONTEXT TAGS */
+  .context-tags { display: flex; align-items: center; gap: 8px; margin-bottom: 36px; flex-wrap: wrap; }
+  .ctx-label { font-size: 12px; color: var(--text-muted); }
+  .ctx-tag { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; background: rgba(124,58,237,0.12); border: 1px solid rgba(167,139,250,0.25); color: var(--purple); }
+
+  /* FORM SECTION */
+  .form-section { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 28px; margin-bottom: 16px; transition: border-color 0.2s; }
+  .form-section:focus-within { border-color: rgba(167,139,250,0.35); }
+
+  .section-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
+  .section-icon { width: 30px; height: 30px; background: rgba(124,58,237,0.15); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
+  .section-desc { font-size: 13px; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.6; }
+
+  /* EXPERIENCE LEVEL CARDS */
+  .experience-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 20px; }
+
+  .exp-card {
+    background: rgba(255,255,255,0.03);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .exp-card:hover { border-color: rgba(167,139,250,0.4); background: var(--card-hover); transform: translateY(-2px); }
+
+  .exp-card.selected.entry { border-color: var(--green); background: rgba(16,185,129,0.08); }
+  .exp-card.selected.mid { border-color: var(--purple); background: rgba(124,58,237,0.1); }
+  .exp-card.selected.senior { border-color: var(--orange); background: rgba(245,158,11,0.08); }
+
+  .exp-radio {
+    position: absolute; top: 16px; right: 16px;
+    width: 18px; height: 18px; border-radius: 50%;
+    border: 2px solid var(--border);
+    transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .exp-card.selected.entry .exp-radio { border-color: var(--green); background: var(--green); }
+  .exp-card.selected.mid .exp-radio { border-color: var(--purple); background: var(--purple); }
+  .exp-card.selected.senior .exp-radio { border-color: var(--orange); background: var(--orange); }
+
+  .exp-radio::after {
+    content: '';
+    width: 6px; height: 6px;
+    background: white; border-radius: 50%;
+    opacity: 0; transition: opacity 0.2s;
+  }
+
+  .exp-card.selected .exp-radio::after { opacity: 1; }
+
+  .exp-emoji { font-size: 28px; margin-bottom: 12px; display: block; }
+
+  .exp-level { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 3px; }
+
+  .exp-years { font-size: 12px; font-weight: 500; margin-bottom: 10px; }
+  .entry .exp-years { color: var(--green); }
+  .mid .exp-years { color: var(--purple); }
+  .senior .exp-years { color: var(--orange); }
+
+  .exp-rate {
+    font-size: 13px; font-weight: 600; color: var(--text-primary);
+    margin-bottom: 8px;
+  }
+
+  .exp-desc { font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 14px; }
+
+  .exp-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+
+  .exp-tag {
+    font-size: 10px; padding: 3px 8px;
+    border-radius: 4px; font-weight: 500;
+  }
+
+  .entry .exp-tag { background: rgba(16,185,129,0.12); color: var(--green); }
+  .mid .exp-tag { background: rgba(167,139,250,0.12); color: var(--purple); }
+  .senior .exp-tag { background: rgba(245,158,11,0.12); color: var(--orange); }
+
+  /* HELP LINK */
+  .help-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12px; color: var(--purple);
+    cursor: pointer; text-decoration: underline; text-underline-offset: 3px;
+    margin-top: 4px;
+  }
+
+  /* MARKET CONTEXT */
+  .market-context {
+    background: rgba(167,139,250,0.06);
+    border: 1px solid rgba(167,139,250,0.15);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-top: 16px;
+    display: none;
+  }
+
+  .market-context.visible { display: block; }
+
+  .market-context p { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+  .market-context strong { color: var(--purple); }
+
+  /* LOCATION TOGGLE SECTION */
+  .toggle-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .toggle-left { flex: 1; }
+  .toggle-title { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 3px; }
+  .toggle-sub { font-size: 12px; color: var(--text-muted); }
+
+  /* TOGGLE SWITCH */
+  .toggle-switch {
+    width: 48px; height: 26px;
+    background: var(--border);
+    border-radius: 13px;
+    position: relative; cursor: pointer;
+    transition: background 0.25s;
+    flex-shrink: 0;
+  }
+
+  .toggle-switch.on { background: var(--purple-dark); }
+
+  .toggle-knob {
+    width: 20px; height: 20px;
+    background: white; border-radius: 50%;
+    position: absolute; top: 3px; left: 3px;
+    transition: transform 0.25s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  }
+
+  .toggle-switch.on .toggle-knob { transform: translateX(22px); }
+
+  /* LOCATION FIELDS - hidden by default */
+  .location-fields {
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition: max-height 0.4s ease, opacity 0.3s ease;
+  }
+
+  .location-fields.open { max-height: 600px; opacity: 1; }
+
+  .field-label { font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+
+  .field-input {
+    width: 100%; padding: 13px 16px;
+    background: rgba(255,255,255,0.04);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    color: var(--text-primary);
+    font-size: 14px; font-family: 'DM Sans', sans-serif;
+    outline: none; transition: all 0.2s;
+    margin-bottom: 6px;
+  }
+
+  .field-input::placeholder { color: var(--text-muted); }
+  .field-input:focus { border-color: var(--purple); background: rgba(167,139,250,0.06); box-shadow: 0 0 0 3px rgba(167,139,250,0.1); }
+
+  .field-hint { font-size: 11px; color: var(--text-muted); margin-bottom: 20px; }
+
+  /* RADIUS SLIDER */
+  .radius-section { margin-bottom: 20px; }
+
+  .radius-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .radius-label { font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.07em; }
+
+  .radius-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px; font-weight: 800; color: var(--purple);
+    display: flex; align-items: baseline; gap: 4px;
+  }
+
+  .radius-value span { font-size: 13px; font-weight: 400; color: var(--text-muted); }
+
+  /* CUSTOM SLIDER */
+  .slider-wrap { position: relative; margin-bottom: 10px; }
+
+  input[type="range"] {
+    width: 100%; -webkit-appearance: none; appearance: none;
+    height: 6px; border-radius: 3px; outline: none; cursor: pointer;
+    background: linear-gradient(to right, var(--purple-dark) 0%, var(--purple) 30%, var(--border) 30%);
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: white;
+    border: 3px solid var(--purple);
+    box-shadow: 0 2px 8px rgba(124,58,237,0.4);
+    cursor: pointer; transition: transform 0.15s;
+  }
+
+  input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+
+  .slider-labels {
+    display: flex; justify-content: space-between;
+    font-size: 11px; color: var(--text-muted); margin-top: 4px;
+  }
+
+  /* RADIUS VISUAL */
+  .radius-visual {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    display: flex; align-items: center; gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .radius-map {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background: rgba(124,58,237,0.05);
+    position: relative; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .radius-dot {
+    width: 8px; height: 8px;
+    background: var(--purple);
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px rgba(167,139,250,0.3);
+  }
+
+  .radius-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1.5px solid rgba(167,139,250,0.25);
+    background: rgba(124,58,237,0.05);
+    transition: all 0.3s;
+  }
+
+  .radius-text { flex: 1; }
+  .radius-text strong { font-size: 14px; font-weight: 600; color: var(--text-primary); display: block; margin-bottom: 4px; }
+  .radius-text p { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+
+  /* REMOTE NOTICE */
+  .remote-notice {
+    display: flex; align-items: flex-start; gap: 10px;
+    background: rgba(245,158,11,0.07);
+    border: 1px solid rgba(245,158,11,0.2);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+
+  .remote-notice p { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+  .remote-notice strong { color: var(--orange); }
+
+  /* REMOTE ONLY BADGE — shown when toggle is OFF */
+  .remote-badge {
+    display: flex; align-items: center; gap: 10px;
+    padding: 16px 18px;
+    background: rgba(16,185,129,0.07);
+    border: 1px solid rgba(16,185,129,0.2);
+    border-radius: 10px;
+  }
+
+  .remote-badge p { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+  .remote-badge strong { color: var(--green); }
+
+  /* HELP MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px);
+    z-index: 200;
+    display: none; align-items: center; justify-content: center;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: #1a1630;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    max-width: 480px; width: 90%;
+    position: relative;
+  }
+
+  .modal-close {
+    position: absolute; top: 16px; right: 16px;
+    width: 28px; height: 28px;
+    background: var(--border); border: none;
+    border-radius: 50%; color: var(--text-muted);
+    font-size: 14px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .modal h3 { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px; }
+  .modal > p { font-size: 13px; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.6; }
+
+  .modal-question { margin-bottom: 20px; }
+  .modal-question p { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 10px; }
+
+  .modal-options { display: flex; flex-direction: column; gap: 8px; }
+
+  .modal-option {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 8px; cursor: pointer; transition: all 0.15s;
+  }
+
+  .modal-option:hover { border-color: var(--purple); }
+  .modal-option span { font-size: 13px; color: var(--text-secondary); }
+  .modal-option .opt-result { font-size: 12px; font-weight: 600; }
+  .entry-result { color: var(--green); }
+  .mid-result { color: var(--purple); }
+  .senior-result { color: var(--orange); }
+
+  .modal-btn {
+    width: 100%; padding: 12px;
+    background: linear-gradient(135deg, var(--purple-dark), #9333ea);
+    border: none; border-radius: 10px; color: white;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; margin-top: 8px;
+  }
+
+  /* FORM FOOTER */
+  .form-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 48px;
+    background: rgba(13,11,26,0.95);
+    border-top: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+    position: fixed; bottom: 0;
+    width: calc(100% - 240px); margin-left: 240px;
+    z-index: 50;
+  }
+
+  .btn-draft { display: flex; align-items: center; gap: 8px; padding: 10px 18px; background: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .btn-draft:hover { border-color: var(--purple); color: var(--purple); }
+
+  .footer-right { display: flex; gap: 12px; align-items: center; }
+
+  .btn-back { padding: 10px 24px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .btn-back:hover { color: var(--text-primary); }
+
+  .btn-next {
+    padding: 12px 28px;
+    background: linear-gradient(135deg, var(--purple-dark), #9333ea);
+    border: none; border-radius: 8px;
+    color: white; font-size: 14px; font-weight: 600;
+    cursor: pointer; font-family: 'DM Sans', sans-serif;
+    display: flex; align-items: center; gap: 8px;
+    box-shadow: 0 4px 14px rgba(124,58,237,0.35);
+    transition: all 0.25s;
+  }
+
+  .btn-next:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(124,58,237,0.45); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">
+    <div class="logo-icon">🎵</div>
+    EchoVizion
+  </div>
+  <ul class="nav-links">
+    <li><a href="#">Dashboard</a></li>
+    <li><a href="#" class="active">Projects</a></li>
+    <li><a href="#">Messages</a></li>
+    <li><a href="#">Community</a></li>
+  </ul>
+  <div style="display:flex;align-items:center;gap:16px;">
+    <span style="font-size:20px;color:var(--text-muted);">🔔</span>
+    <div class="avatar">F</div>
+  </div>
+</nav>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div>
+      <div class="sidebar-label">Project Creation</div>
+      <div class="progress-text">Step 5 of 11 · 45% Complete</div>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill"></div></div>
+    </div>
+
+    <div class="steps-list">
+      <div class="step-item completed"><div class="step-num">✓</div><div class="step-name">Service Selection</div></div>
+      <div class="step-item completed"><div class="step-num">✓</div><div class="step-name">Creative Roles</div></div>
+      <div class="step-item completed"><div class="step-num">✓</div><div class="step-name">Project Details</div></div>
+      <div class="step-item completed"><div class="step-num">✓</div><div class="step-name">Budget Definition</div></div>
+      <div class="step-item active"><div class="step-num">5</div><div class="step-name">Experience & Location</div></div>
+      <div class="step-item"><div class="step-num">6</div><div class="step-name">Creative Direction</div></div>
+      <div class="step-item"><div class="step-num">7</div><div class="step-name">Visual Style Selection</div></div>
+      <div class="step-item"><div class="step-num">8</div><div class="step-name">Inspiration References</div></div>
+      <div class="step-item"><div class="step-num">9</div><div class="step-name">Timeline & Deliverables</div></div>
+      <div class="step-item"><div class="step-num">10</div><div class="step-name">Usage Rights</div></div>
+      <div class="step-item"><div class="step-num">11</div><div class="step-name">Review & Submit</div></div>
+    </div>
+
+    <div class="sidebar-help">
+      <p>Not sure what experience level fits your project? Use the "Help Me Choose" guide.</p>
+      <button class="help-btn">💬 Contact Support</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="step-meta">Step 5 of 11</div>
+    <h1 class="step-title">Experience &amp; <span>Location</span></h1>
+    <p class="step-subtitle">Tell us what level of creative you need and whether they have to be nearby. Most projects work great remotely.</p>
+
+    <!-- CONTEXT TAGS -->
+    <div class="context-tags">
+      <span class="ctx-label">Your project:</span>
+      <span class="ctx-tag">🎬 Music Video</span>
+      <span class="ctx-tag">🎭 Director · Editor</span>
+      <span class="ctx-tag">💰 $2,000 – $5,000</span>
+    </div>
+
+    <!-- SECTION 1: EXPERIENCE LEVEL -->
+    <div class="form-section">
+      <div class="section-title">
+        <div class="section-icon">⭐</div>
+        Experience Level
+      </div>
+      <p class="section-desc">What level of creative are you looking to work with? This affects the match pool and typical rates.</p>
+
+      <div class="experience-grid">
+
+        <!-- ENTRY LEVEL -->
+        <div class="exp-card entry" onclick="selectExp(this, 'entry')" id="card-entry">
+          <div class="exp-radio"></div>
+          <span class="exp-emoji">🌱</span>
+          <div class="exp-level">Entry Level</div>
+          <div class="exp-years">0 – 2 years</div>
+          <div class="exp-rate">$15 – $30/hr</div>
+          <div class="exp-desc">Great for simpler projects and tighter budgets. Emerging talent with fresh ideas.</div>
+          <div class="exp-tags">
+            <span class="exp-tag">Budget-friendly</span>
+            <span class="exp-tag">Fresh perspective</span>
+            <span class="exp-tag">Simpler projects</span>
+          </div>
+        </div>
+
+        <!-- MID LEVEL -->
+        <div class="exp-card mid selected" onclick="selectExp(this, 'mid')" id="card-mid">
+          <div class="exp-radio"></div>
+          <span class="exp-emoji">🔥</span>
+          <div class="exp-level">Mid-Level</div>
+          <div class="exp-years">3 – 5 years</div>
+          <div class="exp-rate">$30 – $60/hr</div>
+          <div class="exp-desc">Experienced professionals delivering quality results. Best for most projects.</div>
+          <div class="exp-tags">
+            <span class="exp-tag">Most popular</span>
+            <span class="exp-tag">Proven track record</span>
+            <span class="exp-tag">Great value</span>
+          </div>
+        </div>
+
+        <!-- SENIOR LEVEL -->
+        <div class="exp-card senior" onclick="selectExp(this, 'senior')" id="card-senior">
+          <div class="exp-radio"></div>
+          <span class="exp-emoji">👑</span>
+          <div class="exp-level">Senior Level</div>
+          <div class="exp-years">5+ years</div>
+          <div class="exp-rate">$60 – $150+/hr</div>
+          <div class="exp-desc">Top-tier creatives for premium projects. Industry veterans with deep portfolios.</div>
+          <div class="exp-tags">
+            <span class="exp-tag">Premium quality</span>
+            <span class="exp-tag">Industry veteran</span>
+            <span class="exp-tag">High-budget projects</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- HELP LINK -->
+      <div class="help-link" onclick="openModal()">
+        ❓ Help me choose the right level
+      </div>
+
+      <!-- MARKET CONTEXT - shows after selection -->
+      <div class="market-context visible" id="market-context">
+        <p id="market-text">💡 <strong>Mid-Level</strong> creatives typically charge $30–60/hr and are the most popular choice for music videos in your budget range ($2,000–$5,000). You'll have a strong match pool.</p>
+      </div>
+    </div>
+
+    <!-- SECTION 2: LOCATION -->
+    <div class="form-section">
+      <div class="section-title">
+        <div class="section-icon">📍</div>
+        Location Preference
+      </div>
+      <p class="section-desc">Do you need your creative to be physically nearby? Only turn this on if your project requires on-location filming.</p>
+
+      <!-- TOGGLE ROW -->
+      <div class="toggle-row">
+        <div class="toggle-left">
+          <div class="toggle-title">Location matters for this project</div>
+          <div class="toggle-sub">Enable if you need on-site filming or in-person collaboration</div>
+        </div>
+        <div class="toggle-switch" id="loc-toggle" onclick="toggleLocation()">
+          <div class="toggle-knob"></div>
+        </div>
+      </div>
+
+      <!-- REMOTE BADGE — shown when toggle OFF -->
+      <div class="remote-badge" id="remote-badge">
+        <span style="font-size:20px;">🌐</span>
+        <p><strong>Open to all locations.</strong> Your project will match with talented creatives worldwide. Most music videos are created through remote collaboration — you'll have the largest match pool possible.</p>
+      </div>
+
+      <!-- LOCATION FIELDS — shown when toggle ON -->
+      <div class="location-fields" id="location-fields">
+
+        <div style="margin-bottom:16px;">
+          <div class="field-label">Your Location</div>
+          <input type="text" class="field-input" placeholder="e.g., New York, NY or Los Angeles, CA" id="location-input" oninput="handleLocation(this)">
+          <div class="field-hint">Enter your city or region so we can find nearby creatives</div>
+        </div>
+
+        <!-- RADIUS SLIDER -->
+        <div class="radius-section">
+          <div class="radius-header">
+            <div class="radius-label">Search Radius</div>
+            <div class="radius-value" id="radius-display">30 <span>miles</span></div>
+          </div>
+
+          <div class="slider-wrap">
+            <input
+              type="range"
+              min="5" max="100" value="30" step="5"
+              id="radius-slider"
+              oninput="updateRadius(this.value)"
+            >
+          </div>
+          <div class="slider-labels">
+            <span>5 miles</span>
+            <span>25 miles</span>
+            <span>50 miles</span>
+            <span>75 miles</span>
+            <span>100 miles</span>
+          </div>
+        </div>
+
+        <!-- RADIUS VISUAL -->
+        <div class="radius-visual">
+          <div class="radius-map" id="radius-map">
+            <div class="radius-ring" id="radius-ring" style="width:60px;height:60px;top:9px;left:9px;"></div>
+            <div class="radius-dot"></div>
+          </div>
+          <div class="radius-text">
+            <strong id="radius-summary">Matching creatives within 30 miles of your location</strong>
+            <p>Creatives outside this radius won't appear in your matches. <br>Tip: A wider radius gives you more options and better matches.</p>
+          </div>
+        </div>
+
+        <!-- REMOTE NOTICE -->
+        <div class="remote-notice">
+          <span style="font-size:16px;">⚠️</span>
+          <p><strong>Heads up:</strong> Enabling location limits your match pool. Most directors, editors, and animators work remotely. Only use this if your shoot requires physical presence.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <div style="height:40px;"></div>
+  </main>
+</div>
+
+<!-- FOOTER -->
+<div class="form-footer">
+  <button class="btn-draft">💾 Save as Draft</button>
+  <div class="footer-right">
+    <span style="font-size:13px;color:var(--green);">✅ Experience level selected</span>
+    <button class="btn-back">← Back</button>
+    <button class="btn-next">Next: Creative Direction →</button>
+  </div>
+</div>
+
+<!-- HELP MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h3>Help Me Choose</h3>
+    <p>Answer these quick questions and we'll suggest the right experience level for your project.</p>
+
+    <div class="modal-question">
+      <p>Is this your first music video?</p>
+      <div class="modal-options">
+        <div class="modal-option" onclick="suggestLevel('entry')">
+          <span>Yes, first time</span>
+          <span class="opt-result entry-result">→ Entry Level</span>
+        </div>
+        <div class="modal-option" onclick="suggestLevel('mid')">
+          <span>No, I've done a few</span>
+          <span class="opt-result mid-result">→ Mid-Level</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-question">
+      <p>Do you need advanced VFX or complex cinematography?</p>
+      <div class="modal-options">
+        <div class="modal-option" onclick="suggestLevel('senior')">
+          <span>Yes, heavy VFX / cinematic quality</span>
+          <span class="opt-result senior-result">→ Senior Level</span>
+        </div>
+        <div class="modal-option" onclick="suggestLevel('mid')">
+          <span>No, standard production quality</span>
+          <span class="opt-result mid-result">→ Mid-Level</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-question">
+      <p>What's your budget range?</p>
+      <div class="modal-options">
+        <div class="modal-option" onclick="suggestLevel('entry')">
+          <span>Under $1,500</span>
+          <span class="opt-result entry-result">→ Entry Level</span>
+        </div>
+        <div class="modal-option" onclick="suggestLevel('mid')">
+          <span>$1,500 – $5,000</span>
+          <span class="opt-result mid-result">→ Mid-Level</span>
+        </div>
+        <div class="modal-option" onclick="suggestLevel('senior')">
+          <span>$5,000+</span>
+          <span class="opt-result senior-result">→ Senior Level</span>
+        </div>
+      </div>
+    </div>
+
+    <button class="modal-btn" onclick="closeModal()">Got It — Apply Selection</button>
+  </div>
+</div>
+
+<script>
+  let locationOpen = false;
+
+  // EXPERIENCE SELECTION
+  function selectExp(card, level) {
+    document.querySelectorAll('.exp-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+
+    const ctx = document.getElementById('market-context');
+    const txt = document.getElementById('market-text');
+    ctx.classList.add('visible');
+
+    const msgs = {
+      entry: '💡 <strong>Entry-Level</strong> creatives typically charge $15–30/hr. Great for simpler concepts on a tight budget. Your match pool will be large but portfolios will be less extensive.',
+      mid:   '💡 <strong>Mid-Level</strong> creatives typically charge $30–60/hr and are the most popular choice for music videos in your budget range. You\'ll have a strong, well-rounded match pool.',
+      senior:'💡 <strong>Senior-Level</strong> creatives typically charge $60–150+/hr. With your current budget ($2K–$5K), you may receive fewer proposals. Consider increasing your budget for better results.'
+    };
+
+    txt.innerHTML = msgs[level];
+  }
+
+  // LOCATION TOGGLE
+  function toggleLocation() {
+    locationOpen = !locationOpen;
+    const toggle = document.getElementById('loc-toggle');
+    const fields = document.getElementById('location-fields');
+    const badge = document.getElementById('remote-badge');
+
+    toggle.classList.toggle('on', locationOpen);
+    fields.classList.toggle('open', locationOpen);
+    badge.style.display = locationOpen ? 'none' : 'flex';
+  }
+
+  // RADIUS SLIDER
+  function updateRadius(val) {
+    document.getElementById('radius-display').innerHTML = `${val} <span>miles</span>`;
+    document.getElementById('radius-summary').textContent = `Matching creatives within ${val} miles of your location`;
+
+    // Update slider gradient
+    const slider = document.getElementById('radius-slider');
+    const pct = ((val - 5) / 95) * 100;
+    slider.style.background = `linear-gradient(to right, var(--purple-dark) 0%, var(--purple) ${pct}%, var(--border) ${pct}%)`;
+
+    // Update radius ring size
+    const ring = document.getElementById('radius-ring');
+    const size = 20 + (val / 100) * 56;
+    const offset = (80 - size) / 2;
+    ring.style.width = size + 'px';
+    ring.style.height = size + 'px';
+    ring.style.top = offset + 'px';
+    ring.style.left = offset + 'px';
+  }
+
+  function handleLocation(input) {
+    // Would trigger autocomplete in production
+  }
+
+  // MODAL
+  function openModal() {
+    document.getElementById('modal-overlay').classList.add('open');
+  }
+
+  function closeModal() {
+    document.getElementById('modal-overlay').classList.remove('open');
+  }
+
+  function closeModalOutside(e) {
+    if (e.target === document.getElementById('modal-overlay')) closeModal();
+  }
+
+  function suggestLevel(level) {
+    closeModal();
+    const card = document.getElementById('card-' + level);
+    selectExp(card, level);
+    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+</script>
+</body>
+</html>

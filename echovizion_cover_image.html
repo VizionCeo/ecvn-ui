@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EchoVizion – Project Cover Image</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0d0b1a;
+    --sidebar-bg: #120f24;
+    --card-bg: #1a1630;
+    --purple: #a78bfa;
+    --purple-dark: #7c3aed;
+    --pink: #f472b6;
+    --green: #10b981;
+    --orange: #f59e0b;
+    --teal: #06b6d4;
+    --border: #2a2448;
+    --text-primary: #f1f0ff;
+    --text-secondary: #9ca3af;
+    --text-muted: #6b7280;
+  }
+
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; }
+
+  /* NAV */
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 0 32px; height: 56px; background: rgba(13,11,26,0.95); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(12px); }
+  .logo { display: flex; align-items: center; gap: 10px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 18px; }
+  .logo-icon { width: 30px; height: 30px; background: linear-gradient(135deg, var(--purple-dark), var(--pink)); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 14px; font-weight: 500; }
+  .nav-links a.active { color: var(--text-primary); border-bottom: 2px solid var(--purple); padding-bottom: 2px; }
+  .nav-right { display: flex; align-items: center; gap: 16px; }
+  .notif { width: 32px; height: 32px; border-radius: 50%; background: var(--card-bg); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 14px; position: relative; cursor: pointer; }
+  .notif-dot { position: absolute; top: 6px; right: 6px; width: 6px; height: 6px; border-radius: 50%; background: var(--pink); }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--purple-dark), var(--pink)); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: white; }
+
+  /* LAYOUT */
+  .layout { display: flex; flex: 1; }
+
+  /* SIDEBAR */
+  .sidebar { width: 240px; background: var(--sidebar-bg); border-right: 1px solid var(--border); padding: 24px 16px; position: sticky; top: 56px; height: calc(100vh - 56px); overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+  .sidebar-proj-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); font-weight: 500; margin-bottom: 2px; }
+  .sidebar-step-label { font-size: 13px; color: var(--purple); font-weight: 600; font-family: 'Syne', sans-serif; margin-bottom: 10px; }
+  .progress-bar-wrap { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; margin-bottom: 6px; }
+  .progress-bar-fill { height: 100%; width: 18%; background: linear-gradient(90deg, var(--purple-dark), var(--pink)); border-radius: 2px; }
+  .progress-pct { font-size: 12px; color: var(--text-muted); }
+  .progress-pct strong { color: var(--text-secondary); font-weight: 500; }
+  .steps-list { display: flex; flex-direction: column; gap: 2px; }
+  .step-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; cursor: pointer; transition: all 0.15s; border: 1px solid transparent; }
+  .step-item.active { background: rgba(124,58,237,0.15); border-color: rgba(167,139,250,0.3); }
+  .step-item.completed .step-num { background: var(--purple-dark); color: white; }
+  .step-item.completed .step-name { color: var(--text-secondary); }
+  .step-num { width: 22px; height: 22px; border-radius: 50%; background: var(--border); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: var(--text-muted); flex-shrink: 0; }
+  .step-item.active .step-num { background: linear-gradient(135deg, var(--purple-dark), var(--purple)); color: white; }
+  .step-name { font-size: 13px; color: var(--text-muted); }
+  .step-item.active .step-name { color: var(--text-primary); font-weight: 500; }
+  .sidebar-help { margin-top: auto; padding: 14px; background: var(--card-bg); border-radius: 10px; border: 1px solid var(--border); }
+  .sidebar-help p { font-size: 12px; color: var(--text-secondary); margin-bottom: 10px; line-height: 1.5; }
+  .help-btn { width: 100%; padding: 8px; background: linear-gradient(135deg, var(--purple-dark), #9333ea); border: none; border-radius: 8px; color: white; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+
+  /* MAIN */
+  .main { flex: 1; padding: 40px 56px 140px; max-width: 860px; }
+  .step-meta { font-size: 12px; color: var(--purple); font-weight: 500; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.08em; }
+  .step-title { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px; }
+  .step-title span { color: var(--purple); }
+  .step-subtitle { font-size: 14px; color: var(--text-secondary); margin-bottom: 36px; line-height: 1.7; max-width: 580px; }
+
+  /* CONTEXT TAGS */
+  .context-tags { display: flex; align-items: center; gap: 8px; margin-bottom: 36px; flex-wrap: wrap; }
+  .ctx-label { font-size: 12px; color: var(--text-muted); }
+  .ctx-tag { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; background: rgba(124,58,237,0.12); border: 1px solid rgba(167,139,250,0.25); color: var(--purple); }
+
+  /* FORM SECTION */
+  .form-section { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 28px; margin-bottom: 16px; transition: border-color 0.2s; }
+
+  .section-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+  .section-icon { font-size: 16px; width: 30px; height: 30px; background: rgba(124,58,237,0.15); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .section-subtitle { font-size: 13px; color: var(--text-muted); margin-bottom: 22px; line-height: 1.6; padding-left: 38px; }
+
+  /* ─── TWO-COLUMN LAYOUT ─── */
+  .upload-layout {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 24px;
+    align-items: start;
+  }
+
+  /* ─── DROP ZONE ─────────── */
+  .drop-zone {
+    border: 2px dashed var(--border);
+    border-radius: 14px;
+    padding: 48px 32px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 12px;
+    cursor: pointer; transition: all 0.25s;
+    background: rgba(255,255,255,0.015);
+    position: relative; overflow: hidden;
+    min-height: 260px;
+    text-align: center;
+  }
+
+  .drop-zone:hover {
+    border-color: var(--purple);
+    background: rgba(124,58,237,0.06);
+  }
+
+  .drop-zone.drag-over {
+    border-color: var(--purple);
+    background: rgba(124,58,237,0.1);
+    transform: scale(1.01);
+    box-shadow: 0 0 0 4px rgba(124,58,237,0.12);
+  }
+
+  .drop-zone.has-image {
+    padding: 0; border-style: solid;
+    border-color: var(--purple);
+  }
+
+  .drop-icon {
+    width: 56px; height: 56px; border-radius: 14px;
+    background: rgba(124,58,237,0.12);
+    border: 1px solid rgba(167,139,250,0.25);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px; transition: all 0.2s;
+  }
+
+  .drop-zone:hover .drop-icon {
+    background: rgba(124,58,237,0.22);
+    transform: translateY(-2px);
+  }
+
+  .drop-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: var(--text-primary); }
+  .drop-sub { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+  .drop-or { font-size: 12px; color: var(--text-muted); }
+
+  .drop-btn {
+    padding: 9px 22px; border-radius: 8px;
+    background: linear-gradient(135deg, var(--purple-dark), #9333ea);
+    border: none; color: white; font-size: 13px; font-weight: 600;
+    cursor: pointer; font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s;
+    box-shadow: 0 4px 12px rgba(124,58,237,0.3);
+  }
+
+  .drop-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(124,58,237,0.4); }
+
+  .file-input { display: none; }
+
+  /* ─── IMAGE PREVIEW ─────── */
+  .preview-wrap {
+    position: relative; width: 100%; height: 100%;
+    min-height: 260px; display: none;
+  }
+
+  .preview-wrap.visible { display: block; }
+
+  .preview-img {
+    width: 100%; height: 100%; min-height: 260px;
+    object-fit: cover; border-radius: 12px; display: block;
+  }
+
+  .preview-overlay {
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,0);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    transition: background 0.2s;
+  }
+
+  .preview-wrap:hover .preview-overlay { background: rgba(0,0,0,0.55); }
+
+  .preview-action {
+    padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 600;
+    cursor: pointer; font-family: 'DM Sans', sans-serif;
+    opacity: 0; transition: opacity 0.2s; border: none;
+    display: flex; align-items: center; gap: 6px;
+  }
+
+  .preview-wrap:hover .preview-action { opacity: 1; }
+
+  .preview-action.replace { background: white; color: #1a1630; }
+  .preview-action.remove { background: rgba(239,68,68,0.8); color: white; }
+
+  /* ─── DROP ZONE EMPTY ─── */
+  .drop-empty { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .drop-zone.has-image .drop-empty { display: none; }
+
+  /* ─── PREVIEW PANEL ─────────────────────────────── */
+  .preview-panel { display: flex; flex-direction: column; gap: 14px; }
+
+  .preview-panel-label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+
+  /* Card preview */
+  .preview-card {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
+  }
+
+  .preview-card-thumb {
+    width: 100%; height: 140px;
+    background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(244,114,182,0.15));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; color: var(--text-muted); position: relative; overflow: hidden;
+    transition: all 0.3s;
+  }
+
+  .preview-card-thumb img {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    object-fit: cover; display: none;
+  }
+
+  .preview-card-thumb img.visible { display: block; }
+
+  .preview-card-thumb .thumb-placeholder { transition: opacity 0.2s; }
+  .preview-card-thumb.has-img .thumb-placeholder { opacity: 0; }
+
+  .preview-card-body { padding: 12px 14px; }
+  .preview-card-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 3px; }
+  .preview-card-meta { font-size: 11px; color: var(--text-muted); }
+
+  /* Profile banner preview */
+  .preview-banner {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border); border-radius: 12px;
+    overflow: hidden; padding: 14px;
+  }
+
+  .banner-img-row {
+    display: flex; align-items: center; gap: 10px;
+  }
+
+  .banner-thumb {
+    width: 44px; height: 44px; border-radius: 8px;
+    background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(244,114,182,0.15));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0; overflow: hidden; position: relative;
+  }
+
+  .banner-thumb img {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    object-fit: cover; display: none; border-radius: 8px;
+  }
+  .banner-thumb img.visible { display: block; }
+
+  .banner-text-col { flex: 1; }
+  .banner-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: var(--text-primary); }
+  .banner-sub { font-size: 11px; color: var(--text-muted); }
+
+  /* ─── URL FALLBACK TAB ──── */
+  .tab-row { display: flex; gap: 0; margin-bottom: 20px; border-radius: 10px; overflow: hidden; border: 1px solid var(--border); }
+  .tab-btn { flex: 1; padding: 11px 16px; background: transparent; border: none; color: var(--text-muted); font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 7px; }
+  .tab-btn:not(:last-child) { border-right: 1px solid var(--border); }
+  .tab-btn.active { background: rgba(124,58,237,0.15); color: var(--purple); font-weight: 600; }
+  .tab-btn:not(.active):hover { background: rgba(255,255,255,0.03); color: var(--text-secondary); }
+
+  .tab-panel { display: none; }
+  .tab-panel.visible { display: block; }
+
+  /* URL Input */
+  .url-input-row { display: flex; gap: 10px; }
+  .url-input {
+    flex: 1; padding: 12px 16px;
+    background: rgba(255,255,255,0.04); border: 1.5px solid var(--border);
+    border-radius: 10px; color: var(--text-primary);
+    font-size: 13px; font-family: 'DM Sans', sans-serif; outline: none; transition: all 0.2s;
+  }
+  .url-input::placeholder { color: var(--text-muted); }
+  .url-input:focus { border-color: var(--purple); background: rgba(167,139,250,0.05); box-shadow: 0 0 0 3px rgba(167,139,250,0.1); }
+  .url-load-btn {
+    padding: 12px 18px; background: linear-gradient(135deg, var(--purple-dark), #9333ea);
+    border: none; border-radius: 10px; color: white; font-size: 13px; font-weight: 600;
+    cursor: pointer; font-family: 'DM Sans', sans-serif; white-space: nowrap; transition: all 0.2s;
+  }
+  .url-load-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(124,58,237,0.4); }
+  .url-hint { font-size: 11px; color: var(--text-muted); margin-top: 8px; line-height: 1.5; }
+
+  /* ─── IMAGE SPECS ────────── */
+  .specs-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+  .spec-card {
+    background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px; text-align: center;
+  }
+
+  .spec-icon { font-size: 20px; margin-bottom: 6px; }
+  .spec-label { font-size: 11px; color: var(--text-muted); margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.07em; }
+  .spec-value { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: var(--text-primary); }
+
+  /* ─── TIPS ──────────────── */
+  .tips-row { display: flex; flex-direction: column; gap: 9px; margin-top: 16px; }
+  .tip-row { display: flex; align-items: flex-start; gap: 10px; }
+  .tip-check { width: 18px; height: 18px; border-radius: 50%; background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.25); display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--green); flex-shrink: 0; margin-top: 1px; }
+  .tip-text { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+  .tip-text strong { color: var(--text-secondary); font-weight: 500; }
+
+  /* ─── UPLOAD STATUS ─────── */
+  .upload-status {
+    display: none; align-items: center; gap: 10px;
+    padding: 12px 16px; border-radius: 10px; margin-top: 14px;
+    font-size: 13px;
+  }
+  .upload-status.uploading { display: flex; background: rgba(124,58,237,0.1); border: 1px solid rgba(167,139,250,0.25); color: var(--purple); }
+  .upload-status.success { display: flex; background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2); color: var(--green); }
+  .upload-status.error { display: flex; background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); color: #ef4444; }
+
+  .spinner {
+    width: 16px; height: 16px; border: 2px solid rgba(167,139,250,0.3);
+    border-top-color: var(--purple); border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* VALIDATION */
+  .validation-note { display: flex; align-items: center; gap: 8px; font-size: 12px; margin-bottom: 24px; margin-top: 8px; }
+  .validation-dot { width: 6px; height: 6px; border-radius: 50%; }
+
+  /* FOOTER */
+  .form-footer { display: flex; align-items: center; justify-content: space-between; padding: 20px 48px; background: rgba(13,11,26,0.95); border-top: 1px solid var(--border); backdrop-filter: blur(12px); position: fixed; bottom: 0; width: calc(100% - 240px); margin-left: 240px; z-index: 50; }
+  .btn-draft { display: flex; align-items: center; gap: 8px; padding: 10px 18px; background: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .btn-draft:hover { border-color: var(--purple); color: var(--purple); }
+  .footer-right { display: flex; gap: 12px; align-items: center; }
+  .btn-back { padding: 10px 24px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .btn-back:hover { color: var(--text-primary); }
+  .btn-skip { padding: 10px 20px; background: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--text-muted); font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .btn-skip:hover { color: var(--text-secondary); border-color: var(--text-muted); }
+  .btn-next { padding: 12px 28px; background: linear-gradient(135deg, var(--purple-dark), #9333ea); border: none; border-radius: 8px; color: white; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; display: flex; align-items: center; gap: 8px; transition: all 0.25s; box-shadow: 0 4px 14px rgba(124,58,237,0.35); opacity: 0.45; pointer-events: none; }
+  .btn-next.ready { opacity: 1; pointer-events: all; }
+  .btn-next.ready:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(124,58,237,0.45); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">
+    <div class="logo-icon">🎵</div>
+    EchoVizion
+  </div>
+  <ul class="nav-links">
+    <li><a href="#">Projects</a></li>
+    <li><a href="#" class="active">Create Project</a></li>
+    <li><a href="#">Messages</a></li>
+    <li><a href="#">Profile</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="notif">🔔<div class="notif-dot"></div></div>
+    <div class="avatar">V</div>
+  </div>
+</nav>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div>
+      <div class="sidebar-proj-label">Project Creation</div>
+      <div class="sidebar-step-label">Step 2/10</div>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill"></div></div>
+      <div class="progress-pct"><strong>18% Complete</strong></div>
+    </div>
+
+    <div class="steps-list">
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Project Details</span></div>
+      <div class="step-item active"><div class="step-num">2</div><span class="step-name">Cover Image</span></div>
+      <div class="step-item"><div class="step-num">3</div><span class="step-name">Budget Definition</span></div>
+      <div class="step-item"><div class="step-num">4</div><span class="step-name">Creative Direction</span></div>
+      <div class="step-item"><div class="step-num">5</div><span class="step-name">Visual Style Selection</span></div>
+      <div class="step-item"><div class="step-num">6</div><span class="step-name">Inspiration References</span></div>
+      <div class="step-item"><div class="step-num">7</div><span class="step-name">Technical Requirements</span></div>
+      <div class="step-item"><div class="step-num">8</div><span class="step-name">Talent & Crew Needs</span></div>
+      <div class="step-item"><div class="step-num">9</div><span class="step-name">Location & Travel</span></div>
+      <div class="step-item"><div class="step-num">10</div><span class="step-name">Review & Submit</span></div>
+    </div>
+
+    <div class="sidebar-help">
+      <p>Need help choosing a cover image? Pick something that captures the mood of your project.</p>
+      <button class="help-btn">💬 Contact Support</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="step-meta">Step 2 of 10</div>
+    <h1 class="step-title">Project <span>Cover Image</span></h1>
+    <p class="step-subtitle">Upload a cover image for your project. This appears on your project card when creatives browse open briefs — a strong visual makes your project stand out and attract the right talent.</p>
+
+    <div class="context-tags">
+      <span class="ctx-label">Your project:</span>
+      <span class="ctx-tag">🎬 Music Video</span>
+      <span class="ctx-tag">🎵 Afro-Reggae / R&B</span>
+      <span class="ctx-tag">💰 $5K – $15K</span>
+    </div>
+
+    <!-- ── UPLOAD SECTION ──────────────────────────── -->
+    <div class="form-section">
+      <div class="section-title">
+        <div class="section-icon">🖼️</div>
+        Upload Your Cover Image
+      </div>
+      <p class="section-subtitle">Drag and drop an image or click to browse — or paste a URL below. This is optional but strongly recommended.</p>
+
+      <!-- INPUT METHOD TABS -->
+      <div class="tab-row">
+        <button class="tab-btn active" id="tab-upload" onclick="switchTab('upload')">📁 Upload File</button>
+        <button class="tab-btn" id="tab-url" onclick="switchTab('url')">🔗 Use Image URL</button>
+      </div>
+
+      <!-- UPLOAD PANEL -->
+      <div class="tab-panel visible" id="panel-upload">
+        <div class="upload-layout">
+
+          <!-- DROP ZONE -->
+          <div
+            class="drop-zone" id="drop-zone"
+            onclick="triggerFileInput()"
+            ondragover="handleDragOver(event)"
+            ondragleave="handleDragLeave(event)"
+            ondrop="handleDrop(event)"
+          >
+            <div class="drop-empty">
+              <div class="drop-icon">🖼️</div>
+              <div class="drop-title">Drop your image here</div>
+              <div class="drop-sub">JPG, PNG, WebP or GIF<br>Maximum 10MB</div>
+              <div class="drop-or">— or —</div>
+              <button class="drop-btn" onclick="event.stopPropagation();triggerFileInput()">Browse Files</button>
+            </div>
+
+            <!-- PREVIEW -->
+            <div class="preview-wrap" id="preview-wrap">
+              <img id="preview-img" class="preview-img" src="" alt="Cover preview">
+              <div class="preview-overlay">
+                <button class="preview-action replace" onclick="event.stopPropagation();triggerFileInput()">🔄 Replace</button>
+                <button class="preview-action remove" onclick="event.stopPropagation();removeImage()">✕ Remove</button>
+              </div>
+            </div>
+          </div>
+
+          <input type="file" class="file-input" id="file-input" accept="image/*" onchange="handleFileSelect(event)">
+
+          <!-- LIVE PREVIEWS PANEL -->
+          <div class="preview-panel">
+            <div class="preview-panel-label">Preview</div>
+
+            <!-- Project Card preview -->
+            <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;">Project card</div>
+            <div class="preview-card">
+              <div class="preview-card-thumb" id="card-thumb">
+                <span class="thumb-placeholder">🎬</span>
+                <img id="card-thumb-img" src="" alt="">
+              </div>
+              <div class="preview-card-body">
+                <div class="preview-card-title">I'm So Tired of This World</div>
+                <div class="preview-card-meta">Music Video · $5K–$15K · Afro-Reggae</div>
+              </div>
+            </div>
+
+            <!-- Profile browse preview -->
+            <div style="font-size:11px;color:var(--text-muted);margin-top:8px;margin-bottom:6px;">Browse listing</div>
+            <div class="preview-banner">
+              <div class="banner-img-row">
+                <div class="banner-thumb">
+                  <span style="font-size:18px;">🎬</span>
+                  <img id="banner-thumb-img" src="" alt="">
+                </div>
+                <div class="banner-text-col">
+                  <div class="banner-title">I'm So Tired of This World</div>
+                  <div class="banner-sub">Music Video · Posted just now</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- UPLOAD STATUS -->
+        <div class="upload-status" id="upload-status"></div>
+      </div>
+
+      <!-- URL PANEL -->
+      <div class="tab-panel" id="panel-url">
+        <div class="url-input-row">
+          <input
+            type="url" class="url-input" id="url-input"
+            placeholder="https://example.com/my-cover-image.jpg"
+          >
+          <button class="url-load-btn" onclick="loadImageFromUrl()">Load Image</button>
+        </div>
+        <div class="url-hint">Paste a direct link to any image file — JPG, PNG, or WebP. The image must be publicly accessible. Works with Google Drive (shared), Dropbox, or any public image URL.</div>
+
+        <!-- URL PREVIEW -->
+        <div id="url-preview-wrap" style="margin-top:16px;display:none;">
+          <div class="upload-layout" style="margin-top:0;">
+            <div class="drop-zone has-image" style="cursor:default;">
+              <div class="preview-wrap visible">
+                <img id="url-preview-img" class="preview-img" src="" alt="URL Preview">
+                <div class="preview-overlay">
+                  <button class="preview-action remove" onclick="removeUrlImage()">✕ Remove</button>
+                </div>
+              </div>
+            </div>
+            <div class="preview-panel">
+              <div class="preview-panel-label">Preview</div>
+              <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;">Project card</div>
+              <div class="preview-card">
+                <div class="preview-card-thumb" id="url-card-thumb">
+                  <span class="thumb-placeholder">🎬</span>
+                  <img id="url-card-thumb-img" src="" alt="">
+                </div>
+                <div class="preview-card-body">
+                  <div class="preview-card-title">I'm So Tired of This World</div>
+                  <div class="preview-card-meta">Music Video · $5K–$15K · Afro-Reggae</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── IMAGE SPECS ──────────────────────────────── -->
+    <div class="form-section">
+      <div class="section-title">
+        <div class="section-icon">📐</div>
+        Image Requirements & Tips
+      </div>
+      <p class="section-subtitle">Follow these guidelines to ensure your cover image looks great across all placements</p>
+
+      <div class="specs-grid">
+        <div class="spec-card">
+          <div class="spec-icon">📐</div>
+          <div class="spec-label">Aspect Ratio</div>
+          <div class="spec-value">16:9 recommended</div>
+        </div>
+        <div class="spec-card">
+          <div class="spec-icon">🔍</div>
+          <div class="spec-label">Min Resolution</div>
+          <div class="spec-value">1280 × 720px</div>
+        </div>
+        <div class="spec-card">
+          <div class="spec-icon">💾</div>
+          <div class="spec-label">Max File Size</div>
+          <div class="spec-value">10 MB</div>
+        </div>
+        <div class="spec-card">
+          <div class="spec-icon">🗂️</div>
+          <div class="spec-label">Accepted Formats</div>
+          <div class="spec-value">JPG · PNG · WebP</div>
+        </div>
+        <div class="spec-card">
+          <div class="spec-icon">✨</div>
+          <div class="spec-label">Ideal Content</div>
+          <div class="spec-value">Mood / vibe shots</div>
+        </div>
+        <div class="spec-card">
+          <div class="spec-icon">🚫</div>
+          <div class="spec-label">Avoid</div>
+          <div class="spec-value">Text-heavy images</div>
+        </div>
+      </div>
+
+      <div class="tips-row">
+        <div class="tip-row">
+          <div class="tip-check">✓</div>
+          <div class="tip-text"><strong>Use existing album art or a mood board</strong> — anything that communicates the visual feel of your project works well</div>
+        </div>
+        <div class="tip-row">
+          <div class="tip-check">✓</div>
+          <div class="tip-text"><strong>Avoid heavy text overlays</strong> — the project title is already shown below the image on your card, so text in the image is redundant</div>
+        </div>
+        <div class="tip-row">
+          <div class="tip-check">✓</div>
+          <div class="tip-text"><strong>A strong visual signals quality</strong> — creatives often decide whether to read a brief based on the cover image alone</div>
+        </div>
+        <div class="tip-row">
+          <div class="tip-check">✓</div>
+          <div class="tip-text"><strong>Darker, moodier images tend to perform better</strong> on our dark-themed platform — high contrast works especially well</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VALIDATION -->
+    <div class="validation-note">
+      <div class="validation-dot" id="val-dot" style="background:var(--orange);"></div>
+      <span id="val-text" style="color:var(--orange);">Upload a cover image or skip this step to continue</span>
+    </div>
+
+    <div style="height:40px;"></div>
+  </main>
+</div>
+
+<!-- FOOTER -->
+<div class="form-footer">
+  <button class="btn-draft">💾 Save as Draft</button>
+  <div class="footer-right">
+    <span id="footer-status" style="font-size:13px;color:var(--text-muted);">No image uploaded yet</span>
+    <button class="btn-back">← Back</button>
+    <button class="btn-skip" onclick="skipStep()">Skip for now</button>
+    <button class="btn-next" id="next-btn" onclick="goNext()">Next: Budget Definition →</button>
+  </div>
+</div>
+
+<script>
+  let imageReady = false;
+
+  // ─── TABS ─────────────────────────────────────────
+  function switchTab(tab) {
+    document.getElementById('tab-upload').classList.toggle('active', tab === 'upload');
+    document.getElementById('tab-url').classList.toggle('active', tab === 'url');
+    document.getElementById('panel-upload').classList.toggle('visible', tab === 'upload');
+    document.getElementById('panel-url').classList.toggle('visible', tab === 'url');
+  }
+
+  // ─── FILE INPUT ───────────────────────────────────
+  function triggerFileInput() {
+    document.getElementById('file-input').click();
+  }
+
+  function handleFileSelect(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) {
+      showStatus('error', '✕ File too large — maximum size is 10MB');
+      return;
+    }
+    if (!file.type.startsWith('image/')) {
+      showStatus('error', '✕ Invalid file type — please upload an image');
+      return;
+    }
+    showStatus('uploading', 'Uploading image…');
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setTimeout(() => applyImage(e.target.result), 600);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // ─── DRAG & DROP ──────────────────────────────────
+  function handleDragOver(e) {
+    e.preventDefault();
+    document.getElementById('drop-zone').classList.add('drag-over');
+  }
+
+  function handleDragLeave(e) {
+    document.getElementById('drop-zone').classList.remove('drag-over');
+  }
+
+  function handleDrop(e) {
+    e.preventDefault();
+    document.getElementById('drop-zone').classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (!file || !file.type.startsWith('image/')) {
+      showStatus('error', '✕ Please drop a valid image file');
+      return;
+    }
+    showStatus('uploading', 'Processing image…');
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      setTimeout(() => applyImage(ev.target.result), 500);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // ─── APPLY IMAGE ─────────────────────────────────
+  function applyImage(src) {
+    // Drop zone
+    const dropZone = document.getElementById('drop-zone');
+    const previewWrap = document.getElementById('preview-wrap');
+    const previewImg = document.getElementById('preview-img');
+
+    dropZone.classList.add('has-image');
+    previewWrap.classList.add('visible');
+    previewImg.src = src;
+
+    // Card thumb
+    const cardThumb = document.getElementById('card-thumb');
+    const cardThumbImg = document.getElementById('card-thumb-img');
+    cardThumb.classList.add('has-img');
+    cardThumbImg.src = src;
+    cardThumbImg.classList.add('visible');
+
+    // Banner thumb
+    const bannerThumbImg = document.getElementById('banner-thumb-img');
+    bannerThumbImg.src = src;
+    bannerThumbImg.classList.add('visible');
+
+    showStatus('success', '✅ Image uploaded successfully');
+    imageReady = true;
+    updateUI();
+  }
+
+  function removeImage() {
+    const dropZone = document.getElementById('drop-zone');
+    const previewWrap = document.getElementById('preview-wrap');
+
+    dropZone.classList.remove('has-image');
+    previewWrap.classList.remove('visible');
+
+    // Reset card/banner
+    document.getElementById('card-thumb').classList.remove('has-img');
+    document.getElementById('card-thumb-img').classList.remove('visible');
+    document.getElementById('banner-thumb-img').classList.remove('visible');
+
+    document.getElementById('upload-status').className = 'upload-status';
+    document.getElementById('file-input').value = '';
+
+    imageReady = false;
+    updateUI();
+  }
+
+  // ─── URL IMAGE ────────────────────────────────────
+  function loadImageFromUrl() {
+    const url = document.getElementById('url-input').value.trim();
+    if (!url) return;
+
+    const testImg = new Image();
+    testImg.onload = () => {
+      // Apply to URL previews
+      const urlPreviewImg = document.getElementById('url-preview-img');
+      urlPreviewImg.src = url;
+      document.getElementById('url-preview-wrap').style.display = 'block';
+
+      const urlCardThumb = document.getElementById('url-card-thumb');
+      const urlCardThumbImg = document.getElementById('url-card-thumb-img');
+      urlCardThumb.classList.add('has-img');
+      urlCardThumbImg.src = url;
+      urlCardThumbImg.classList.add('visible');
+
+      imageReady = true;
+      updateUI();
+    };
+    testImg.onerror = () => {
+      alert('Could not load image from that URL. Please check the link and make sure it points directly to an image file.');
+    };
+    testImg.src = url;
+  }
+
+  function removeUrlImage() {
+    document.getElementById('url-preview-wrap').style.display = 'none';
+    document.getElementById('url-input').value = '';
+    document.getElementById('url-card-thumb').classList.remove('has-img');
+    document.getElementById('url-card-thumb-img').classList.remove('visible');
+    imageReady = false;
+    updateUI();
+  }
+
+  // ─── STATUS MESSAGE ───────────────────────────────
+  function showStatus(type, msg) {
+    const el = document.getElementById('upload-status');
+    el.className = `upload-status ${type}`;
+    if (type === 'uploading') {
+      el.innerHTML = `<div class="spinner"></div> ${msg}`;
+    } else {
+      el.innerHTML = msg;
+    }
+  }
+
+  // ─── UI ───────────────────────────────────────────
+  function updateUI() {
+    const btn = document.getElementById('next-btn');
+    const status = document.getElementById('footer-status');
+    const dot = document.getElementById('val-dot');
+    const valText = document.getElementById('val-text');
+
+    if (imageReady) {
+      btn.classList.add('ready');
+      status.textContent = '✅ Cover image ready';
+      status.style.color = 'var(--green)';
+      dot.style.background = 'var(--green)';
+      valText.textContent = 'Looking great — ready to continue to the next step';
+      valText.style.color = 'var(--green)';
+    } else {
+      btn.classList.remove('ready');
+      status.textContent = 'No image uploaded yet';
+      status.style.color = 'var(--text-muted)';
+      dot.style.background = 'var(--orange)';
+      valText.textContent = 'Upload a cover image or skip this step to continue';
+      valText.style.color = 'var(--orange)';
+    }
+  }
+
+  function skipStep() {
+    alert('Skipping to Budget Definition…');
+  }
+
+  function goNext() {
+    if (imageReady) alert('Proceeding to Budget Definition…');
+  }
+</script>
+
+</body>
+</html>

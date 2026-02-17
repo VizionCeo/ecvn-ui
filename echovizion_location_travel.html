@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EchoVizion – Location & Travel Preferences</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0d0b1a;
+    --sidebar-bg: #120f24;
+    --card-bg: #1a1630;
+    --purple: #a78bfa;
+    --purple-dark: #7c3aed;
+    --pink: #f472b6;
+    --green: #10b981;
+    --orange: #f59e0b;
+    --teal: #06b6d4;
+    --border: #2a2448;
+    --text-primary: #f1f0ff;
+    --text-secondary: #9ca3af;
+    --text-muted: #6b7280;
+  }
+
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; }
+
+  /* NAV */
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 0 32px; height: 56px; background: rgba(13,11,26,0.95); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(12px); }
+  .logo { display: flex; align-items: center; gap: 10px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 18px; }
+  .logo-icon { width: 30px; height: 30px; background: linear-gradient(135deg, var(--purple-dark), var(--pink)); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 14px; font-weight: 500; }
+  .nav-links a.active { color: var(--text-primary); border-bottom: 2px solid var(--purple); padding-bottom: 2px; }
+  .nav-right { display: flex; align-items: center; gap: 16px; }
+  .notif { width: 32px; height: 32px; border-radius: 50%; background: var(--card-bg); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 14px; position: relative; cursor: pointer; }
+  .notif-dot { position: absolute; top: 6px; right: 6px; width: 6px; height: 6px; border-radius: 50%; background: var(--pink); }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--purple-dark), var(--pink)); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: white; }
+
+  /* LAYOUT */
+  .layout { display: flex; flex: 1; }
+
+  /* SIDEBAR */
+  .sidebar { width: 240px; background: var(--sidebar-bg); border-right: 1px solid var(--border); padding: 24px 16px; position: sticky; top: 56px; height: calc(100vh - 56px); overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+  .sidebar-proj-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); font-weight: 500; margin-bottom: 2px; }
+  .sidebar-step-label { font-size: 13px; color: var(--purple); font-weight: 600; font-family: 'Syne', sans-serif; margin-bottom: 10px; }
+  .progress-bar-wrap { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; margin-bottom: 6px; }
+  .progress-bar-fill { height: 100%; width: 90%; background: linear-gradient(90deg, var(--purple-dark), var(--pink)); border-radius: 2px; }
+  .progress-pct { font-size: 12px; color: var(--text-muted); }
+  .progress-pct strong { color: var(--text-secondary); font-weight: 500; }
+  .steps-list { display: flex; flex-direction: column; gap: 2px; }
+  .step-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; cursor: pointer; transition: all 0.15s; border: 1px solid transparent; }
+  .step-item.active { background: rgba(124,58,237,0.15); border-color: rgba(167,139,250,0.3); }
+  .step-item.completed .step-num { background: var(--purple-dark); color: white; }
+  .step-item.completed .step-name { color: var(--text-secondary); }
+  .step-num { width: 22px; height: 22px; border-radius: 50%; background: var(--border); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: var(--text-muted); flex-shrink: 0; }
+  .step-item.active .step-num { background: linear-gradient(135deg, var(--purple-dark), var(--purple)); color: white; }
+  .step-name { font-size: 13px; color: var(--text-muted); }
+  .step-item.active .step-name { color: var(--text-primary); font-weight: 500; }
+  .sidebar-help { margin-top: auto; padding: 14px; background: var(--card-bg); border-radius: 10px; border: 1px solid var(--border); }
+  .sidebar-help p { font-size: 12px; color: var(--text-secondary); margin-bottom: 10px; line-height: 1.5; }
+  .help-btn { width: 100%; padding: 8px; background: linear-gradient(135deg, var(--purple-dark), #9333ea); border: none; border-radius: 8px; color: white; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+
+  /* MAIN */
+  .main { flex: 1; padding: 36px 48px 140px; max-width: 860px; }
+
+  .page-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 10px; }
+  .page-header-icon { width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, var(--purple-dark), var(--pink)); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  .step-meta { font-size: 12px; color: var(--purple); font-weight: 500; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.08em; }
+  .step-title { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; color: var(--text-primary); }
+  .step-subtitle { font-size: 13px; color: var(--text-secondary); margin-bottom: 28px; line-height: 1.7; max-width: 620px; }
+
+  /* SECTIONS */
+  .form-section { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 26px 28px; margin-bottom: 14px; transition: border-color 0.2s; }
+  .form-section:focus-within { border-color: rgba(167,139,250,0.35); }
+
+  .section-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 6px; }
+  .section-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
+  .section-icon { width: 28px; height: 28px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+  .section-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 20px; padding-left: 36px; line-height: 1.5; }
+
+  .req-badge { font-size: 11px; font-weight: 500; color: var(--pink); background: rgba(244,114,182,0.1); border: 1px solid rgba(244,114,182,0.25); border-radius: 6px; padding: 3px 8px; white-space: nowrap; }
+  .opt-badge { font-size: 11px; font-weight: 500; color: var(--text-muted); background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 6px; padding: 3px 8px; }
+
+  /* ZIP INPUT */
+  .zip-input {
+    width: 100%; padding: 13px 16px;
+    background: rgba(255,255,255,0.04);
+    border: 1.5px solid var(--border);
+    border-radius: 10px; color: var(--text-primary);
+    font-size: 14px; font-family: 'DM Sans', sans-serif;
+    outline: none; transition: all 0.2s;
+    margin-bottom: 8px;
+  }
+  .zip-input::placeholder { color: var(--text-muted); }
+  .zip-input:focus { border-color: var(--purple); background: rgba(167,139,250,0.05); box-shadow: 0 0 0 3px rgba(167,139,250,0.1); }
+  .zip-input.valid { border-color: rgba(16,185,129,0.5); }
+
+  .field-hint { font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+
+  /* DETECTED LOCATION */
+  .detected-location {
+    display: none; align-items: center; gap: 8px;
+    margin-top: 8px; padding: 8px 12px;
+    background: rgba(16,185,129,0.07);
+    border: 1px solid rgba(16,185,129,0.2);
+    border-radius: 8px; font-size: 12px; color: var(--green);
+  }
+  .detected-location.visible { display: flex; }
+
+  /* ─── DISTANCE SLIDER ──────────────────────── */
+  .slider-container { padding: 8px 0 4px; }
+
+  .slider-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .slider-label { font-size: 13px; color: var(--text-secondary); font-weight: 500; }
+  .slider-value {
+    font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800;
+    color: var(--text-primary);
+  }
+  .slider-value span { font-size: 14px; color: var(--text-muted); font-weight: 400; margin-left: 2px; }
+
+  .slider-track-wrap { position: relative; height: 6px; background: var(--border); border-radius: 3px; margin-bottom: 10px; }
+  .slider-fill { position: absolute; left: 0; top: 0; height: 100%; background: linear-gradient(90deg, var(--purple-dark), var(--pink)); border-radius: 3px; transition: width 0.05s; }
+
+  .distance-slider {
+    position: absolute; top: -7px; left: 0;
+    width: 100%; height: 20px;
+    -webkit-appearance: none; background: transparent;
+    outline: none;
+  }
+  .distance-slider::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%;
+    background: white; border: 2px solid var(--purple-dark);
+    box-shadow: 0 2px 8px rgba(124,58,237,0.45); cursor: grab;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .distance-slider::-webkit-slider-thumb:active { cursor: grabbing; transform: scale(1.2); box-shadow: 0 4px 14px rgba(124,58,237,0.6); }
+
+  .slider-ticks { display: flex; justify-content: space-between; padding: 0 2px; }
+  .slider-tick { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+  .tick-mark { width: 1px; height: 5px; background: var(--border); }
+  .tick-label { font-size: 11px; color: var(--text-muted); }
+
+  /* REMOTE NOTE — shows/hides based on slider value */
+  .remote-note {
+    display: none; align-items: center; gap: 8px; margin-top: 12px;
+    padding: 8px 12px; border-radius: 8px; font-size: 12px;
+    background: rgba(6,182,212,0.07); border: 1px solid rgba(6,182,212,0.2);
+    color: var(--teal);
+  }
+  .remote-note.visible { display: flex; }
+
+  /* ─── TRAVEL OPTIONS ───────────────────────── */
+  .travel-options { display: flex; flex-direction: column; gap: 10px; }
+
+  .travel-option {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 16px 18px; border-radius: 12px;
+    border: 1.5px solid var(--border);
+    background: rgba(255,255,255,0.02);
+    cursor: pointer; transition: all 0.2s; user-select: none;
+    position: relative; overflow: hidden;
+  }
+
+  .travel-option::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(124,58,237,0.06), rgba(167,139,250,0.03));
+    opacity: 0; transition: opacity 0.2s;
+  }
+
+  .travel-option:hover { border-color: rgba(167,139,250,0.4); }
+  .travel-option:hover::before { opacity: 1; }
+
+  .travel-option.selected {
+    border-color: var(--purple);
+    background: rgba(124,58,237,0.09);
+  }
+  .travel-option.selected::before { opacity: 1; }
+
+  /* Custom checkbox */
+  .travel-checkbox {
+    width: 20px; height: 20px; border-radius: 6px;
+    border: 2px solid var(--border); flex-shrink: 0; margin-top: 1px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s; background: transparent;
+  }
+  .travel-option.selected .travel-checkbox {
+    background: var(--purple-dark); border-color: var(--purple-dark);
+  }
+  .travel-option.selected .travel-checkbox::after {
+    content: '✓'; font-size: 11px; color: white; font-weight: 700;
+  }
+
+  .travel-option-body { flex: 1; }
+  .travel-option-icon { font-size: 18px; margin-bottom: 4px; line-height: 1; }
+  .travel-option-name { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 3px; font-family: 'Syne', sans-serif; }
+  .travel-option-desc { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+
+  /* Mutually exclusive note */
+  .exclusive-note {
+    display: none; margin-top: 8px; padding: 8px 12px;
+    background: rgba(245,158,11,0.07); border: 1px solid rgba(245,158,11,0.2);
+    border-radius: 8px; font-size: 11px; color: var(--orange);
+  }
+  .exclusive-note.visible { display: block; }
+
+  /* NOTES TEXTAREA */
+  .notes-textarea {
+    width: 100%; min-height: 100px;
+    background: rgba(255,255,255,0.04);
+    border: 1.5px solid var(--border);
+    border-radius: 10px; color: var(--text-primary);
+    font-size: 13px; font-family: 'DM Sans', sans-serif;
+    padding: 14px 16px; outline: none; resize: vertical; line-height: 1.7;
+    transition: all 0.2s; margin-bottom: 6px;
+  }
+  .notes-textarea::placeholder { color: var(--text-muted); font-style: italic; }
+  .notes-textarea:focus { border-color: var(--purple); background: rgba(167,139,250,0.05); box-shadow: 0 0 0 3px rgba(167,139,250,0.1); }
+
+  /* TIPS SECTION */
+  .tips-section {
+    background: linear-gradient(135deg, rgba(6,182,212,0.06), rgba(124,58,237,0.06));
+    border: 1px solid rgba(6,182,212,0.18);
+    border-radius: 14px; padding: 20px 24px; margin-bottom: 14px;
+  }
+  .tips-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .tips-icon { width: 28px; height: 28px; border-radius: 7px; background: rgba(6,182,212,0.15); display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .tips-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--text-primary); }
+  .tips-list { display: flex; flex-direction: column; gap: 9px; }
+  .tip-row { display: flex; align-items: flex-start; gap: 10px; }
+  .tip-check { width: 18px; height: 18px; border-radius: 50%; background: rgba(6,182,212,0.15); border: 1px solid rgba(6,182,212,0.3); display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--teal); flex-shrink: 0; margin-top: 1px; }
+  .tip-text { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+
+  /* VALIDATION */
+  .validation-note { display: flex; align-items: center; gap: 8px; font-size: 12px; margin-bottom: 24px; margin-top: 8px; }
+  .validation-dot { width: 6px; height: 6px; border-radius: 50%; }
+
+  /* FOOTER */
+  .form-footer { display: flex; align-items: center; justify-content: space-between; padding: 20px 48px; background: rgba(13,11,26,0.95); border-top: 1px solid var(--border); backdrop-filter: blur(12px); position: fixed; bottom: 0; width: calc(100% - 240px); margin-left: 240px; z-index: 50; }
+  .btn-draft { display: flex; align-items: center; gap: 8px; padding: 10px 18px; background: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .btn-draft:hover { border-color: var(--purple); color: var(--purple); }
+  .footer-right { display: flex; gap: 12px; align-items: center; }
+  .btn-back { padding: 10px 24px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .btn-back:hover { color: var(--text-primary); }
+  .btn-next { padding: 12px 28px; background: linear-gradient(135deg, var(--purple-dark), #9333ea); border: none; border-radius: 8px; color: white; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; display: flex; align-items: center; gap: 8px; transition: all 0.25s; box-shadow: 0 4px 14px rgba(124,58,237,0.35); opacity: 0.45; pointer-events: none; }
+  .btn-next.ready { opacity: 1; pointer-events: all; }
+  .btn-next.ready:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(124,58,237,0.45); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">
+    <div class="logo-icon">🎵</div>
+    EchoVizion
+  </div>
+  <ul class="nav-links">
+    <li><a href="#">Projects</a></li>
+    <li><a href="#" class="active">Create Project</a></li>
+    <li><a href="#">Messages</a></li>
+    <li><a href="#">Profile</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="notif">🔔<div class="notif-dot"></div></div>
+    <div class="avatar">V</div>
+  </div>
+</nav>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div>
+      <div class="sidebar-proj-label">Project Creation</div>
+      <div class="sidebar-step-label">Step 9/10</div>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill"></div></div>
+      <div class="progress-pct"><strong>90% Complete</strong></div>
+    </div>
+
+    <div class="steps-list">
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Project Details</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Budget Definition</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Creative Direction</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Visual Style Selection</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Inspiration References</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Technical Requirements</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Talent & Crew Needs</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Collaboration Style</span></div>
+      <div class="step-item active"><div class="step-num">9</div><span class="step-name">Location & Travel</span></div>
+      <div class="step-item"><div class="step-num">10</div><span class="step-name">Review & Submit</span></div>
+    </div>
+
+    <div class="sidebar-help">
+      <p>Our team is here to guide you through the project creation process.</p>
+      <button class="help-btn">💬 Contact Support</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="page-header">
+      <div class="page-header-icon">📍</div>
+      <div>
+        <div class="step-meta">Step 9 of 10</div>
+        <h1 class="step-title">Location & Travel Preferences</h1>
+      </div>
+    </div>
+
+    <p class="step-subtitle">Help us understand your location and travel flexibility to match you with creators in your area or those willing to travel to you.</p>
+
+    <!-- ── SECTION 1: ZIP CODE ─────────────────────── -->
+    <div class="form-section">
+      <div class="section-header">
+        <div class="section-title">
+          <div class="section-icon" style="background:rgba(244,114,182,0.12);border:1px solid rgba(244,114,182,0.2);">📮</div>
+          ZIP Code / Postal Code
+        </div>
+        <span class="req-badge">Required</span>
+      </div>
+      <div class="section-sub">Your location helps us find nearby creators and calculate travel distances</div>
+
+      <input
+        type="text"
+        class="zip-input"
+        id="zip-input"
+        placeholder="Enter your ZIP or postal code"
+        maxlength="10"
+        oninput="handleZip(this)"
+      >
+
+      <div class="field-hint">We never share your exact location — only the general area is used for matching</div>
+
+      <div class="detected-location" id="detected-loc">
+        <span>✅</span>
+        <span id="detected-loc-text">Location detected</span>
+      </div>
+    </div>
+
+    <!-- ── SECTION 2: DISTANCE SLIDER ─────────────── -->
+    <div class="form-section">
+      <div class="section-header">
+        <div class="section-title">
+          <div class="section-icon" style="background:rgba(167,139,250,0.12);border:1px solid rgba(167,139,250,0.2);">📏</div>
+          How far can you / the creator travel?
+        </div>
+        <span class="req-badge">Required</span>
+      </div>
+      <div class="section-sub">Set the maximum distance for in-person collaboration — this helps filter creatives by proximity</div>
+
+      <div class="slider-container">
+        <div class="slider-top">
+          <span class="slider-label">Distance Range</span>
+          <div class="slider-value" id="slider-value-display">50 <span>miles</span></div>
+        </div>
+
+        <div class="slider-track-wrap">
+          <div class="slider-fill" id="slider-fill" style="width:50%;"></div>
+          <input
+            type="range" class="distance-slider" id="distance-slider"
+            min="0" max="100" value="50" step="5"
+            oninput="updateDistanceSlider(this.value)"
+          >
+        </div>
+
+        <div class="slider-ticks">
+          <div class="slider-tick"><div class="tick-mark"></div><div class="tick-label">0 mi</div></div>
+          <div class="slider-tick"><div class="tick-mark"></div><div class="tick-label">25 mi</div></div>
+          <div class="slider-tick"><div class="tick-mark"></div><div class="tick-label">50 mi</div></div>
+          <div class="slider-tick"><div class="tick-mark"></div><div class="tick-label">75 mi</div></div>
+          <div class="slider-tick"><div class="tick-mark"></div><div class="tick-label">100+</div></div>
+        </div>
+
+        <div class="remote-note" id="remote-note">
+          💡 At this distance you may want to also consider remote collaboration — it removes travel costs entirely
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECTION 3: TRAVEL OPTIONS ──────────────── -->
+    <div class="form-section">
+      <div class="section-header">
+        <div class="section-title">
+          <div class="section-icon" style="background:rgba(6,182,212,0.12);border:1px solid rgba(6,182,212,0.2);">✈️</div>
+          Travel & Collaboration Options
+        </div>
+        <span style="font-size:11px;color:var(--text-muted);">Select all that apply</span>
+      </div>
+      <div class="section-sub">Choose your preferred collaboration and travel arrangements — selecting more options expands your creative pool</div>
+
+      <div class="travel-options">
+
+        <div class="travel-option" id="opt-travel-to-me" onclick="toggleOption('travel-to-me')">
+          <div class="travel-checkbox" id="cb-travel-to-me"></div>
+          <div class="travel-option-body">
+            <div class="travel-option-icon">🚶</div>
+            <div class="travel-option-name">Creator can travel to me</div>
+            <div class="travel-option-desc">The creator will come to your location for filming and production — travel costs are typically negotiated separately</div>
+          </div>
+        </div>
+
+        <div class="travel-option" id="opt-i-travel" onclick="toggleOption('i-travel')">
+          <div class="travel-checkbox" id="cb-i-travel"></div>
+          <div class="travel-option-body">
+            <div class="travel-option-icon">✈️</div>
+            <div class="travel-option-name">I can travel to creator's location</div>
+            <div class="travel-option-desc">You're willing to travel to the creator's studio or preferred filming location — great for accessing specialized facilities</div>
+          </div>
+        </div>
+
+        <div class="travel-option" id="opt-remote" onclick="toggleOption('remote')">
+          <div class="travel-checkbox" id="cb-remote"></div>
+          <div class="travel-option-body">
+            <div class="travel-option-icon">💻</div>
+            <div class="travel-option-name">Remote collaboration</div>
+            <div class="travel-option-desc">Work together virtually without in-person meetings — ideal for post-production work, animation, or motion graphics</div>
+          </div>
+        </div>
+
+        <div class="travel-option" id="opt-local-only" onclick="toggleOption('local-only')">
+          <div class="travel-checkbox" id="cb-local-only"></div>
+          <div class="travel-option-body">
+            <div class="travel-option-icon">📌</div>
+            <div class="travel-option-name">Must be filmed locally</div>
+            <div class="travel-option-desc">Project must be completed within your specified distance range — only local creatives will be shown in your matches</div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="exclusive-note" id="exclusive-note">
+        ⚠️ Heads up — "Must be filmed locally" and "Remote collaboration" are somewhat contradictory. Make sure your selections reflect your actual flexibility.
+      </div>
+    </div>
+
+    <!-- ── SECTION 4: ADDITIONAL NOTES ────────────── -->
+    <div class="form-section">
+      <div class="section-header">
+        <div class="section-title">
+          <div class="section-icon" style="background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.2);">📝</div>
+          Additional Location Notes
+        </div>
+        <span class="opt-badge">Optional</span>
+      </div>
+      <div class="section-sub">Any specific location requirements, preferred filming areas, accessibility needs, or other travel-related details</div>
+
+      <textarea
+        class="notes-textarea"
+        placeholder="e.g., I'm based in Atlanta and prefer to film in the Old Fourth Ward area. I have a home studio available for post-production sessions. Happy to travel within Georgia for the right creative…"
+        rows="4"
+      ></textarea>
+      <div class="field-hint">Share any additional details about location preferences or travel arrangements that would help creatives understand your situation</div>
+    </div>
+
+    <!-- ── TIPS ────────────────────────────────────── -->
+    <div class="tips-section">
+      <div class="tips-header">
+        <div class="tips-icon">💡</div>
+        <div class="tips-title">Travel & Location Tips</div>
+      </div>
+      <div class="tips-list">
+        <div class="tip-row">
+          <div class="tip-check">✓</div>
+          <div class="tip-text">Travel costs are typically negotiated separately from project fees — always clarify this upfront with your matched creative</div>
+        </div>
+        <div class="tip-row">
+          <div class="tip-check">✓</div>
+          <div class="tip-text">Remote collaboration can significantly reduce costs and expand your options — many post-production workflows are fully remote-friendly</div>
+        </div>
+        <div class="tip-row">
+          <div class="tip-check">✓</div>
+          <div class="tip-text">Local creators may offer more flexible scheduling, faster turnaround, and lower logistics overhead for your production</div>
+        </div>
+        <div class="tip-row">
+          <div class="tip-check">✓</div>
+          <div class="tip-text">Consider timezone differences when selecting remote collaborators — a 6+ hour gap can affect feedback loops and revision cycles</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VALIDATION -->
+    <div class="validation-note">
+      <div class="validation-dot" id="val-dot" style="background:var(--orange);"></div>
+      <span id="val-text" style="color:var(--orange);">Enter your ZIP code and select at least one travel option to continue</span>
+    </div>
+
+    <div style="height:40px;"></div>
+  </main>
+</div>
+
+<!-- FOOTER -->
+<div class="form-footer">
+  <button class="btn-draft">💾 Save as Draft</button>
+  <div class="footer-right">
+    <span id="footer-status" style="font-size:13px;color:var(--text-muted);">Complete required fields above</span>
+    <button class="btn-back">← Back</button>
+    <button class="btn-next" id="next-btn" onclick="goNext()">Next: Review & Submit →</button>
+  </div>
+</div>
+
+<script>
+  // ─── STATE ────────────────────────────────────────
+  let zipValid = false;
+  const travelSelected = new Set();
+
+  // ─── ZIP INPUT ───────────────────────────────────
+  const LOCATION_MAP = {
+    '10001': 'New York, NY', '90001': 'Los Angeles, CA', '60601': 'Chicago, IL',
+    '77001': 'Houston, TX', '30301': 'Atlanta, GA', '33101': 'Miami, FL',
+    '19801': 'Wilmington, DE', '19901': 'Dover, DE', '19702': 'Newark, DE',
+    '19711': 'Newark, DE', '19720': 'New Castle, DE'
+  };
+
+  function handleZip(input) {
+    const val = input.value.replace(/\D/g, '').slice(0, 5);
+    input.value = val;
+
+    if (val.length >= 5) {
+      input.classList.add('valid');
+      zipValid = true;
+      const city = LOCATION_MAP[val] || `ZIP ${val}`;
+      const loc = document.getElementById('detected-loc');
+      document.getElementById('detected-loc-text').textContent = `📍 ${city} — location confirmed`;
+      loc.classList.add('visible');
+    } else {
+      input.classList.remove('valid');
+      zipValid = false;
+      document.getElementById('detected-loc').classList.remove('visible');
+    }
+    updateUI();
+  }
+
+  // ─── DISTANCE SLIDER ─────────────────────────────
+  function updateDistanceSlider(val) {
+    const num = parseInt(val);
+    const pct = num; // 0–100 directly maps
+    document.getElementById('slider-fill').style.width = pct + '%';
+
+    let display;
+    if (num >= 100) { display = '100+ <span>miles</span>'; }
+    else { display = `${num} <span>miles</span>`; }
+    document.getElementById('slider-value-display').innerHTML = display;
+
+    // Show remote note at high distances
+    const remoteNote = document.getElementById('remote-note');
+    remoteNote.classList.toggle('visible', num >= 75);
+  }
+
+  // ─── TRAVEL OPTIONS ──────────────────────────────
+  function toggleOption(id) {
+    const option = document.getElementById(`opt-${id}`);
+    const cb = document.getElementById(`cb-${id}`);
+
+    if (travelSelected.has(id)) {
+      travelSelected.delete(id);
+      option.classList.remove('selected');
+    } else {
+      travelSelected.add(id);
+      option.classList.add('selected');
+    }
+
+    // Warn if "local only" + "remote" are both selected
+    const conflictNote = document.getElementById('exclusive-note');
+    conflictNote.classList.toggle('visible',
+      travelSelected.has('local-only') && travelSelected.has('remote')
+    );
+
+    updateUI();
+  }
+
+  // ─── UI ───────────────────────────────────────────
+  function updateUI() {
+    const ready = zipValid && travelSelected.size > 0;
+    const btn = document.getElementById('next-btn');
+    const status = document.getElementById('footer-status');
+    const dot = document.getElementById('val-dot');
+    const valText = document.getElementById('val-text');
+
+    if (ready) {
+      btn.classList.add('ready');
+      status.textContent = `✅ Location set · ${travelSelected.size} option${travelSelected.size > 1 ? 's' : ''} selected`;
+      status.style.color = 'var(--green)';
+      dot.style.background = 'var(--green)';
+      valText.textContent = "You're all set — ready to move to the final review";
+      valText.style.color = 'var(--green)';
+    } else if (zipValid && travelSelected.size === 0) {
+      btn.classList.remove('ready');
+      status.textContent = 'Select at least one travel option';
+      status.style.color = 'var(--orange)';
+      dot.style.background = 'var(--orange)';
+      valText.textContent = 'Select at least one travel & collaboration option to continue';
+      valText.style.color = 'var(--orange)';
+    } else if (!zipValid && travelSelected.size > 0) {
+      btn.classList.remove('ready');
+      status.textContent = 'Enter your ZIP code to continue';
+      status.style.color = 'var(--orange)';
+      dot.style.background = 'var(--orange)';
+      valText.textContent = 'Enter your ZIP code to continue';
+      valText.style.color = 'var(--orange)';
+    } else {
+      btn.classList.remove('ready');
+      status.textContent = 'Complete required fields above';
+      status.style.color = 'var(--text-muted)';
+      dot.style.background = 'var(--orange)';
+      valText.textContent = 'Enter your ZIP code and select at least one travel option to continue';
+      valText.style.color = 'var(--orange)';
+    }
+  }
+
+  function goNext() {
+    if (zipValid && travelSelected.size > 0) alert('Proceeding to Review & Submit…');
+  }
+</script>
+
+</body>
+</html>

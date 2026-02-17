@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EchoVizion – Review & Submit</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #0d0b1a; --sidebar-bg: #120f24; --card-bg: #1a1630;
+    --purple: #a78bfa; --purple-dark: #7c3aed; --pink: #f472b6;
+    --green: #10b981; --orange: #f59e0b; --teal: #06b6d4;
+    --border: #2a2448; --text-primary: #f1f0ff;
+    --text-secondary: #9ca3af; --text-muted: #6b7280;
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; }
+
+  /* NAV */
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 0 32px; height: 56px; background: rgba(13,11,26,0.95); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(12px); }
+  .logo { display: flex; align-items: center; gap: 10px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 18px; }
+  .logo-icon { width: 30px; height: 30px; background: linear-gradient(135deg, var(--purple-dark), var(--pink)); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 14px; font-weight: 500; }
+  .nav-links a.active { color: var(--text-primary); border-bottom: 2px solid var(--purple); padding-bottom: 2px; }
+  .nav-right { display: flex; align-items: center; gap: 16px; }
+  .notif { width: 32px; height: 32px; border-radius: 50%; background: var(--card-bg); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 14px; position: relative; cursor: pointer; }
+  .notif-dot { position: absolute; top: 6px; right: 6px; width: 6px; height: 6px; border-radius: 50%; background: var(--pink); }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--purple-dark), var(--pink)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: white; }
+
+  .layout { display: flex; flex: 1; }
+
+  /* SIDEBAR */
+  .sidebar { width: 240px; background: var(--sidebar-bg); border-right: 1px solid var(--border); padding: 24px 16px; position: sticky; top: 56px; height: calc(100vh - 56px); overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+  .sidebar-proj-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); font-weight: 500; margin-bottom: 2px; }
+  .sidebar-step-badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; background: linear-gradient(135deg, var(--purple-dark), var(--pink)); color: white; margin-bottom: 10px; }
+  .progress-bar-wrap { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; margin-bottom: 6px; }
+  .progress-bar-fill { height: 100%; width: 100%; background: linear-gradient(90deg, var(--purple-dark), var(--pink)); border-radius: 2px; }
+  .progress-pct { font-size: 12px; color: var(--text-muted); margin-bottom: 14px; }
+  .progress-pct strong { color: var(--green); font-weight: 600; }
+  .steps-list { display: flex; flex-direction: column; gap: 2px; }
+  .step-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; cursor: pointer; border: 1px solid transparent; transition: all 0.15s; }
+  .step-item.active { background: rgba(124,58,237,0.15); border-color: rgba(167,139,250,0.3); }
+  .step-item.completed .step-num { background: var(--purple-dark); color: white; }
+  .step-item.completed .step-name { color: var(--text-secondary); }
+  .step-num { width: 22px; height: 22px; border-radius: 50%; background: var(--border); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: var(--text-muted); flex-shrink: 0; }
+  .step-item.active .step-num { background: linear-gradient(135deg, var(--purple-dark), var(--purple)); color: white; }
+  .step-name { font-size: 13px; color: var(--text-muted); }
+  .step-item.active .step-name { color: var(--text-primary); font-weight: 500; }
+  .sidebar-safe { margin-top: auto; display: flex; align-items: center; gap: 8px; padding: 12px 14px; background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.2); border-radius: 10px; }
+  .sidebar-safe-text { font-size: 11px; color: var(--text-secondary); line-height: 1.5; }
+
+  /* MAIN */
+  .main { flex: 1; padding: 36px 48px 140px; max-width: 880px; }
+
+  .final-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(244,114,182,0.15)); border: 1px solid rgba(167,139,250,0.3); color: var(--purple); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 8px; }
+  .step-title { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px; }
+  .step-subtitle { font-size: 13px; color: var(--text-secondary); margin-bottom: 28px; line-height: 1.7; max-width: 620px; }
+
+  /* ── COMPLETENESS + MATCH SCORE ─────────────── */
+  .top-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+
+  .complete-card {
+    background: linear-gradient(135deg, rgba(16,185,129,0.08), rgba(6,182,212,0.05));
+    border: 1px solid rgba(16,185,129,0.25); border-radius: 14px; padding: 20px 22px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .complete-score-big { font-family: 'Syne', sans-serif; font-size: 42px; font-weight: 800; color: var(--green); line-height: 1; flex-shrink: 0; }
+  .complete-score-big span { font-size: 18px; color: var(--text-muted); font-weight: 400; }
+  .complete-text-col {}
+  .complete-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 3px; }
+  .complete-sub { font-size: 11px; color: var(--text-secondary); line-height: 1.6; }
+
+  .match-card {
+    background: linear-gradient(135deg, rgba(124,58,237,0.08), rgba(244,114,182,0.04));
+    border: 1px solid rgba(167,139,250,0.2); border-radius: 14px; padding: 20px 22px;
+  }
+  .match-card-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
+  .match-card-sub { font-size: 11px; color: var(--text-muted); font-weight: 400; }
+  .match-bars { display: flex; flex-direction: column; gap: 8px; }
+  .match-bar-row { display: flex; align-items: center; gap: 10px; }
+  .match-bar-label { font-size: 11px; color: var(--text-muted); width: 120px; flex-shrink: 0; }
+  .match-bar-track { flex: 1; height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .match-bar-fill { height: 100%; border-radius: 3px; }
+  .match-bar-pct { font-size: 11px; font-weight: 600; color: var(--text-secondary); width: 30px; text-align: right; flex-shrink: 0; }
+
+  /* ── SECTION LABEL ──────────────────────────── */
+  .section-group { margin-bottom: 8px; margin-top: 22px; display: flex; align-items: center; gap: 10px; }
+  .section-group:first-of-type { margin-top: 0; }
+  .section-group-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); }
+  .section-group-line { flex: 1; height: 1px; background: var(--border); }
+
+  /* ── REVIEW SECTIONS ────────────────────────── */
+  .review-section {
+    background: var(--card-bg); border: 1px solid var(--border);
+    border-radius: 14px; margin-bottom: 10px; overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .review-section:hover { border-color: rgba(167,139,250,0.25); }
+
+  .rs-header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 16px 20px;
+  }
+  .rs-icon { width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 15px; background: rgba(124,58,237,0.1); border: 1px solid rgba(167,139,250,0.2); }
+  .rs-name { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: var(--text-primary); flex: 1; }
+  .rs-status { display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: 20px; }
+  .rs-status.done { background: rgba(16,185,129,0.1); color: var(--green); border: 1px solid rgba(16,185,129,0.25); }
+  .rs-status.skip { background: rgba(107,114,128,0.08); color: var(--text-muted); border: 1px solid rgba(107,114,128,0.2); }
+  .edit-btn { padding: 5px 13px; border-radius: 6px; font-size: 12px; font-weight: 500; background: rgba(167,139,250,0.08); border: 1px solid rgba(167,139,250,0.2); color: var(--purple); cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; white-space: nowrap; }
+  .edit-btn:hover { background: rgba(167,139,250,0.18); border-color: var(--purple); }
+
+  /* CONTENT AREA — always visible, no collapse */
+  .rs-body { border-top: 1px solid var(--border); padding: 16px 20px; }
+
+  .data-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 500; margin-bottom: 4px; }
+  .data-value { font-size: 13px; color: var(--text-primary); line-height: 1.6; }
+  .data-value.dim { color: var(--text-secondary); }
+  .data-row { margin-bottom: 12px; }
+  .data-row:last-child { margin-bottom: 0; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  /* Pills */
+  .pill-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+  .pill { padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 500; background: rgba(124,58,237,0.1); border: 1px solid rgba(167,139,250,0.25); color: var(--purple); }
+  .pill.green  { background: rgba(16,185,129,0.1);  border-color: rgba(16,185,129,0.3);  color: var(--green);  }
+  .pill.teal   { background: rgba(6,182,212,0.1);   border-color: rgba(6,182,212,0.3);   color: var(--teal);   }
+  .pill.orange { background: rgba(245,158,11,0.1);  border-color: rgba(245,158,11,0.3);  color: var(--orange); }
+  .pill.pink   { background: rgba(244,114,182,0.1); border-color: rgba(244,114,182,0.3); color: var(--pink);   }
+
+  /* Budget bar */
+  .budget-display { display: flex; align-items: center; gap: 16px; margin-top: 6px; }
+  .budget-amount { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; color: var(--green); }
+  .budget-tier { font-size: 11px; color: var(--text-muted); padding: 3px 9px; border-radius: 4px; background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2); }
+  .budget-bar-track { width: 100%; height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; margin-top: 10px; }
+  .budget-bar-fill { height: 100%; width: 45%; background: linear-gradient(90deg, var(--green), var(--teal)); border-radius: 3px; }
+
+  /* Vision preview */
+  .vision-preview { font-size: 13px; color: var(--text-secondary); line-height: 1.75; padding: 12px 14px; background: rgba(255,255,255,0.025); border: 1px solid var(--border); border-radius: 8px; font-style: italic; margin-top: 6px; }
+
+  /* Reference cards */
+  .ref-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 6px; }
+  .ref-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 10px; padding: 10px; }
+  .ref-card-icon { font-size: 22px; margin-bottom: 5px; }
+  .ref-card-title { font-size: 11px; font-weight: 600; color: var(--text-primary); line-height: 1.4; margin-bottom: 2px; }
+  .ref-card-creator { font-size: 10px; color: var(--text-muted); }
+
+  .divider { height: 1px; background: var(--border); margin: 14px 0; opacity: 0.5; }
+
+  /* ── WHAT HAPPENS NEXT ──────────────────────── */
+  .next-section {
+    background: linear-gradient(135deg, rgba(124,58,237,0.06), rgba(6,182,212,0.04));
+    border: 1px solid rgba(167,139,250,0.18); border-radius: 14px; padding: 22px 24px; margin-bottom: 14px;
+  }
+  .next-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+  .next-steps { display: flex; flex-direction: column; gap: 12px; }
+  .next-step { display: flex; align-items: flex-start; gap: 12px; }
+  .next-step-num { width: 26px; height: 26px; border-radius: 50%; background: linear-gradient(135deg, var(--purple-dark), var(--purple)); color: white; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .next-step-body {}
+  .next-step-title { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
+  .next-step-desc { font-size: 12px; color: var(--text-muted); line-height: 1.6; }
+
+  /* ── CHECKLIST ──────────────────────────────── */
+  .checklist-section { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 24px; margin-bottom: 14px; }
+  .checklist-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 16px; }
+  .check-row { display: flex; align-items: flex-start; gap: 12px; padding: 12px 14px; border-radius: 10px; cursor: pointer; border: 1.5px solid var(--border); background: rgba(255,255,255,0.02); transition: all 0.2s; margin-bottom: 8px; user-select: none; }
+  .check-row:hover { border-color: rgba(167,139,250,0.3); }
+  .check-row.checked { border-color: var(--purple); background: rgba(124,58,237,0.07); }
+  .check-row:last-child { margin-bottom: 0; }
+  .check-box { width: 20px; height: 20px; border-radius: 6px; border: 2px solid var(--border); flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.2s; margin-top: 1px; }
+  .check-row.checked .check-box { background: var(--purple-dark); border-color: var(--purple-dark); }
+  .check-row.checked .check-box::after { content: '✓'; font-size: 11px; color: white; font-weight: 700; }
+  .check-text { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+  .check-text strong { color: var(--text-primary); }
+
+  /* ── FOOTER ─────────────────────────────────── */
+  .form-footer { display: flex; align-items: center; justify-content: space-between; padding: 20px 48px; background: rgba(13,11,26,0.95); border-top: 1px solid var(--border); backdrop-filter: blur(12px); position: fixed; bottom: 0; width: calc(100% - 240px); margin-left: 240px; z-index: 50; }
+  .btn-draft { display: flex; align-items: center; gap: 8px; padding: 10px 18px; background: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .btn-draft:hover { border-color: var(--purple); color: var(--purple); }
+  .footer-right { display: flex; gap: 12px; align-items: center; }
+  .btn-back { padding: 10px 24px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .btn-back:hover { color: var(--text-primary); }
+  .footer-status { font-size: 13px; color: var(--text-muted); }
+  .btn-submit { padding: 13px 32px; background: linear-gradient(135deg, var(--purple-dark), #9333ea); border: none; border-radius: 8px; color: white; font-size: 15px; font-weight: 700; cursor: pointer; font-family: 'Syne', sans-serif; display: flex; align-items: center; gap: 8px; transition: all 0.25s; box-shadow: 0 4px 20px rgba(124,58,237,0.35); opacity: 0.4; pointer-events: none; }
+  .btn-submit.ready { opacity: 1; pointer-events: all; }
+  .btn-submit.ready:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(124,58,237,0.55); }
+
+  /* ── SUCCESS OVERLAY ─────────────────────────── */
+  .success-overlay { position: fixed; inset: 0; z-index: 300; background: var(--bg); display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 20px; text-align: center; padding: 40px; opacity: 0; pointer-events: none; transition: opacity 0.5s; }
+  .success-overlay.visible { opacity: 1; pointer-events: all; }
+  .success-ring { width: 90px; height: 90px; border-radius: 50%; background: linear-gradient(135deg, var(--purple-dark), var(--pink)); display: flex; align-items: center; justify-content: center; font-size: 40px; box-shadow: 0 0 0 16px rgba(124,58,237,0.1), 0 0 0 32px rgba(124,58,237,0.05); animation: pulseRing 2.5s ease infinite; }
+  @keyframes pulseRing { 0%,100% { box-shadow: 0 0 0 16px rgba(124,58,237,0.1), 0 0 0 32px rgba(124,58,237,0.05); } 50% { box-shadow: 0 0 0 24px rgba(124,58,237,0.07), 0 0 0 44px rgba(124,58,237,0.03); } }
+  .success-title { font-family: 'Syne', sans-serif; font-size: 34px; font-weight: 800; color: var(--text-primary); }
+  .success-title span { background: linear-gradient(135deg, var(--purple), var(--pink)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .success-sub { font-size: 15px; color: var(--text-secondary); line-height: 1.75; max-width: 480px; }
+  .success-stats { display: flex; gap: 12px; }
+  .success-stat { padding: 16px 22px; border-radius: 12px; background: var(--card-bg); border: 1px solid var(--border); text-align: center; }
+  .success-stat-val { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800; color: var(--purple); }
+  .success-stat-label { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+  .success-actions { display: flex; gap: 12px; }
+  .btn-view { padding: 13px 28px; background: linear-gradient(135deg, var(--purple-dark), #9333ea); border: none; border-radius: 8px; color: white; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; box-shadow: 0 4px 14px rgba(124,58,237,0.35); }
+  .btn-view:hover { transform: translateY(-2px); }
+  .btn-dash { padding: 13px 28px; background: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .btn-dash:hover { border-color: var(--purple); color: var(--purple); }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo"><div class="logo-icon">🎵</div>EchoVizion</div>
+  <ul class="nav-links">
+    <li><a href="#">Projects</a></li>
+    <li><a href="#" class="active">Create Project</a></li>
+    <li><a href="#">Messages</a></li>
+    <li><a href="#">Profile</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="notif">🔔<div class="notif-dot"></div></div>
+    <div class="avatar">V</div>
+  </div>
+</nav>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div>
+      <div class="sidebar-proj-label">Project Creation</div>
+      <div class="sidebar-step-badge">✦ Final Review</div>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill"></div></div>
+      <div class="progress-pct"><strong>100% Complete 🎉</strong></div>
+    </div>
+    <div class="steps-list">
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Project Details</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Budget Definition</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Creative Roles</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Creative Direction</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Visual Style Selection</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Inspiration References</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Technical Requirements</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Timeline & Deliverables</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Talent & Crew Needs</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Collaboration Style</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Usage Rights</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Location & Travel</span></div>
+      <div class="step-item active"><div class="step-num">✦</div><span class="step-name">Review & Submit</span></div>
+    </div>
+    <div class="sidebar-safe">
+      <span style="font-size:18px;">🔒</span>
+      <div class="sidebar-safe-text">Your data is encrypted and only shared with matched creatives after you submit.</div>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <div class="final-badge">✦ Final Review</div>
+    <h1 class="step-title">Review & Submit Project</h1>
+    <p class="step-subtitle">Review all project details carefully before submission. Once submitted, your project will be matched with qualified creatives and become discoverable in the marketplace.</p>
+
+    <!-- TOP ROW: SCORE + MATCH BARS -->
+    <div class="top-row">
+      <div class="complete-card">
+        <div class="complete-score-big">94<span>%</span></div>
+        <div class="complete-text-col">
+          <div class="complete-title">Brief Quality Score</div>
+          <div class="complete-sub">Strong brief — you'll receive more relevant, higher-quality proposals than average.</div>
+        </div>
+      </div>
+      <div class="match-card">
+        <div class="match-card-title">
+          Estimated Match Quality
+          <span class="match-card-sub">~47 creatives match</span>
+        </div>
+        <div class="match-bars">
+          <div class="match-bar-row">
+            <div class="match-bar-label">Creative Direction</div>
+            <div class="match-bar-track"><div class="match-bar-fill" style="width:92%;background:linear-gradient(90deg,var(--purple-dark),var(--purple));"></div></div>
+            <div class="match-bar-pct">92%</div>
+          </div>
+          <div class="match-bar-row">
+            <div class="match-bar-label">Visual Style</div>
+            <div class="match-bar-track"><div class="match-bar-fill" style="width:88%;background:linear-gradient(90deg,var(--pink),var(--purple));"></div></div>
+            <div class="match-bar-pct">88%</div>
+          </div>
+          <div class="match-bar-row">
+            <div class="match-bar-label">Creative Roles</div>
+            <div class="match-bar-track"><div class="match-bar-fill" style="width:100%;background:linear-gradient(90deg,var(--green),var(--teal));"></div></div>
+            <div class="match-bar-pct">100%</div>
+          </div>
+          <div class="match-bar-row">
+            <div class="match-bar-label">References</div>
+            <div class="match-bar-track"><div class="match-bar-fill" style="width:100%;background:linear-gradient(90deg,var(--teal),var(--green));"></div></div>
+            <div class="match-bar-pct">100%</div>
+          </div>
+          <div class="match-bar-row">
+            <div class="match-bar-label">Budget & Scope</div>
+            <div class="match-bar-track"><div class="match-bar-fill" style="width:95%;background:linear-gradient(90deg,var(--orange),var(--pink));"></div></div>
+            <div class="match-bar-pct">95%</div>
+          </div>
+          <div class="match-bar-row">
+            <div class="match-bar-label">Timeline</div>
+            <div class="match-bar-track"><div class="match-bar-fill" style="width:100%;background:linear-gradient(90deg,var(--teal),var(--purple));"></div></div>
+            <div class="match-bar-pct">100%</div>
+          </div>
+          <div class="match-bar-row">
+            <div class="match-bar-label">Location</div>
+            <div class="match-bar-track"><div class="match-bar-fill" style="width:80%;background:linear-gradient(90deg,var(--green),var(--teal));"></div></div>
+            <div class="match-bar-pct">80%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PROJECT ESSENTIALS ══════════════════ -->
+    <div class="section-group"><div class="section-group-label">Project Essentials</div><div class="section-group-line"></div></div>
+
+    <!-- Project Details -->
+    <div class="review-section">
+      <div class="rs-header">
+        <div class="rs-icon">📋</div>
+        <div class="rs-name">Project Details</div>
+        <span class="rs-status done">✓ Complete</span>
+        <button class="edit-btn">Edit</button>
+      </div>
+      <div class="rs-body">
+        <div class="two-col">
+          <div class="data-row"><div class="data-label">Project Title</div><div class="data-value">I'm So Tired of This World</div></div>
+          <div class="data-row"><div class="data-label">Project Type</div><div class="data-value">Full Music Video</div></div>
+          <div class="data-row"><div class="data-label">Genre</div><div class="data-value">Afro-Reggae / R&B / Classical Fusion</div></div>
+          <div class="data-row"><div class="data-label">Release Date</div><div class="data-value">TBD</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Budget -->
+    <div class="review-section">
+      <div class="rs-header">
+        <div class="rs-icon">💰</div>
+        <div class="rs-name">Budget Definition</div>
+        <span class="rs-status done">✓ Complete</span>
+        <button class="edit-btn">Edit</button>
+      </div>
+      <div class="rs-body">
+        <div class="budget-display">
+          <div class="budget-amount">$5,000 – $15,000</div>
+          <span class="budget-tier">Mid-Range Production</span>
+        </div>
+        <div class="budget-bar-track"><div class="budget-bar-fill"></div></div>
+        <div style="display:flex;justify-content:space-between;margin-top:5px;">
+          <span style="font-size:10px;color:var(--text-muted);">$0</span>
+          <span style="font-size:10px;color:var(--text-muted);">$50K+</span>
+        </div>
+        <div class="divider"></div>
+        <div class="data-row"><div class="data-label">Payment Terms</div><div class="data-value dim">50% upfront, 50% on delivery</div></div>
+      </div>
+    </div>
+
+    <!-- Creative Roles Needed -->
+    <div class="review-section">
+      <div class="rs-header">
+        <div class="rs-icon">🎬</div>
+        <div class="rs-name">Creative Roles Needed</div>
+        <span class="rs-status done">✓ Complete</span>
+        <button class="edit-btn">Edit</button>
+      </div>
+      <div class="rs-body">
+        <div class="two-col">
+          <div class="data-row">
+            <div class="data-label">Hiring Approach</div>
+            <div class="data-value">One creative who handles everything</div>
+          </div>
+          <div class="data-row">
+            <div class="data-label">Primary Role</div>
+            <div class="data-value" style="display:flex;align-items:center;gap:8px;">
+              🎬 <strong>Director</strong>
+              <span style="font-size:11px;color:var(--text-muted);background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);padding:2px 8px;border-radius:4px;">$50–150/hr</span>
+            </div>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="data-row">
+          <div class="data-label" style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+            Additional Skills Needed
+            <span style="font-size:10px;color:var(--text-muted);">— each boosts match score for creatives who cover it</span>
+          </div>
+          <div class="pill-row">
+            <span class="pill green">Video Editing <span style="font-size:10px;margin-left:3px;background:rgba(16,185,129,0.2);padding:1px 6px;border-radius:4px;">+10% match</span></span>
+            <span class="pill green">Color Grading <span style="font-size:10px;margin-left:3px;background:rgba(16,185,129,0.2);padding:1px 6px;border-radius:4px;">+10% match</span></span>
+          </div>
+        </div>
+        <div style="margin-top:12px;padding:10px 12px;background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.2);border-radius:8px;font-size:12px;color:var(--orange);">
+          💡 Creatives who personally cover all 3 (Directing + Editing + Color Grading) will rank highest. Those who cover fewer may note they'll subcontract the gap.
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ CREATIVE BRIEF ══════════════════════ -->
+    <div class="section-group"><div class="section-group-label">Creative Brief</div><div class="section-group-line"></div></div>
+
+    <!-- Creative Direction -->
+    <div class="review-section">
+      <div class="rs-header">
+        <div class="rs-icon">✍️</div>
+        <div class="rs-name">Creative Direction</div>
+        <span class="rs-status done">✓ Complete</span>
+        <button class="edit-btn">Edit</button>
+      </div>
+      <div class="rs-body">
+        <div class="data-row">
+          <div class="data-label">Vision</div>
+          <div class="vision-preview">"A surreal meditation on isolation and exhaustion. The world feels overwhelming — neon-lit, fractured, beautiful and suffocating. I want imagery that captures the feeling of being present but disconnected. Slow, intimate camera work contrasted with wide, overwhelming environments. Afrofuturist undertones — the weight of existing in a world not built for you. Inspired by Moonlight's intimacy, Enter the Void's disorientation, and FKA Twigs' physicality…"</div>
+        </div>
+        <div class="divider"></div>
+        <div class="data-row">
+          <div class="data-label">Mood Keywords</div>
+          <div class="pill-row">
+            <span class="pill">Melancholic</span><span class="pill pink">Surreal</span><span class="pill">Intimate</span><span class="pill orange">Spiritual</span><span class="pill teal">Atmospheric</span><span class="pill">Isolated</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Visual Style -->
+    <div class="review-section">
+      <div class="rs-header">
+        <div class="rs-icon">🎨</div>
+        <div class="rs-name">Visual Style Selection</div>
+        <span class="rs-status done">✓ Complete</span>
+        <button class="edit-btn">Edit</button>
+      </div>
+      <div class="rs-body">
+        <div class="data-row">
+          <div class="data-label">12 Style Tags Selected</div>
+          <div class="pill-row">
+            <span class="pill">Surreal</span><span class="pill pink">Afrofuturism</span><span class="pill">Moody</span><span class="pill">Atmospheric</span><span class="pill teal">Cinematic</span><span class="pill">Dreamy</span><span class="pill orange">Film Grain</span><span class="pill">Low Light</span><span class="pill pink">Slow Motion</span><span class="pill">Desaturated</span><span class="pill teal">Chiaroscuro</span><span class="pill">Ethereal</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Inspiration References -->
+    <div class="review-section">
+      <div class="rs-header">
+        <div class="rs-icon">🎞️</div>
+        <div class="rs-name">Inspiration References</div>
+        <span class="rs-status done">✓ Complete</span>
+        <button class="edit-btn">Edit</button>
+      </div>
+      <div class="rs-body">
+        <div class="data-label" style="margin-bottom:10px;">7 References Added</div>
+        <div class="ref-grid">
+          <div class="ref-card"><div class="ref-card-icon">🎬</div><div class="ref-card-title">Moonlight</div><div class="ref-card-creator">Barry Jenkins · 2016</div></div>
+          <div class="ref-card"><div class="ref-card-icon">🌀</div><div class="ref-card-title">Enter the Void</div><div class="ref-card-creator">Gaspar Noé · 2009</div></div>
+          <div class="ref-card"><div class="ref-card-icon">🎵</div><div class="ref-card-title">FKA Twigs – Cellophane</div><div class="ref-card-creator">Andrew Thomas Huang</div></div>
+          <div class="ref-card"><div class="ref-card-icon">🏙️</div><div class="ref-card-title">Blade Runner 2049</div><div class="ref-card-creator">Roger Deakins · 2017</div></div>
+          <div class="ref-card"><div class="ref-card-icon">📷</div><div class="ref-card-title">Gregory Crewdson Photography</div><div class="ref-card-creator">Visual Art</div></div>
+          <div class="ref-card"><div class="ref-card-icon">🎵</div><div class="ref-card-title">Kavinsky – Nightcall</div><div class="ref-card-creator">Music Video</div></div>
+          <div class="ref-card"><div class="ref-card-icon">💻</div><div class="ref-card-title">Beeple's Everydays</div><div class="ref-card-creator">Digital Art</div></div>
+        </div>
+        <div style="margin-top:8px;font-size:11px;color:var(--text-muted);">⚡ References carry 50% weight in the matching algorithm</div>
+      </div>
+    </div>
+
+    <!-- ══ PRODUCTION ══════════════════════════ -->
+    <div class="section-group"><div class="section-group-label">Production Requirements</div><div class="section-group-line"></div></div>
+
+    <!-- Technical Requirements -->
+    <div class="review-section">
+      <div class="rs-header">
+        <div class="rs-icon">⚙️</div>
+        <div class="rs-name">Technical Requirements</div>
+        <span class="rs-status done">✓ Complete</span>
+        <button class="edit-btn">Edit</button>
+      </div>
+      <div class="rs-body">
+        <div class="pill-row">
+          <span class="pill green">4K Resolution</span><span class="pill pink">Professional Color Grading</span><span class="pill teal">Slow Motion</span><span class="pill orange">Drone Footage</span><span class="pill">Sound Design</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Timeline & Deliverables -->
+    <div class="review-section">
+      <div class="rs-header">
+        <div class="rs-icon">📅</div>
+        <div class="rs-name">Timeline & Deliverables</div>
+        <span class="rs-status done">✓ Complete</span>
+        <button class="edit-btn">Edit</button>
+      </div>
+      <div class="rs-body">
+        <div class="two-col">
+          <div class="data-row">
+            <div class="data-label">Urgency</div>
+            <div class="data-value" style="display:flex;align-items:center;gap:8px;">
+              📅 <strong>Standard</strong>
+              <span style="font-size:11px;background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.25);color:var(--purple);padding:2px 8px;border-radius:4px;">Recommended</span>
+            </div>
+          </div>
+          <div class="data-row">
+            <div class="data-label">Production Window</div>
+            <div class="data-value"><strong style="color:var(--green);">6 weeks</strong> <span style="color:var(--text-muted);font-size:12px;">Mar 15 → Apr 26, 2026</span></div>
+          </div>
+        </div>
+        <div class="divider"></div>
+
+        <!-- Mini timeline bar -->
+        <div style="margin-bottom:14px;">
+          <div class="data-label" style="margin-bottom:8px;">Production Timeline</div>
+          <div style="display:flex;align-items:center;gap:0;position:relative;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+              <div style="width:10px;height:10px;border-radius:50%;background:var(--green);flex-shrink:0;"></div>
+              <div style="font-size:10px;color:var(--text-muted);text-align:center;">Kick-off<br><span style="color:var(--purple);">Mar 15</span></div>
+            </div>
+            <div style="flex:1;height:2px;background:linear-gradient(90deg,rgba(167,139,250,0.4),rgba(244,114,182,0.3));margin:0 -1px;align-self:flex-start;margin-top:4px;"></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+              <div style="width:10px;height:10px;border-radius:50%;background:var(--purple);flex-shrink:0;"></div>
+              <div style="font-size:10px;color:var(--text-muted);text-align:center;">Pre-pro<br><span style="color:var(--purple);">Mar 24</span></div>
+            </div>
+            <div style="flex:1;height:2px;background:linear-gradient(90deg,rgba(167,139,250,0.4),rgba(244,114,182,0.3));margin:0 -1px;align-self:flex-start;margin-top:4px;"></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+              <div style="width:10px;height:10px;border-radius:50%;background:var(--purple);flex-shrink:0;"></div>
+              <div style="font-size:10px;color:var(--text-muted);text-align:center;">Shoot<br><span style="color:var(--purple);">Apr 1</span></div>
+            </div>
+            <div style="flex:1;height:2px;background:linear-gradient(90deg,rgba(167,139,250,0.4),rgba(244,114,182,0.3));margin:0 -1px;align-self:flex-start;margin-top:4px;"></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+              <div style="width:10px;height:10px;border-radius:50%;background:var(--purple);flex-shrink:0;"></div>
+              <div style="font-size:10px;color:var(--text-muted);text-align:center;">Rough Cut<br><span style="color:var(--purple);">Apr 12</span></div>
+            </div>
+            <div style="flex:1;height:2px;background:linear-gradient(90deg,rgba(167,139,250,0.4),rgba(244,114,182,0.3));margin:0 -1px;align-self:flex-start;margin-top:4px;"></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+              <div style="width:10px;height:10px;border-radius:50%;background:var(--pink);flex-shrink:0;"></div>
+              <div style="font-size:10px;color:var(--text-muted);text-align:center;">Delivery<br><span style="color:var(--pink);">Apr 26</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="data-row">
+          <div class="data-label" style="margin-bottom:8px;">Key Milestones (4 selected)</div>
+          <div class="pill-row">
+            <span class="pill teal">Pre-Production Meeting</span>
+            <span class="pill teal">Shoot Day Sign-off</span>
+            <span class="pill teal">Rough Cut Review</span>
+            <span class="pill teal">Final Approval</span>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="data-row">
+          <div class="data-label" style="margin-bottom:8px;">Deliverables (4 items)</div>
+          <div class="pill-row">
+            <span class="pill green">Final Master File <span style="font-size:10px;background:rgba(16,185,129,0.2);padding:1px 5px;border-radius:3px;margin-left:2px;">auto</span></span>
+            <span class="pill">Raw Footage</span>
+            <span class="pill pink">Social Media Cuts <span style="font-size:10px;background:rgba(244,114,182,0.15);padding:1px 5px;border-radius:3px;margin-left:2px;">9:16 · 1:1 · 30s</span></span>
+            <span class="pill">Subtitled Version</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Talent & Crew -->
+    <div class="review-section">
+      <div class="rs-header">
+        <div class="rs-icon">🎭</div>
+        <div class="rs-name">Talent & Crew Needs</div>
+        <span class="rs-status done">✓ Complete</span>
+        <button class="edit-btn">Edit</button>
+      </div>
+      <div class="rs-body">
+        <div class="data-row">
+          <div class="data-label">Production Support (2)</div>
+          <div class="pill-row">
+            <span class="pill pink">Dancers <span style="font-size:10px;background:rgba(244,114,182,0.2);padding:1px 5px;border-radius:3px;margin-left:2px;">must have</span></span>
+            <span class="pill">Styling / Wardrobe</span>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="data-row"><div class="data-label">Dancer Notes</div><div class="data-value dim">4–6 dancers, afrobeats / contemporary fusion style preferred</div></div>
+      </div>
+    </div>
+
+    <!-- ══ LOGISTICS & TERMS ═══════════════════ -->
+    <div class="section-group"><div class="section-group-label">Logistics & Terms</div><div class="section-group-line"></div></div>
+
+    <!-- Collaboration Style -->
+    <div class="review-section">
+      <div class="rs-header">
+        <div class="rs-icon">🤝</div>
+        <div class="rs-name">Collaboration Style</div>
+        <span class="rs-status done">✓ Complete</span>
+        <button class="edit-btn">Edit</button>
+      </div>
+      <div class="rs-body">
+        <div class="data-row"><div class="data-label">Approach</div><div class="data-value">🤝 Full Collaboration — joint decision-making, active feedback loop throughout production</div></div>
+      </div>
+    </div>
+
+    <!-- Usage Rights -->
+    <div class="review-section">
+      <div class="rs-header">
+        <div class="rs-icon">📋</div>
+        <div class="rs-name">Usage Rights</div>
+        <span class="rs-status done">✓ Complete</span>
+        <button class="edit-btn">Edit</button>
+      </div>
+      <div class="rs-body">
+        <div class="two-col">
+          <div class="data-row"><div class="data-label">Tier</div><div class="data-value">📱 Organic Social Media</div></div>
+          <div class="data-row"><div class="data-label">Rate Impact</div><div class="data-value dim">Standard rates — no premium</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Location & Travel -->
+    <div class="review-section">
+      <div class="rs-header">
+        <div class="rs-icon">📍</div>
+        <div class="rs-name">Location & Travel</div>
+        <span class="rs-status done">✓ Complete</span>
+        <button class="edit-btn">Edit</button>
+      </div>
+      <div class="rs-body">
+        <div class="two-col">
+          <div class="data-row"><div class="data-label">Location</div><div class="data-value">Newark, DE (ZIP 19711)</div></div>
+          <div class="data-row"><div class="data-label">Max Distance</div><div class="data-value">50 miles</div></div>
+        </div>
+        <div class="divider"></div>
+        <div class="data-row">
+          <div class="data-label">Travel Options</div>
+          <div class="pill-row"><span class="pill green">Creator travels to me</span><span class="pill teal">Remote collaboration</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ WHAT HAPPENS NEXT ═══════════════════ -->
+    <div class="section-group" style="margin-top:28px;"><div class="section-group-label">What Happens After Submission</div><div class="section-group-line"></div></div>
+
+    <div class="next-section">
+      <div class="next-steps">
+        <div class="next-step">
+          <div class="next-step-num">1</div>
+          <div class="next-step-body">
+            <div class="next-step-title">Matching Algorithm Activates</div>
+            <div class="next-step-desc">Our AI analyzes your brief against creative profiles — aesthetic alignment, budget compatibility, location, technical skills, and production network.</div>
+          </div>
+        </div>
+        <div class="next-step">
+          <div class="next-step-num">2</div>
+          <div class="next-step-body">
+            <div class="next-step-title">Project Goes Live</div>
+            <div class="next-step-desc">Your brief becomes discoverable to matched creatives in our network who fit your criteria. They can view your full brief and begin crafting proposals.</div>
+          </div>
+        </div>
+        <div class="next-step">
+          <div class="next-step-num">3</div>
+          <div class="next-step-body">
+            <div class="next-step-title">Receive Matches — Within 24 Hours</div>
+            <div class="next-step-desc">You'll receive curated creative matches with portfolio links and match scores. You can message, review proposals, and negotiate directly on the platform.</div>
+          </div>
+        </div>
+        <div class="next-step">
+          <div class="next-step-num">4</div>
+          <div class="next-step-body">
+            <div class="next-step-title">Start Collaborating</div>
+            <div class="next-step-desc">Review notecards, schedule video calls, discuss creative vision, and negotiate terms with your preferred creatives through EchoVizion's messaging system.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ FINAL CHECKLIST ════════════════════ -->
+    <div class="checklist-section">
+      <div class="checklist-title">✅ Final Validation Checklist</div>
+
+      <div class="check-row" onclick="toggleCheck(this, 0)">
+        <div class="check-box"></div>
+        <div class="check-text">I have reviewed all project details and confirm they are <strong>accurate and complete</strong></div>
+      </div>
+      <div class="check-row" onclick="toggleCheck(this, 1)">
+        <div class="check-box"></div>
+        <div class="check-text">I understand that my project will be <strong>matched with qualified creatives</strong> based on the information provided</div>
+      </div>
+      <div class="check-row" onclick="toggleCheck(this, 2)">
+        <div class="check-box"></div>
+        <div class="check-text">I agree to the platform's <a style="color:var(--purple);cursor:pointer;" onclick="event.stopPropagation()">Terms of Service</a> and <a style="color:var(--purple);cursor:pointer;" onclick="event.stopPropagation()">Creative Collaboration Guidelines</a></div>
+      </div>
+      <div class="check-row" onclick="toggleCheck(this, 3)">
+        <div class="check-box"></div>
+        <div class="check-text">I acknowledge that <strong>budget ranges are estimates</strong> and final pricing will be negotiated with matched creatives</div>
+      </div>
+    </div>
+
+    <div style="height:40px;"></div>
+  </main>
+</div>
+
+<!-- FOOTER -->
+<div class="form-footer">
+  <button class="btn-draft">💾 Save as Draft</button>
+  <div class="footer-right">
+    <span class="footer-status" id="footer-status">Confirm all 4 items above to publish</span>
+    <button class="btn-back">← Back</button>
+    <button class="btn-submit" id="submit-btn" onclick="submitProject()">🚀 Submit Project & Find Creatives</button>
+  </div>
+</div>
+
+<!-- SUCCESS OVERLAY -->
+<div class="success-overlay" id="success-overlay">
+  <div class="success-ring">🎉</div>
+  <div class="success-title">Your brief is <span>live</span></div>
+  <div class="success-sub">"I'm So Tired of This World" is now visible to creatives on EchoVizion. Expect your first matches within 24 hours.</div>
+  <div class="success-stats">
+    <div class="success-stat"><div class="success-stat-val">94%</div><div class="success-stat-label">Brief quality</div></div>
+    <div class="success-stat"><div class="success-stat-val">~47</div><div class="success-stat-label">Matching creatives</div></div>
+    <div class="success-stat"><div class="success-stat-val">24h</div><div class="success-stat-label">First match est.</div></div>
+  </div>
+  <div class="success-actions">
+    <button class="btn-view">View My Project →</button>
+    <button class="btn-dash">Go to Dashboard</button>
+  </div>
+</div>
+
+<script>
+  const checks = [false, false, false, false];
+
+  function toggleCheck(row, idx) {
+    checks[idx] = !checks[idx];
+    row.classList.toggle('checked', checks[idx]);
+    const allDone = checks.every(Boolean);
+    const btn = document.getElementById('submit-btn');
+    const status = document.getElementById('footer-status');
+    btn.classList.toggle('ready', allDone);
+    if (allDone) {
+      status.textContent = '✅ Everything confirmed — ready to publish';
+      status.style.color = 'var(--green)';
+    } else {
+      const remaining = checks.filter(c => !c).length;
+      status.textContent = `${remaining} item${remaining > 1 ? 's' : ''} remaining`;
+      status.style.color = 'var(--text-muted)';
+    }
+  }
+
+  function submitProject() {
+    if (!checks.every(Boolean)) return;
+    const btn = document.getElementById('submit-btn');
+    btn.innerHTML = '⏳ Publishing…';
+    btn.style.opacity = '0.7';
+    btn.style.pointerEvents = 'none';
+    setTimeout(() => {
+      document.getElementById('success-overlay').classList.add('visible');
+    }, 1400);
+  }
+</script>
+
+</body>
+</html>

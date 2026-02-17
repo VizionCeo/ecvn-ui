@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EchoVizion – Talent & Crew Needs</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0d0b1a;
+    --sidebar-bg: #120f24;
+    --card-bg: #1a1630;
+    --purple: #a78bfa;
+    --purple-dark: #7c3aed;
+    --pink: #f472b6;
+    --green: #10b981;
+    --orange: #f59e0b;
+    --teal: #06b6d4;
+    --border: #2a2448;
+    --text-primary: #f1f0ff;
+    --text-secondary: #9ca3af;
+    --text-muted: #6b7280;
+  }
+
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; }
+
+  /* NAV */
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 0 32px; height: 56px; background: rgba(13,11,26,0.95); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(12px); }
+  .logo { display: flex; align-items: center; gap: 10px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 18px; }
+  .logo-icon { width: 30px; height: 30px; background: linear-gradient(135deg, var(--purple-dark), var(--pink)); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 14px; font-weight: 500; }
+  .nav-links a.active { color: var(--text-primary); border-bottom: 2px solid var(--purple); padding-bottom: 2px; }
+  .nav-right { display: flex; align-items: center; gap: 16px; }
+  .notif { width: 32px; height: 32px; border-radius: 50%; background: var(--card-bg); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 14px; position: relative; cursor: pointer; }
+  .notif-dot { position: absolute; top: 6px; right: 6px; width: 6px; height: 6px; border-radius: 50%; background: var(--pink); }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--purple-dark), var(--pink)); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: white; }
+
+  .layout { display: flex; flex: 1; }
+
+  /* SIDEBAR */
+  .sidebar { width: 240px; background: var(--sidebar-bg); border-right: 1px solid var(--border); padding: 24px 16px; position: sticky; top: 56px; height: calc(100vh - 56px); overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+  .sidebar-proj-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); font-weight: 500; margin-bottom: 2px; }
+  .sidebar-step-label { font-size: 13px; color: var(--purple); font-weight: 600; font-family: 'Syne', sans-serif; margin-bottom: 10px; }
+  .progress-bar-wrap { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; margin-bottom: 6px; }
+  .progress-bar-fill { height: 100%; width: 70%; background: linear-gradient(90deg, var(--purple-dark), var(--pink)); border-radius: 2px; }
+  .progress-pct { font-size: 12px; color: var(--text-muted); }
+  .progress-pct strong { color: var(--text-secondary); font-weight: 500; }
+  .steps-list { display: flex; flex-direction: column; gap: 2px; }
+  .step-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; cursor: pointer; border: 1px solid transparent; transition: all 0.15s; }
+  .step-item.active { background: rgba(124,58,237,0.15); border-color: rgba(167,139,250,0.3); }
+  .step-item.completed .step-num { background: var(--purple-dark); color: white; }
+  .step-item.completed .step-name { color: var(--text-secondary); }
+  .step-num { width: 22px; height: 22px; border-radius: 50%; background: var(--border); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: var(--text-muted); flex-shrink: 0; }
+  .step-item.active .step-num { background: linear-gradient(135deg, var(--purple-dark), var(--purple)); color: white; }
+  .step-name { font-size: 13px; color: var(--text-muted); }
+  .step-item.active .step-name { color: var(--text-primary); font-weight: 500; }
+  .sidebar-help { margin-top: auto; padding: 14px; background: var(--card-bg); border-radius: 10px; border: 1px solid var(--border); }
+  .sidebar-help p { font-size: 12px; color: var(--text-secondary); margin-bottom: 10px; line-height: 1.5; }
+  .help-btn { width: 100%; padding: 8px; background: linear-gradient(135deg, var(--purple-dark), #9333ea); border: none; border-radius: 8px; color: white; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+
+  /* MAIN */
+  .main { flex: 1; padding: 36px 48px 140px; max-width: 900px; }
+
+  .page-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 10px; }
+  .page-header-icon { width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, var(--purple-dark), var(--pink)); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  .step-meta { font-size: 12px; color: var(--purple); font-weight: 500; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.08em; }
+  .step-title { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; color: var(--text-primary); }
+  .step-subtitle { font-size: 13px; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.7; max-width: 680px; }
+
+  /* HOW THIS WORKS EXPLAINER */
+  .explainer {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;
+    margin-bottom: 20px;
+  }
+  .explainer-card {
+    background: var(--card-bg); border: 1px solid var(--border);
+    border-radius: 12px; padding: 16px;
+  }
+  .explainer-step { font-size: 11px; font-weight: 600; color: var(--purple); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 5px; }
+  .explainer-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 5px; }
+  .explainer-desc { font-size: 11px; color: var(--text-muted); line-height: 1.6; }
+  .explainer-arrow {
+    display: flex; align-items: center; justify-content: center;
+    color: var(--border); font-size: 20px; margin-top: 24px;
+  }
+
+  /* OPTIONAL BANNER */
+  .optional-banner {
+    display: flex; align-items: flex-start; gap: 14px;
+    background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.2);
+    border-radius: 12px; padding: 18px 20px; margin-bottom: 20px;
+  }
+  .opt-icon { width: 34px; height: 34px; border-radius: 9px; background: rgba(16,185,129,0.15); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .opt-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 3px; }
+  .opt-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+
+  /* SELECTED SUMMARY */
+  .summary-tray {
+    background: var(--card-bg); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px 18px; margin-bottom: 16px;
+    transition: border-color 0.3s;
+  }
+  .summary-tray.has-items { border-color: rgba(167,139,250,0.4); }
+  .summary-tray-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0; }
+  .summary-tray-label { font-size: 13px; font-weight: 500; color: var(--text-secondary); }
+  .summary-tray-label strong { color: var(--purple); font-family: 'Syne', sans-serif; }
+  .summary-pills { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 12px; }
+  .summary-pill { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 500; background: rgba(124,58,237,0.12); border: 1px solid rgba(167,139,250,0.3); color: var(--purple); display: flex; align-items: center; gap: 5px; animation: pillIn 0.15s ease; }
+  @keyframes pillIn { from { opacity:0; transform:scale(0.85); } to { opacity:1; transform:scale(1); } }
+  .summary-pill button { background: none; border: none; color: rgba(167,139,250,0.5); font-size: 13px; cursor: pointer; line-height: 1; padding: 0; transition: color 0.15s; }
+  .summary-pill button:hover { color: var(--pink); }
+  .tray-clear { font-size: 11px; color: var(--text-muted); cursor: pointer; text-decoration: underline; transition: color 0.15s; }
+  .tray-clear:hover { color: var(--pink); }
+
+  /* SECTION CARD */
+  .cat-section { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 24px; margin-bottom: 14px; }
+  .cat-header { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
+  .cat-icon { width: 28px; height: 28px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+  .cat-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--text-primary); }
+  .cat-subtitle { font-size: 12px; color: var(--text-muted); margin-bottom: 18px; padding-left: 38px; line-height: 1.6; }
+
+  /* CREW CARDS GRID */
+  .crew-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .crew-card {
+    background: rgba(255,255,255,0.02); border: 1.5px solid var(--border);
+    border-radius: 12px; overflow: hidden;
+    cursor: pointer; transition: all 0.2s; position: relative;
+  }
+  .crew-card:hover { border-color: rgba(167,139,250,0.4); background: rgba(124,58,237,0.04); }
+  .crew-card.selected { border-color: var(--purple); background: rgba(124,58,237,0.09); }
+
+  .crew-card-main { display: flex; align-items: flex-start; gap: 12px; padding: 16px 16px 12px; }
+
+  .crew-card-icon {
+    width: 36px; height: 36px; border-radius: 9px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 18px;
+    background: rgba(124,58,237,0.1); border: 1px solid rgba(167,139,250,0.2);
+    transition: all 0.2s;
+  }
+  .crew-card.selected .crew-card-icon { background: rgba(124,58,237,0.22); border-color: var(--purple); }
+
+  .crew-card-text { flex: 1; min-width: 0; }
+  .crew-card-name { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 3px; font-family: 'Syne', sans-serif; }
+  .crew-card-desc { font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+
+  .crew-card-check {
+    width: 20px; height: 20px; border-radius: 6px;
+    border: 2px solid var(--border); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s; margin-top: 2px;
+  }
+  .crew-card.selected .crew-card-check { background: var(--purple-dark); border-color: var(--purple-dark); }
+  .crew-card.selected .crew-card-check::after { content: '✓'; font-size: 11px; color: white; font-weight: 700; }
+
+  /* IMPORTANCE BADGE */
+  .importance-row {
+    display: none; align-items: center; gap: 8px;
+    padding: 0 16px 12px; animation: fadeIn 0.2s ease;
+  }
+  .crew-card.selected .importance-row { display: flex; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:translateY(0); } }
+
+  .imp-label { font-size: 11px; color: var(--text-muted); flex-shrink: 0; }
+  .imp-btn {
+    padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 500;
+    border: 1px solid var(--border); background: transparent;
+    color: var(--text-muted); cursor: pointer; font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s;
+  }
+  .imp-btn.active-must { background: rgba(244,114,182,0.15); border-color: rgba(244,114,182,0.4); color: var(--pink); }
+  .imp-btn.active-nice { background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.3); color: var(--green); }
+  .imp-btn:not(.active-must):not(.active-nice):hover { border-color: var(--border); color: var(--text-secondary); }
+
+  /* EXPANDABLE NOTES */
+  .crew-card-notes {
+    display: none; padding: 0 16px 14px;
+    animation: fadeIn 0.2s ease;
+  }
+  .crew-card.selected .crew-card-notes { display: block; }
+
+  .crew-notes-divider { height: 1px; background: rgba(167,139,250,0.15); margin-bottom: 10px; }
+
+  .crew-notes-input {
+    width: 100%; padding: 9px 12px;
+    background: rgba(255,255,255,0.04);
+    border: 1.5px solid rgba(167,139,250,0.2);
+    border-radius: 8px; color: var(--text-primary);
+    font-size: 11px; font-family: 'DM Sans', sans-serif;
+    outline: none; resize: none; line-height: 1.6;
+    transition: all 0.2s;
+  }
+  .crew-notes-input::placeholder { color: var(--text-muted); font-style: italic; }
+  .crew-notes-input:focus { border-color: var(--purple); background: rgba(167,139,250,0.06); }
+
+  /* MATCH SECTION */
+  .match-section { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 24px; margin-bottom: 14px; }
+  .match-header { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
+  .match-header-icon { width: 28px; height: 28px; border-radius: 7px; background: rgba(124,58,237,0.15); display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .match-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--text-primary); }
+  .match-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.7; padding-left: 38px; margin-bottom: 14px; }
+
+  /* MATCH EXAMPLE */
+  .match-example {
+    margin-left: 38px;
+    background: rgba(124,58,237,0.07); border: 1px solid rgba(167,139,250,0.2);
+    border-radius: 10px; padding: 14px 16px;
+  }
+  .match-example-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 10px; }
+  .match-row { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
+  .match-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .match-row-text { font-size: 12px; color: var(--text-secondary); flex: 1; }
+  .match-score-badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 4px; flex-shrink: 0; }
+  .match-score-badge.high { background: rgba(16,185,129,0.15); color: var(--green); }
+  .match-score-badge.mid { background: rgba(245,158,11,0.12); color: var(--orange); }
+  .match-note {
+    font-size: 11px; color: var(--text-muted); margin-top: 10px;
+    padding-top: 10px; border-top: 1px solid rgba(167,139,250,0.1); line-height: 1.6;
+  }
+
+  /* BUDGET BANNER */
+  .budget-banner {
+    display: flex; align-items: flex-start; gap: 14px;
+    background: rgba(245,158,11,0.06); border: 1px solid rgba(245,158,11,0.2);
+    border-radius: 12px; padding: 18px 20px; margin-bottom: 14px;
+  }
+  .budget-icon { width: 34px; height: 34px; border-radius: 9px; background: rgba(245,158,11,0.12); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .budget-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 3px; }
+  .budget-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 8px; }
+  .budget-tip { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: var(--orange); background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2); border-radius: 6px; padding: 4px 10px; }
+
+  /* VALIDATION */
+  .validation-note { display: flex; align-items: center; gap: 8px; font-size: 12px; margin-bottom: 24px; margin-top: 8px; }
+  .validation-dot { width: 6px; height: 6px; border-radius: 50%; }
+
+  /* FOOTER */
+  .form-footer { display: flex; align-items: center; justify-content: space-between; padding: 20px 48px; background: rgba(13,11,26,0.95); border-top: 1px solid var(--border); backdrop-filter: blur(12px); position: fixed; bottom: 0; width: calc(100% - 240px); margin-left: 240px; z-index: 50; }
+  .btn-draft { display: flex; align-items: center; gap: 8px; padding: 10px 18px; background: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .btn-draft:hover { border-color: var(--purple); color: var(--purple); }
+  .footer-right { display: flex; gap: 12px; align-items: center; }
+  .btn-back { padding: 10px 24px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .btn-back:hover { color: var(--text-primary); }
+  .btn-next { padding: 12px 28px; background: linear-gradient(135deg, var(--purple-dark), #9333ea); border: none; border-radius: 8px; color: white; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; display: flex; align-items: center; gap: 8px; transition: all 0.25s; box-shadow: 0 4px 14px rgba(124,58,237,0.35); }
+  .btn-next:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(124,58,237,0.45); }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">
+    <div class="logo-icon">🎵</div>
+    EchoVizion
+  </div>
+  <ul class="nav-links">
+    <li><a href="#">Projects</a></li>
+    <li><a href="#" class="active">Create Project</a></li>
+    <li><a href="#">Messages</a></li>
+    <li><a href="#">Profile</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="notif">🔔<div class="notif-dot"></div></div>
+    <div class="avatar">V</div>
+  </div>
+</nav>
+
+<div class="layout">
+
+  <aside class="sidebar">
+    <div>
+      <div class="sidebar-proj-label">Project Creation</div>
+      <div class="sidebar-step-label">Step 7/10</div>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill"></div></div>
+      <div class="progress-pct"><strong>70% Complete</strong></div>
+    </div>
+    <div class="steps-list">
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Project Details</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Budget Definition</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Creative Direction</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Visual Style Selection</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Inspiration References</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Technical Requirements</span></div>
+      <div class="step-item active"><div class="step-num">7</div><span class="step-name">Talent & Crew Needs</span></div>
+      <div class="step-item"><div class="step-num">8</div><span class="step-name">Collaboration Style</span></div>
+      <div class="step-item"><div class="step-num">9</div><span class="step-name">Location & Travel</span></div>
+      <div class="step-item"><div class="step-num">10</div><span class="step-name">Review & Submit</span></div>
+    </div>
+    <div class="sidebar-help">
+      <p>Not sure what crew you need? Leave this blank and discuss it with your matched creative during the proposal stage.</p>
+      <button class="help-btn">💬 Contact Support</button>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <div class="page-header">
+      <div class="page-header-icon">🎬</div>
+      <div>
+        <div class="step-meta">Step 7 of 10</div>
+        <h1 class="step-title">Talent & Crew Needs</h1>
+      </div>
+    </div>
+
+    <p class="step-subtitle">Specify any production support beyond the primary creative. This helps us match you with a director who has the right crew network and coordination experience — you're not hiring these people separately, you're filtering for a creative who can make it happen.</p>
+
+    <!-- HOW THIS WORKS -->
+    <div class="explainer">
+      <div class="explainer-card">
+        <div class="explainer-step">You select</div>
+        <div class="explainer-title">Production needs</div>
+        <div class="explainer-desc">e.g. Dancers, Styling, Hair & Makeup</div>
+      </div>
+      <div class="explainer-card" style="border-color:rgba(167,139,250,0.25);background:rgba(124,58,237,0.07);">
+        <div class="explainer-step" style="color:var(--pink);">Algorithm filters</div>
+        <div class="explainer-title">Crew network match</div>
+        <div class="explainer-desc">Creatives who've flagged these coordination capabilities in their profile rank higher</div>
+      </div>
+      <div class="explainer-card">
+        <div class="explainer-step" style="color:var(--green);">You get</div>
+        <div class="explainer-title">One matched creative</div>
+        <div class="explainer-desc">Who can either provide these themselves or coordinate reliable crew they already work with</div>
+      </div>
+    </div>
+
+    <!-- OPTIONAL BANNER -->
+    <div class="optional-banner">
+      <div class="opt-icon">ℹ️</div>
+      <div>
+        <div class="opt-title">Optional — Skip If Unsure</div>
+        <div class="opt-desc">Many great directors can source crew flexibly. If you're unsure what you need, leave this blank and discuss production scope directly with your matched creative during the proposal stage. These signals narrow your match pool — only add what you're certain about.</div>
+      </div>
+    </div>
+
+    <!-- SUMMARY TRAY -->
+    <div class="summary-tray" id="summary-tray">
+      <div class="summary-tray-header">
+        <span class="summary-tray-label" id="summary-label">No production needs selected — <strong>this step is optional</strong></span>
+        <span class="tray-clear" id="tray-clear" onclick="clearAll()" style="display:none;">Clear all</span>
+      </div>
+      <div class="summary-pills" id="summary-pills" style="display:none;"></div>
+    </div>
+
+    <!-- SECTION 1: ON-SCREEN TALENT -->
+    <div class="cat-section">
+      <div class="cat-header">
+        <div class="cat-icon" style="background:rgba(244,114,182,0.12);border:1px solid rgba(244,114,182,0.2);">🎭</div>
+        <div class="cat-title">On-Screen Talent</div>
+      </div>
+      <div class="cat-subtitle">People who appear in front of the camera — your matched creative should have established relationships or sourcing channels for these</div>
+
+      <div class="crew-grid">
+
+        <div class="crew-card" id="card-dancers" onclick="toggleCard(event,'dancers','Dancers')">
+          <div class="crew-card-main">
+            <div class="crew-card-icon">💃</div>
+            <div class="crew-card-text">
+              <div class="crew-card-name">Dancers</div>
+              <div class="crew-card-desc">Choreographed performers for dance sequences or background movement</div>
+            </div>
+            <div class="crew-card-check"></div>
+          </div>
+          <div class="importance-row">
+            <span class="imp-label">Priority:</span>
+            <button class="imp-btn" id="imp-dancers-must" onclick="setImp(event,'dancers','must')">Must have</button>
+            <button class="imp-btn" id="imp-dancers-nice" onclick="setImp(event,'dancers','nice')">Nice to have</button>
+          </div>
+          <div class="crew-card-notes">
+            <div class="crew-notes-divider"></div>
+            <textarea class="crew-notes-input" rows="2" placeholder="How many dancers? What style — contemporary, afrobeats, freestyle?" onclick="event.stopPropagation()"></textarea>
+          </div>
+        </div>
+
+        <div class="crew-card" id="card-extras" onclick="toggleCard(event,'extras','Extras / Background Talent')">
+          <div class="crew-card-main">
+            <div class="crew-card-icon">👥</div>
+            <div class="crew-card-text">
+              <div class="crew-card-name">Extras / Background Talent</div>
+              <div class="crew-card-desc">Background performers to populate scenes and create atmosphere</div>
+            </div>
+            <div class="crew-card-check"></div>
+          </div>
+          <div class="importance-row">
+            <span class="imp-label">Priority:</span>
+            <button class="imp-btn" id="imp-extras-must" onclick="setImp(event,'extras','must')">Must have</button>
+            <button class="imp-btn" id="imp-extras-nice" onclick="setImp(event,'extras','nice')">Nice to have</button>
+          </div>
+          <div class="crew-card-notes">
+            <div class="crew-notes-divider"></div>
+            <textarea class="crew-notes-input" rows="2" placeholder="Roughly how many extras? Any specific look or demographic?" onclick="event.stopPropagation()"></textarea>
+          </div>
+        </div>
+
+        <div class="crew-card" id="card-models" onclick="toggleCard(event,'models','Models / Featured Actors')">
+          <div class="crew-card-main">
+            <div class="crew-card-icon">🌟</div>
+            <div class="crew-card-text">
+              <div class="crew-card-name">Models / Featured Actors</div>
+              <div class="crew-card-desc">People with featured, named roles — not just background filler</div>
+            </div>
+            <div class="crew-card-check"></div>
+          </div>
+          <div class="importance-row">
+            <span class="imp-label">Priority:</span>
+            <button class="imp-btn" id="imp-models-must" onclick="setImp(event,'models','must')">Must have</button>
+            <button class="imp-btn" id="imp-models-nice" onclick="setImp(event,'models','nice')">Nice to have</button>
+          </div>
+          <div class="crew-card-notes">
+            <div class="crew-notes-divider"></div>
+            <textarea class="crew-notes-input" rows="2" placeholder="How many? Any specific characteristics — age, look, acting experience?" onclick="event.stopPropagation()"></textarea>
+          </div>
+        </div>
+
+        <div class="crew-card" id="card-choreographer" onclick="toggleCard(event,'choreographer','Choreographer')">
+          <div class="crew-card-main">
+            <div class="crew-card-icon">🎵</div>
+            <div class="crew-card-text">
+              <div class="crew-card-name">Choreographer</div>
+              <div class="crew-card-desc">Movement director for dance sequences or performance staging</div>
+            </div>
+            <div class="crew-card-check"></div>
+          </div>
+          <div class="importance-row">
+            <span class="imp-label">Priority:</span>
+            <button class="imp-btn" id="imp-choreographer-must" onclick="setImp(event,'choreographer','must')">Must have</button>
+            <button class="imp-btn" id="imp-choreographer-nice" onclick="setImp(event,'choreographer','nice')">Nice to have</button>
+          </div>
+          <div class="crew-card-notes">
+            <div class="crew-notes-divider"></div>
+            <textarea class="crew-notes-input" rows="2" placeholder="What style — afrobeats, contemporary, hip-hop, abstract movement?" onclick="event.stopPropagation()"></textarea>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SECTION 2: STYLING & APPEARANCE -->
+    <div class="cat-section">
+      <div class="cat-header">
+        <div class="cat-icon" style="background:rgba(167,139,250,0.12);border:1px solid rgba(167,139,250,0.2);">✨</div>
+        <div class="cat-title">Styling & Appearance</div>
+      </div>
+      <div class="cat-subtitle">Appearance crew — your creative should have stylists, MUA artists, or wardrobe contacts in their network</div>
+
+      <div class="crew-grid">
+
+        <div class="crew-card" id="card-styling" onclick="toggleCard(event,'styling','Styling / Wardrobe')">
+          <div class="crew-card-main">
+            <div class="crew-card-icon">👗</div>
+            <div class="crew-card-text">
+              <div class="crew-card-name">Styling / Wardrobe</div>
+              <div class="crew-card-desc">Professional wardrobe styling and costume coordination for all talent</div>
+            </div>
+            <div class="crew-card-check"></div>
+          </div>
+          <div class="importance-row">
+            <span class="imp-label">Priority:</span>
+            <button class="imp-btn" id="imp-styling-must" onclick="setImp(event,'styling','must')">Must have</button>
+            <button class="imp-btn" id="imp-styling-nice" onclick="setImp(event,'styling','nice')">Nice to have</button>
+          </div>
+          <div class="crew-card-notes">
+            <div class="crew-notes-divider"></div>
+            <textarea class="crew-notes-input" rows="2" placeholder="Any specific aesthetic — luxury, streetwear, period costume, cultural dress?" onclick="event.stopPropagation()"></textarea>
+          </div>
+        </div>
+
+        <div class="crew-card" id="card-hmua" onclick="toggleCard(event,'hmua','Hair & Makeup Artists')">
+          <div class="crew-card-main">
+            <div class="crew-card-icon">💄</div>
+            <div class="crew-card-text">
+              <div class="crew-card-name">Hair & Makeup Artists</div>
+              <div class="crew-card-desc">Professional H&MUA for talent — on-set touch-ups and continuity</div>
+            </div>
+            <div class="crew-card-check"></div>
+          </div>
+          <div class="importance-row">
+            <span class="imp-label">Priority:</span>
+            <button class="imp-btn" id="imp-hmua-must" onclick="setImp(event,'hmua','must')">Must have</button>
+            <button class="imp-btn" id="imp-hmua-nice" onclick="setImp(event,'hmua','nice')">Nice to have</button>
+          </div>
+          <div class="crew-card-notes">
+            <div class="crew-notes-divider"></div>
+            <textarea class="crew-notes-input" rows="2" placeholder="Any special requirements — melanin expertise, special FX makeup, period styling?" onclick="event.stopPropagation()"></textarea>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SECTION 3: SET & ENVIRONMENT -->
+    <div class="cat-section">
+      <div class="cat-header">
+        <div class="cat-icon" style="background:rgba(6,182,212,0.12);border:1px solid rgba(6,182,212,0.2);">🏗️</div>
+        <div class="cat-title">Set & Environment</div>
+      </div>
+      <div class="cat-subtitle">Physical environment crew — production designers and prop coordinators who build the visual world of your video</div>
+
+      <div class="crew-grid">
+
+        <div class="crew-card" id="card-setdesign" onclick="toggleCard(event,'setdesign','Set Design / Art Direction')">
+          <div class="crew-card-main">
+            <div class="crew-card-icon">🎨</div>
+            <div class="crew-card-text">
+              <div class="crew-card-name">Set Design / Art Direction</div>
+              <div class="crew-card-desc">Custom environment builds, backdrops, and artistic spatial design</div>
+            </div>
+            <div class="crew-card-check"></div>
+          </div>
+          <div class="importance-row">
+            <span class="imp-label">Priority:</span>
+            <button class="imp-btn" id="imp-setdesign-must" onclick="setImp(event,'setdesign','must')">Must have</button>
+            <button class="imp-btn" id="imp-setdesign-nice" onclick="setImp(event,'setdesign','nice')">Nice to have</button>
+          </div>
+          <div class="crew-card-notes">
+            <div class="crew-notes-divider"></div>
+            <textarea class="crew-notes-input" rows="2" placeholder="What kind of set — surreal environment, realistic room, abstract installation?" onclick="event.stopPropagation()"></textarea>
+          </div>
+        </div>
+
+        <div class="crew-card" id="card-props" onclick="toggleCard(event,'props','Props & Set Dressing')">
+          <div class="crew-card-main">
+            <div class="crew-card-icon">🪑</div>
+            <div class="crew-card-text">
+              <div class="crew-card-name">Props & Set Dressing</div>
+              <div class="crew-card-desc">Props sourcing and detailed set decoration for visual storytelling</div>
+            </div>
+            <div class="crew-card-check"></div>
+          </div>
+          <div class="importance-row">
+            <span class="imp-label">Priority:</span>
+            <button class="imp-btn" id="imp-props-must" onclick="setImp(event,'props','must')">Must have</button>
+            <button class="imp-btn" id="imp-props-nice" onclick="setImp(event,'props','nice')">Nice to have</button>
+          </div>
+          <div class="crew-card-notes">
+            <div class="crew-notes-divider"></div>
+            <textarea class="crew-notes-input" rows="2" placeholder="Any specific props or objects central to the concept?" onclick="event.stopPropagation()"></textarea>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- HOW THIS AFFECTS MATCHING -->
+    <div class="match-section">
+      <div class="match-header">
+        <div class="match-header-icon">🎯</div>
+        <div class="match-title">How This Feeds the Matching Algorithm</div>
+      </div>
+      <div class="match-desc">
+        These selections don't find you multiple people — they filter for <em>one creative</em> who has the production network to pull it off. During their onboarding, creatives declare what crew they can coordinate. Your selections become weighted filters on those declarations.
+      </div>
+
+      <div class="match-example">
+        <div class="match-example-label">Example — your project: Director + Dancers + Styling</div>
+        <div class="match-row">
+          <div class="match-dot" style="background:var(--green);"></div>
+          <div class="match-row-text">Sarah K. — Director · Has dancer network · Has styling contacts</div>
+          <span class="match-score-badge high">96% match</span>
+        </div>
+        <div class="match-row">
+          <div class="match-dot" style="background:var(--orange);"></div>
+          <div class="match-row-text">Marcus T. — Director · Has dancer network · No styling flagged</div>
+          <span class="match-score-badge mid">78% match</span>
+        </div>
+        <div class="match-note">
+          Marcus would appear in results with a note: <em>"Covers 2 of 3 production needs — may need to source styling separately or include it in proposal scope."</em>
+          You always make the final call.
+        </div>
+      </div>
+    </div>
+
+    <!-- BUDGET NOTE -->
+    <div class="budget-banner">
+      <div class="budget-icon">💰</div>
+      <div>
+        <div class="budget-title">Budget Consideration</div>
+        <div class="budget-desc">Each production element you add expands the scope and cost of your project. Many directors will include crew coordination in their proposal and price it as a package — others may suggest you handle certain elements separately. Discuss this openly once you're matched.</div>
+        <div class="budget-tip">💡 Tip: Be open to creative solutions — experienced directors often know ways to achieve the same result for less</div>
+      </div>
+    </div>
+
+    <!-- VALIDATION -->
+    <div class="validation-note">
+      <div class="validation-dot" id="val-dot" style="background:var(--green);"></div>
+      <span id="val-text" style="color:var(--green);">Optional step — you can continue at any time</span>
+    </div>
+
+    <div style="height:40px;"></div>
+  </main>
+</div>
+
+<div class="form-footer">
+  <button class="btn-draft">💾 Save as Draft</button>
+  <div class="footer-right">
+    <span id="footer-status" style="font-size:13px;color:var(--text-muted);">Optional — 0 crew needs selected</span>
+    <button class="btn-back">← Back</button>
+    <button class="btn-next" onclick="goNext()">Next: Collaboration Style →</button>
+  </div>
+</div>
+
+<script>
+  const selected = new Map(); // id → { label, imp: 'must'|'nice'|null }
+  const impState = {}; // id → 'must'|'nice'
+
+  function toggleCard(event, id, label) {
+    if (event.target.tagName === 'TEXTAREA' || event.target.tagName === 'BUTTON') return;
+
+    const card = document.getElementById(`card-${id}`);
+
+    if (selected.has(id)) {
+      selected.delete(id);
+      delete impState[id];
+      card.classList.remove('selected');
+      removePill(id);
+      resetImp(id);
+    } else {
+      selected.set(id, { label, imp: null });
+      card.classList.add('selected');
+      addPill(id, label, null);
+    }
+    updateUI();
+  }
+
+  function setImp(event, id, level) {
+    event.stopPropagation();
+    if (!selected.has(id)) return;
+
+    const current = impState[id];
+    // Toggle off if clicking same
+    if (current === level) {
+      impState[id] = null;
+      selected.get(id).imp = null;
+    } else {
+      impState[id] = level;
+      selected.get(id).imp = level;
+    }
+
+    // Update button states
+    const mustBtn = document.getElementById(`imp-${id}-must`);
+    const niceBtn = document.getElementById(`imp-${id}-nice`);
+    mustBtn.className = 'imp-btn' + (impState[id] === 'must' ? ' active-must' : '');
+    niceBtn.className = 'imp-btn' + (impState[id] === 'nice' ? ' active-nice' : '');
+
+    // Update pill
+    removePill(id);
+    addPill(id, selected.get(id).label, impState[id]);
+  }
+
+  function resetImp(id) {
+    const mustBtn = document.getElementById(`imp-${id}-must`);
+    const niceBtn = document.getElementById(`imp-${id}-nice`);
+    if (mustBtn) mustBtn.className = 'imp-btn';
+    if (niceBtn) niceBtn.className = 'imp-btn';
+  }
+
+  function addPill(id, label, imp) {
+    const container = document.getElementById('summary-pills');
+    const pill = document.createElement('span');
+    pill.className = 'summary-pill';
+    pill.id = `pill-${id}`;
+
+    let impTag = '';
+    if (imp === 'must') impTag = ' <span style="background:rgba(244,114,182,0.2);color:var(--pink);padding:1px 6px;border-radius:4px;font-size:10px;">must</span>';
+    if (imp === 'nice') impTag = ' <span style="background:rgba(16,185,129,0.15);color:var(--green);padding:1px 6px;border-radius:4px;font-size:10px;">optional</span>';
+
+    pill.innerHTML = `${label}${impTag} <button onclick="removePillById('${id}');event.stopPropagation()">×</button>`;
+    container.appendChild(pill);
+    container.style.display = 'flex';
+    document.getElementById('summary-tray').classList.add('has-items');
+    document.getElementById('tray-clear').style.display = 'inline';
+  }
+
+  function removePill(id) {
+    const el = document.getElementById(`pill-${id}`);
+    if (el) el.remove();
+    if (selected.size === 0) {
+      document.getElementById('summary-pills').style.display = 'none';
+      document.getElementById('summary-tray').classList.remove('has-items');
+      document.getElementById('tray-clear').style.display = 'none';
+    }
+  }
+
+  function removePillById(id) {
+    selected.delete(id);
+    delete impState[id];
+    const card = document.getElementById(`card-${id}`);
+    if (card) { card.classList.remove('selected'); resetImp(id); }
+    removePill(id);
+    updateUI();
+  }
+
+  function clearAll() {
+    selected.forEach((_, id) => {
+      const card = document.getElementById(`card-${id}`);
+      if (card) { card.classList.remove('selected'); resetImp(id); }
+    });
+    selected.clear();
+    Object.keys(impState).forEach(k => delete impState[k]);
+    document.getElementById('summary-pills').innerHTML = '';
+    document.getElementById('summary-pills').style.display = 'none';
+    document.getElementById('summary-tray').classList.remove('has-items');
+    document.getElementById('tray-clear').style.display = 'none';
+    updateUI();
+  }
+
+  function updateUI() {
+    const count = selected.size;
+    const status = document.getElementById('footer-status');
+    const label = document.getElementById('summary-label');
+
+    if (count === 0) {
+      status.textContent = 'Optional — 0 crew needs selected';
+      status.style.color = 'var(--text-muted)';
+      label.innerHTML = 'No production needs selected — <strong>this step is optional</strong>';
+    } else {
+      const mustCount = [...selected.values()].filter(v => v.imp === 'must').length;
+      status.textContent = `${count} production need${count > 1 ? 's' : ''} selected${mustCount > 0 ? ` · ${mustCount} must-have` : ''}`;
+      status.style.color = 'var(--purple)';
+      label.innerHTML = `<strong style="color:var(--purple);">${count} production need${count > 1 ? 's' : ''} selected</strong> — included in your project brief`;
+    }
+  }
+
+  function goNext() {
+    alert('Proceeding to Collaboration Style…');
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EchoVizion – Inspiration References</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0d0b1a;
+    --sidebar-bg: #120f24;
+    --card-bg: #1a1630;
+    --purple: #a78bfa;
+    --purple-dark: #7c3aed;
+    --pink: #f472b6;
+    --green: #10b981;
+    --orange: #f59e0b;
+    --teal: #06b6d4;
+    --border: #2a2448;
+    --text-primary: #f1f0ff;
+    --text-secondary: #9ca3af;
+    --text-muted: #6b7280;
+  }
+
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; }
+
+  /* NAV */
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 0 32px; height: 56px; background: rgba(13,11,26,0.95); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(12px); }
+  .logo { display: flex; align-items: center; gap: 10px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 18px; }
+  .logo-icon { width: 30px; height: 30px; background: linear-gradient(135deg, var(--purple-dark), var(--pink)); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 14px; font-weight: 500; }
+  .nav-links a.active { color: var(--text-primary); border-bottom: 2px solid var(--purple); padding-bottom: 2px; }
+  .nav-right { display: flex; align-items: center; gap: 16px; }
+  .notif { width: 32px; height: 32px; border-radius: 50%; background: var(--card-bg); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 14px; position: relative; cursor: pointer; }
+  .notif-dot { position: absolute; top: 6px; right: 6px; width: 6px; height: 6px; border-radius: 50%; background: var(--pink); }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--purple-dark), var(--pink)); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: white; }
+
+  /* LAYOUT */
+  .layout { display: flex; flex: 1; }
+
+  /* SIDEBAR */
+  .sidebar { width: 240px; background: var(--sidebar-bg); border-right: 1px solid var(--border); padding: 24px 16px; position: sticky; top: 56px; height: calc(100vh - 56px); overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+  .sidebar-top { }
+  .sidebar-proj-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); font-weight: 500; margin-bottom: 2px; }
+  .sidebar-step-label { font-size: 13px; color: var(--purple); font-weight: 600; font-family: 'Syne', sans-serif; margin-bottom: 10px; }
+  .progress-bar-wrap { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; margin-bottom: 6px; }
+  .progress-bar-fill { height: 100%; width: 50%; background: linear-gradient(90deg, var(--purple-dark), var(--pink)); border-radius: 2px; }
+  .progress-pct { font-size: 12px; color: var(--text-muted); }
+  .progress-pct strong { color: var(--text-secondary); font-weight: 500; }
+
+  .steps-list { display: flex; flex-direction: column; gap: 2px; }
+  .step-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; cursor: pointer; transition: all 0.15s; border: 1px solid transparent; }
+  .step-item.active { background: rgba(124,58,237,0.15); border-color: rgba(167,139,250,0.3); }
+  .step-item.completed .step-num { background: var(--purple-dark); color: white; }
+  .step-item.completed .step-name { color: var(--text-secondary); }
+  .step-num { width: 22px; height: 22px; border-radius: 50%; background: var(--border); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: var(--text-muted); flex-shrink: 0; }
+  .step-item.active .step-num { background: linear-gradient(135deg, var(--purple-dark), var(--purple)); color: white; }
+  .step-name { font-size: 13px; color: var(--text-muted); line-height: 1.3; }
+  .step-item.active .step-name { color: var(--text-primary); font-weight: 500; }
+
+  .sidebar-help { margin-top: auto; padding: 14px; background: var(--card-bg); border-radius: 10px; border: 1px solid var(--border); }
+  .sidebar-help p { font-size: 12px; color: var(--text-secondary); margin-bottom: 10px; line-height: 1.5; }
+  .help-btn { width: 100%; padding: 8px; background: linear-gradient(135deg, var(--purple-dark), #9333ea); border: none; border-radius: 8px; color: white; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+
+  /* MAIN */
+  .main { flex: 1; padding: 36px 48px 140px; max-width: 940px; }
+
+  .page-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 10px; }
+  .page-header-icon { width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, var(--purple-dark), var(--pink)); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  .step-meta { font-size: 12px; color: var(--purple); font-weight: 500; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.08em; }
+  .step-title { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; color: var(--text-primary); }
+  .step-subtitle { font-size: 13px; color: var(--text-secondary); margin-bottom: 28px; line-height: 1.7; max-width: 700px; }
+
+  /* MATCH BANNER */
+  .match-banner { display: flex; align-items: flex-start; gap: 14px; background: linear-gradient(135deg, rgba(6,182,212,0.1), rgba(124,58,237,0.08)); border: 1px solid rgba(6,182,212,0.25); border-radius: 12px; padding: 18px 20px; margin-bottom: 20px; }
+  .match-banner-icon { width: 36px; height: 36px; border-radius: 9px; background: linear-gradient(135deg, var(--teal), var(--purple-dark)); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .match-banner-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 3px; }
+  .match-banner-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 10px; }
+  .match-banner-tip { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: var(--teal); background: rgba(6,182,212,0.1); border: 1px solid rgba(6,182,212,0.25); border-radius: 6px; padding: 4px 10px; }
+
+  /* REFERENCES TRAY */
+  .tray-section { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 22px 24px; margin-bottom: 16px; transition: border-color 0.3s; }
+  .tray-section.has-refs { border-color: rgba(167,139,250,0.4); }
+
+  .tray-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .tray-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: var(--text-primary); }
+  .tray-counter { display: flex; align-items: center; gap: 8px; }
+  .counter-nums { font-size: 13px; font-weight: 600; font-family: 'Syne', sans-serif; }
+  .counter-bar { width: 80px; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .counter-fill { height: 100%; background: linear-gradient(90deg, var(--purple-dark), var(--pink)); border-radius: 2px; transition: width 0.3s ease; }
+
+  .tray-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 28px 0; gap: 8px; }
+  .tray-empty-icon { font-size: 32px; opacity: 0.3; }
+  .tray-empty-text { font-size: 13px; color: var(--text-muted); }
+  .tray-empty-sub { font-size: 12px; color: var(--text-muted); opacity: 0.7; }
+
+  .tray-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+
+  .tray-card { background: rgba(124,58,237,0.08); border: 1px solid rgba(167,139,250,0.3); border-radius: 10px; padding: 12px 14px; position: relative; animation: cardIn 0.2s ease; }
+  @keyframes cardIn { from { opacity: 0; transform: scale(0.92) translateY(4px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+
+  .tray-card-remove { position: absolute; top: 8px; right: 8px; width: 20px; height: 20px; border-radius: 50%; background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); color: #ef4444; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+  .tray-card-remove:hover { background: rgba(239,68,68,0.3); }
+
+  .tray-card-emoji { font-size: 18px; margin-bottom: 6px; }
+  .tray-card-title { font-size: 12px; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; padding-right: 22px; line-height: 1.3; }
+  .tray-card-meta { font-size: 11px; color: var(--text-muted); }
+
+  /* ADD REFERENCE SECTION */
+  .add-section { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 22px 24px; margin-bottom: 16px; }
+
+  .add-header { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+  .add-header-icon { width: 24px; height: 24px; border-radius: 6px; background: linear-gradient(135deg, var(--purple-dark), var(--pink)); display: flex; align-items: center; justify-content: center; font-size: 12px; }
+  .add-header-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--text-primary); }
+
+  /* TABS */
+  .tab-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+
+  .tab-btn {
+    padding: 13px 20px; border-radius: 10px;
+    border: 1.5px solid var(--border);
+    background: rgba(255,255,255,0.02);
+    color: var(--text-secondary); font-size: 14px; font-weight: 500;
+    cursor: pointer; font-family: 'DM Sans', sans-serif;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: all 0.2s;
+  }
+
+  .tab-btn.active {
+    background: linear-gradient(135deg, var(--purple-dark), #9333ea);
+    border-color: transparent; color: white;
+    box-shadow: 0 4px 14px rgba(124,58,237,0.35);
+  }
+
+  .tab-btn:not(.active):hover { border-color: var(--purple); color: var(--purple); background: rgba(124,58,237,0.07); }
+
+  /* CUSTOM URL PANEL */
+  .custom-url-panel { display: none; }
+  .custom-url-panel.visible { display: block; }
+
+  .url-input-row { display: flex; gap: 10px; margin-bottom: 12px; }
+  .url-input { flex: 1; padding: 13px 16px; background: rgba(255,255,255,0.04); border: 1.5px solid var(--border); border-radius: 10px; color: var(--text-primary); font-size: 14px; font-family: 'DM Sans', sans-serif; outline: none; transition: all 0.2s; }
+  .url-input::placeholder { color: var(--text-muted); }
+  .url-input:focus { border-color: var(--purple); background: rgba(167,139,250,0.05); box-shadow: 0 0 0 3px rgba(167,139,250,0.1); }
+  .url-add-btn { padding: 13px 20px; background: linear-gradient(135deg, var(--purple-dark), #9333ea); border: none; border-radius: 10px; color: white; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; white-space: nowrap; transition: all 0.2s; }
+  .url-add-btn:hover { box-shadow: 0 4px 12px rgba(124,58,237,0.4); transform: translateY(-1px); }
+  .url-hint { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+
+  /* ROLODEX PANEL */
+  .rolodex-panel { display: none; }
+  .rolodex-panel.visible { display: block; }
+
+  /* CURATED ROLODEX */
+  .rolodex-section { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 22px 24px; }
+
+  .rolodex-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 4px; }
+  .rolodex-title { display: flex; align-items: center; gap: 8px; font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: var(--text-primary); }
+  .rolodex-icon { font-size: 16px; }
+  .rolodex-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; }
+
+  /* CATEGORY FILTER */
+  .cat-filter { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+
+  .cat-btn { padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; background: rgba(255,255,255,0.04); border: 1.5px solid var(--border); color: var(--text-secondary); cursor: pointer; transition: all 0.15s; }
+  .cat-btn:hover { border-color: var(--purple); color: var(--purple); }
+  .cat-btn.active { background: rgba(124,58,237,0.15); border-color: var(--purple); color: var(--purple); }
+
+  /* SEARCH */
+  .rolodex-search-wrap { position: relative; margin-bottom: 16px; }
+  .rolodex-search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 14px; color: var(--text-muted); pointer-events: none; }
+  .rolodex-search { width: 100%; padding: 11px 14px 11px 40px; background: rgba(255,255,255,0.04); border: 1.5px solid var(--border); border-radius: 10px; color: var(--text-primary); font-size: 13px; font-family: 'DM Sans', sans-serif; outline: none; transition: all 0.2s; }
+  .rolodex-search::placeholder { color: var(--text-muted); }
+  .rolodex-search:focus { border-color: var(--purple); background: rgba(167,139,250,0.05); box-shadow: 0 0 0 3px rgba(167,139,250,0.1); }
+
+  /* ROLODEX CARDS GRID */
+  .rolodex-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .rolodex-card {
+    background: rgba(255,255,255,0.02);
+    border: 1.5px solid var(--border);
+    border-radius: 12px; padding: 16px;
+    display: flex; flex-direction: column; gap: 8px;
+    transition: all 0.2s; position: relative;
+  }
+
+  .rolodex-card:hover { border-color: rgba(167,139,250,0.4); background: rgba(255,255,255,0.04); }
+  .rolodex-card.added { border-color: var(--green); background: rgba(16,185,129,0.06); }
+
+  .rolodex-card-header { display: flex; align-items: flex-start; gap: 10px; }
+  .rc-thumb { width: 36px; height: 36px; border-radius: 8px; background: rgba(124,58,237,0.15); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .rc-info { flex: 1; min-width: 0; }
+  .rc-title { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rc-meta { font-size: 11px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .rc-add-btn {
+    width: 28px; height: 28px; border-radius: 8px; flex-shrink: 0;
+    background: rgba(124,58,237,0.12); border: 1px solid rgba(167,139,250,0.3);
+    color: var(--purple); font-size: 18px; font-weight: 300;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s; font-family: 'DM Sans', sans-serif;
+  }
+
+  .rc-add-btn:hover { background: var(--purple-dark); border-color: var(--purple-dark); color: white; }
+  .rc-add-btn.added { background: var(--green); border-color: var(--green); color: white; font-size: 14px; }
+
+  .rc-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  .rc-tag { font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 500; cursor: pointer; transition: all 0.15s; }
+
+  /* Tag colors */
+  .rc-tag.purple { background: rgba(167,139,250,0.12); color: var(--purple); border: 1px solid rgba(167,139,250,0.25); }
+  .rc-tag.teal   { background: rgba(6,182,212,0.1);   color: var(--teal);   border: 1px solid rgba(6,182,212,0.25);   }
+  .rc-tag.pink   { background: rgba(244,114,182,0.1); color: var(--pink);   border: 1px solid rgba(244,114,182,0.25); }
+  .rc-tag.green  { background: rgba(16,185,129,0.1);  color: var(--green);  border: 1px solid rgba(16,185,129,0.25);  }
+  .rc-tag.orange { background: rgba(245,158,11,0.1);  color: var(--orange); border: 1px solid rgba(245,158,11,0.25);  }
+
+  .rolodex-card.hidden { display: none; }
+
+  /* EMPTY SEARCH STATE */
+  .rolodex-empty { display: none; text-align: center; padding: 32px; color: var(--text-muted); font-size: 13px; grid-column: 1 / -1; }
+
+  /* VALIDATION */
+  .validation-note { display: flex; align-items: center; gap: 8px; font-size: 12px; margin-bottom: 24px; }
+  .validation-dot { width: 6px; height: 6px; border-radius: 50%; }
+
+  /* FOOTER */
+  .form-footer { display: flex; align-items: center; justify-content: space-between; padding: 20px 48px; background: rgba(13,11,26,0.95); border-top: 1px solid var(--border); backdrop-filter: blur(12px); position: fixed; bottom: 0; width: calc(100% - 240px); margin-left: 240px; z-index: 50; }
+  .btn-draft { display: flex; align-items: center; gap: 8px; padding: 10px 18px; background: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .btn-draft:hover { border-color: var(--purple); color: var(--purple); }
+  .footer-right { display: flex; gap: 12px; align-items: center; }
+  .btn-back { padding: 10px 24px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .btn-back:hover { color: var(--text-primary); }
+  .btn-next { padding: 12px 28px; background: linear-gradient(135deg, var(--purple-dark), #9333ea); border: none; border-radius: 8px; color: white; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; display: flex; align-items: center; gap: 8px; transition: all 0.25s; box-shadow: 0 4px 14px rgba(124,58,237,0.35); opacity: 0.45; pointer-events: none; }
+  .btn-next.ready { opacity: 1; pointer-events: all; }
+  .btn-next.ready:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(124,58,237,0.45); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">
+    <div class="logo-icon">🎵</div>
+    EchoVizion
+  </div>
+  <ul class="nav-links">
+    <li><a href="#">Projects</a></li>
+    <li><a href="#" class="active">Create Project</a></li>
+    <li><a href="#">Messages</a></li>
+    <li><a href="#">Profile</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="notif">🔔<div class="notif-dot"></div></div>
+    <div class="avatar">V</div>
+  </div>
+</nav>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-top">
+      <div class="sidebar-proj-label">Project Creation</div>
+      <div class="sidebar-step-label">Step 5/10</div>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill"></div></div>
+      <div class="progress-pct"><strong>50% Complete</strong></div>
+    </div>
+
+    <div class="steps-list">
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Project Details</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Budget Definition</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Creative Direction</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Visual Style Selection</span></div>
+      <div class="step-item active"><div class="step-num">5</div><span class="step-name">Inspiration References</span></div>
+      <div class="step-item"><div class="step-num">6</div><span class="step-name">Technical Requirements</span></div>
+      <div class="step-item"><div class="step-num">7</div><span class="step-name">Talent & Crew Needs</span></div>
+      <div class="step-item"><div class="step-num">8</div><span class="step-name">Collaboration Style</span></div>
+      <div class="step-item"><div class="step-num">9</div><span class="step-name">Usage Rights</span></div>
+      <div class="step-item"><div class="step-num">10</div><span class="step-name">Review & Submit</span></div>
+    </div>
+
+    <div class="sidebar-help">
+      <p>Our team is here to guide you through the project creation process.</p>
+      <button class="help-btn">💬 Contact Support</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="page-header">
+      <div class="page-header-icon">📌</div>
+      <div>
+        <div class="step-meta">Step 5 of 10</div>
+        <h1 class="step-title">Inspiration References</h1>
+      </div>
+    </div>
+
+    <p class="step-subtitle">Add up to 10 inspiration items from our curated Rolodex or via custom URLs. These references power 50% of our matching algorithm through aesthetic analysis — the more specific you are, the better your matches.</p>
+
+    <!-- MATCH BANNER -->
+    <div class="match-banner">
+      <div class="match-banner-icon">🎯</div>
+      <div>
+        <div class="match-banner-title">Matching Algorithm Weight: 50%</div>
+        <div class="match-banner-desc">Your inspiration references are the most influential factor in creative matching. We analyze visual style, mood, cinematography, and aesthetic choices to find creatives whose portfolio work resonates with your references.</div>
+        <div class="match-banner-tip">💡 Tip: Add 5–10 references for optimal matching accuracy</div>
+      </div>
+    </div>
+
+    <!-- REFERENCES TRAY -->
+    <div class="tray-section" id="tray-section">
+      <div class="tray-header">
+        <span class="tray-title">Your Inspiration References</span>
+        <div class="tray-counter">
+          <span class="counter-nums" id="counter-nums" style="color:var(--text-muted);">0 / 10</span>
+          <div class="counter-bar"><div class="counter-fill" id="counter-fill" style="width:0%;"></div></div>
+        </div>
+      </div>
+
+      <div class="tray-empty" id="tray-empty">
+        <div class="tray-empty-icon">🖼️</div>
+        <div class="tray-empty-text">No references added yet</div>
+        <div class="tray-empty-sub">Browse the Rolodex below or add custom URLs to get started</div>
+      </div>
+
+      <div class="tray-grid" id="tray-grid" style="display:none;"></div>
+    </div>
+
+    <!-- ADD NEW REFERENCE -->
+    <div class="add-section">
+      <div class="add-header">
+        <div class="add-header-icon">➕</div>
+        <div class="add-header-title">Add New Reference</div>
+      </div>
+
+      <div class="tab-row">
+        <button class="tab-btn active" id="tab-rolodex" onclick="switchTab('rolodex')">
+          📚 Browse Rolodex
+        </button>
+        <button class="tab-btn" id="tab-url" onclick="switchTab('url')">
+          🔗 Add Custom URL
+        </button>
+      </div>
+
+      <!-- CUSTOM URL PANEL -->
+      <div class="custom-url-panel" id="url-panel">
+        <div class="url-input-row">
+          <input type="url" class="url-input" id="url-input" placeholder="https://vimeo.com/… or YouTube, Instagram, Behance, etc." oninput="validateUrl(this)">
+          <button class="url-add-btn" onclick="addCustomUrl()">Add Reference</button>
+        </div>
+        <div class="url-hint">Paste a link to any film, music video, artwork, Instagram post, Behance project, or visual reference. We'll analyze the aesthetic and use it for matching.</div>
+      </div>
+
+      <!-- ROLODEX PANEL (visible by default via tab switch) -->
+      <div class="rolodex-panel visible" id="rolodex-panel">
+        <!-- shown below as full section for layout reasons -->
+        <p style="font-size:13px;color:var(--text-muted);">Browse our curated collection below and click <strong style="color:var(--purple);">+</strong> to add any reference to your project.</p>
+      </div>
+    </div>
+
+    <!-- CURATED ROLODEX -->
+    <div class="rolodex-section" id="rolodex-section">
+
+      <div class="rolodex-header">
+        <div class="rolodex-title"><span class="rolodex-icon">📚</span> Curated Rolodex</div>
+      </div>
+      <div class="rolodex-sub">Browse our collection of films, music videos, visual artists, and art projects</div>
+
+      <!-- CATEGORY FILTER -->
+      <div class="cat-filter">
+        <div class="cat-btn active" onclick="filterCat(this, 'all')">All Categories</div>
+        <div class="cat-btn" onclick="filterCat(this, 'film')">Films</div>
+        <div class="cat-btn" onclick="filterCat(this, 'music-video')">Music Videos</div>
+        <div class="cat-btn" onclick="filterCat(this, 'art')">Visual Art</div>
+        <div class="cat-btn" onclick="filterCat(this, 'animation')">Animation</div>
+        <div class="cat-btn" onclick="filterCat(this, 'photography')">Photography</div>
+      </div>
+
+      <!-- SEARCH -->
+      <div class="rolodex-search-wrap">
+        <span class="rolodex-search-icon">🔍</span>
+        <input type="text" class="rolodex-search" placeholder="Search by title, director, or style…" oninput="searchRolodex(this.value)">
+      </div>
+
+      <!-- GRID -->
+      <div class="rolodex-grid" id="rolodex-grid">
+
+        <div class="rolodex-card" data-cat="film" data-id="br2049" data-title="Blade Runner 2049" data-meta="Denis Villeneuve · 2017" data-emoji="🎬">
+          <div class="rolodex-card-header">
+            <div class="rc-thumb">🎬</div>
+            <div class="rc-info">
+              <div class="rc-title">Blade Runner 2049</div>
+              <div class="rc-meta">Denis Villeneuve · 2017</div>
+            </div>
+            <button class="rc-add-btn" onclick="toggleRolodex(this, 'br2049')">+</button>
+          </div>
+          <div class="rc-tags">
+            <span class="rc-tag purple">Cyberpunk</span>
+            <span class="rc-tag teal">Neon</span>
+            <span class="rc-tag teal">Sci-Fi</span>
+          </div>
+        </div>
+
+        <div class="rolodex-card" data-cat="music-video" data-id="weeknd-bl" data-title="The Weeknd – Blinding Lights" data-meta="Anton Tammi · 2020" data-emoji="🎵">
+          <div class="rolodex-card-header">
+            <div class="rc-thumb">🎵</div>
+            <div class="rc-info">
+              <div class="rc-title">The Weeknd – Blinding Lights</div>
+              <div class="rc-meta">Anton Tammi · 2020</div>
+            </div>
+            <button class="rc-add-btn" onclick="toggleRolodex(this, 'weeknd-bl')">+</button>
+          </div>
+          <div class="rc-tags">
+            <span class="rc-tag orange">Retro</span>
+            <span class="rc-tag teal">Neon</span>
+            <span class="rc-tag orange">80s</span>
+          </div>
+        </div>
+
+        <div class="rolodex-card" data-cat="art" data-id="beeple" data-title="Beeple's Everydays" data-meta="Mike Winkelmann · 2021" data-emoji="🎨">
+          <div class="rolodex-card-header">
+            <div class="rc-thumb">🎨</div>
+            <div class="rc-info">
+              <div class="rc-title">Beeple's Everydays</div>
+              <div class="rc-meta">Mike Winkelmann · 2021</div>
+            </div>
+            <button class="rc-add-btn" onclick="toggleRolodex(this, 'beeple')">+</button>
+          </div>
+          <div class="rc-tags">
+            <span class="rc-tag pink">3D Art</span>
+            <span class="rc-tag purple">Surreal</span>
+            <span class="rc-tag teal">Digital</span>
+          </div>
+        </div>
+
+        <div class="rolodex-card" data-cat="animation" data-id="gits" data-title="Ghost in the Shell" data-meta="Mamoru Oshii · 1995" data-emoji="🤖">
+          <div class="rolodex-card-header">
+            <div class="rc-thumb">🤖</div>
+            <div class="rc-info">
+              <div class="rc-title">Ghost in the Shell</div>
+              <div class="rc-meta">Mamoru Oshii · 1995</div>
+            </div>
+            <button class="rc-add-btn" onclick="toggleRolodex(this, 'gits')">+</button>
+          </div>
+          <div class="rc-tags">
+            <span class="rc-tag purple">Cyberpunk</span>
+            <span class="rc-tag pink">Anime</span>
+          </div>
+        </div>
+
+        <div class="rolodex-card" data-cat="music-video" data-id="daft-derezzed" data-title="Daft Punk – Derezzed" data-meta="Joseph Kosinski · 2010" data-emoji="🎵">
+          <div class="rolodex-card-header">
+            <div class="rc-thumb">🎵</div>
+            <div class="rc-info">
+              <div class="rc-title">Daft Punk – Derezzed</div>
+              <div class="rc-meta">Joseph Kosinski · 2010</div>
+            </div>
+            <button class="rc-add-btn" onclick="toggleRolodex(this, 'daft-derezzed')">+</button>
+          </div>
+          <div class="rc-tags">
+            <span class="rc-tag teal">Synth Wave</span>
+            <span class="rc-tag purple">Futuristic</span>
+          </div>
+        </div>
+
+        <div class="rolodex-card" data-cat="film" data-id="matrix" data-title="The Matrix" data-meta="Wachowski Sisters · 1999" data-emoji="🎬">
+          <div class="rolodex-card-header">
+            <div class="rc-thumb">🎬</div>
+            <div class="rc-info">
+              <div class="rc-title">The Matrix</div>
+              <div class="rc-meta">Wachowski Sisters · 1999</div>
+            </div>
+            <button class="rc-add-btn" onclick="toggleRolodex(this, 'matrix')">+</button>
+          </div>
+          <div class="rc-tags">
+            <span class="rc-tag purple">Cyberpunk</span>
+            <span class="rc-tag green">Green Tint</span>
+          </div>
+        </div>
+
+        <div class="rolodex-card" data-cat="art" data-id="syd-mead" data-title="Syd Mead's Concept Art" data-meta="Syd Mead · 1980s–2000s" data-emoji="🖌️">
+          <div class="rolodex-card-header">
+            <div class="rc-thumb">🖌️</div>
+            <div class="rc-info">
+              <div class="rc-title">Syd Mead's Concept Art</div>
+              <div class="rc-meta">Syd Mead · 1980s–2000s</div>
+            </div>
+            <button class="rc-add-btn" onclick="toggleRolodex(this, 'syd-mead')">+</button>
+          </div>
+          <div class="rc-tags">
+            <span class="rc-tag purple">Futuristic</span>
+            <span class="rc-tag orange">Industrial</span>
+          </div>
+        </div>
+
+        <div class="rolodex-card" data-cat="music-video" data-id="kavinsky" data-title="Kavinsky – Nightcall" data-meta="Drive Soundtrack · 2011" data-emoji="🎵">
+          <div class="rolodex-card-header">
+            <div class="rc-thumb">🎵</div>
+            <div class="rc-info">
+              <div class="rc-title">Kavinsky – Nightcall</div>
+              <div class="rc-meta">Drive Soundtrack · 2011</div>
+            </div>
+            <button class="rc-add-btn" onclick="toggleRolodex(this, 'kavinsky')">+</button>
+          </div>
+          <div class="rc-tags">
+            <span class="rc-tag teal">Synth Wave</span>
+            <span class="rc-tag orange">Retro</span>
+          </div>
+        </div>
+
+        <div class="rolodex-card" data-cat="animation" data-id="akira" data-title="Akira" data-meta="Katsuhiro Otomo · 1988" data-emoji="🌆">
+          <div class="rolodex-card-header">
+            <div class="rc-thumb">🌆</div>
+            <div class="rc-info">
+              <div class="rc-title">Akira</div>
+              <div class="rc-meta">Katsuhiro Otomo · 1988</div>
+            </div>
+            <button class="rc-add-btn" onclick="toggleRolodex(this, 'akira')">+</button>
+          </div>
+          <div class="rc-tags">
+            <span class="rc-tag purple">Cyberpunk</span>
+            <span class="rc-tag pink">Anime</span>
+          </div>
+        </div>
+
+        <div class="rolodex-card" data-cat="art" data-id="james-jean" data-title="James Jean's Digital Works" data-meta="James Jean · 2010s–Present" data-emoji="🎨">
+          <div class="rolodex-card-header">
+            <div class="rc-thumb">🎨</div>
+            <div class="rc-info">
+              <div class="rc-title">James Jean's Digital Works</div>
+              <div class="rc-meta">James Jean · 2010s–Present</div>
+            </div>
+            <button class="rc-add-btn" onclick="toggleRolodex(this, 'james-jean')">+</button>
+          </div>
+          <div class="rc-tags">
+            <span class="rc-tag purple">Surreal</span>
+            <span class="rc-tag pink">Detailed</span>
+          </div>
+        </div>
+
+        <div class="rolodex-card" data-cat="film" data-id="enter-void" data-title="Enter the Void" data-meta="Gaspar Noé · 2009" data-emoji="🎬">
+          <div class="rolodex-card-header">
+            <div class="rc-thumb">🎬</div>
+            <div class="rc-info">
+              <div class="rc-title">Enter the Void</div>
+              <div class="rc-meta">Gaspar Noé · 2009</div>
+            </div>
+            <button class="rc-add-btn" onclick="toggleRolodex(this, 'enter-void')">+</button>
+          </div>
+          <div class="rc-tags">
+            <span class="rc-tag purple">Psychedelic</span>
+            <span class="rc-tag teal">Neon</span>
+            <span class="rc-tag pink">Ethereal</span>
+          </div>
+        </div>
+
+        <div class="rolodex-card" data-cat="music-video" data-id="fka-twigs" data-title="FKA Twigs – Cellophane" data-meta="Andrew Thomas Huang · 2019" data-emoji="🎵">
+          <div class="rolodex-card-header">
+            <div class="rc-thumb">🎵</div>
+            <div class="rc-info">
+              <div class="rc-title">FKA Twigs – Cellophane</div>
+              <div class="rc-meta">Andrew Thomas Huang · 2019</div>
+            </div>
+            <button class="rc-add-btn" onclick="toggleRolodex(this, 'fka-twigs')">+</button>
+          </div>
+          <div class="rc-tags">
+            <span class="rc-tag pink">Ethereal</span>
+            <span class="rc-tag purple">Surreal</span>
+            <span class="rc-tag green">Intimate</span>
+          </div>
+        </div>
+
+        <div class="rolodex-card" data-cat="photography" data-id="crewdson" data-title="Gregory Crewdson Photography" data-meta="Gregory Crewdson · 2000s–Present" data-emoji="📷">
+          <div class="rolodex-card-header">
+            <div class="rc-thumb">📷</div>
+            <div class="rc-info">
+              <div class="rc-title">Gregory Crewdson Photography</div>
+              <div class="rc-meta">Gregory Crewdson · 2000s–Present</div>
+            </div>
+            <button class="rc-add-btn" onclick="toggleRolodex(this, 'crewdson')">+</button>
+          </div>
+          <div class="rc-tags">
+            <span class="rc-tag purple">Cinematic</span>
+            <span class="rc-tag orange">Moody</span>
+            <span class="rc-tag teal">Suburban</span>
+          </div>
+        </div>
+
+        <div class="rolodex-card" data-cat="film" data-id="moonlight" data-title="Moonlight" data-meta="Barry Jenkins · 2016" data-emoji="🎬">
+          <div class="rolodex-card-header">
+            <div class="rc-thumb">🎬</div>
+            <div class="rc-info">
+              <div class="rc-title">Moonlight</div>
+              <div class="rc-meta">Barry Jenkins · 2016</div>
+            </div>
+            <button class="rc-add-btn" onclick="toggleRolodex(this, 'moonlight')">+</button>
+          </div>
+          <div class="rc-tags">
+            <span class="rc-tag purple">Cinematic</span>
+            <span class="rc-tag green">Intimate</span>
+            <span class="rc-tag pink">Emotional</span>
+          </div>
+        </div>
+
+        <!-- Empty state -->
+        <div class="rolodex-empty" id="rolodex-empty">No results found — try a different search term</div>
+
+      </div>
+    </div>
+
+    <!-- VALIDATION -->
+    <div class="validation-note" id="validation-note" style="margin-top:16px;">
+      <div class="validation-dot" id="val-dot" style="background:var(--orange);"></div>
+      <span id="val-text" style="color:var(--orange);">Add at least 1 reference to continue</span>
+    </div>
+
+    <div style="height:40px;"></div>
+  </main>
+</div>
+
+<!-- FOOTER -->
+<div class="form-footer">
+  <button class="btn-draft">💾 Save as Draft</button>
+  <div class="footer-right">
+    <span id="footer-status" style="font-size:13px;color:var(--text-muted);">No references added yet</span>
+    <button class="btn-back">← Back</button>
+    <button class="btn-next" id="next-btn" onclick="goNext()">Next: Technical Requirements →</button>
+  </div>
+</div>
+
+<script>
+  // ─── STATE ────────────────────────────────────────
+  const MAX = 10;
+  const added = new Map(); // id → { title, meta, emoji }
+
+  // ─── TAB SWITCH ──────────────────────────────────
+  function switchTab(tab) {
+    document.getElementById('tab-rolodex').classList.toggle('active', tab === 'rolodex');
+    document.getElementById('tab-url').classList.toggle('active', tab === 'url');
+    document.getElementById('url-panel').classList.toggle('visible', tab === 'url');
+    document.getElementById('rolodex-panel').classList.toggle('visible', tab === 'rolodex');
+    document.getElementById('rolodex-section').style.display = tab === 'rolodex' ? '' : 'none';
+  }
+
+  // ─── ROLODEX TOGGLE ──────────────────────────────
+  function toggleRolodex(btn, id) {
+    const card = btn.closest('.rolodex-card');
+    const title = card.dataset.title;
+    const meta = card.dataset.meta;
+    const emoji = card.dataset.emoji;
+
+    if (added.has(id)) {
+      // Remove
+      added.delete(id);
+      btn.textContent = '+';
+      btn.classList.remove('added');
+      card.classList.remove('added');
+      removeTrayCard(id);
+    } else {
+      if (added.size >= MAX) {
+        shakeTray(); return;
+      }
+      added.set(id, { title, meta, emoji });
+      btn.textContent = '✓';
+      btn.classList.add('added');
+      card.classList.add('added');
+      addTrayCard(id, title, meta, emoji);
+    }
+
+    updateUI();
+  }
+
+  // ─── TRAY ────────────────────────────────────────
+  function addTrayCard(id, title, meta, emoji) {
+    const grid = document.getElementById('tray-grid');
+    const empty = document.getElementById('tray-empty');
+
+    empty.style.display = 'none';
+    grid.style.display = 'grid';
+    document.getElementById('tray-section').classList.add('has-refs');
+
+    const card = document.createElement('div');
+    card.className = 'tray-card';
+    card.id = 'tray-' + id;
+    card.innerHTML = `
+      <button class="tray-card-remove" onclick="removeTrayById('${id}')">×</button>
+      <div class="tray-card-emoji">${emoji}</div>
+      <div class="tray-card-title">${title}</div>
+      <div class="tray-card-meta">${meta}</div>
+    `;
+    grid.appendChild(card);
+  }
+
+  function removeTrayCard(id) {
+    const el = document.getElementById('tray-' + id);
+    if (el) el.remove();
+    if (added.size === 0) {
+      document.getElementById('tray-empty').style.display = 'flex';
+      document.getElementById('tray-grid').style.display = 'none';
+      document.getElementById('tray-section').classList.remove('has-refs');
+    }
+  }
+
+  function removeTrayById(id) {
+    added.delete(id);
+    removeTrayCard(id);
+    // Reset rolodex card
+    const card = document.querySelector(`[data-id="${id}"]`);
+    if (card) {
+      card.classList.remove('added');
+      const btn = card.querySelector('.rc-add-btn');
+      if (btn) { btn.textContent = '+'; btn.classList.remove('added'); }
+    }
+    updateUI();
+  }
+
+  function shakeTray() {
+    const tray = document.getElementById('tray-section');
+    tray.style.animation = 'none';
+    tray.offsetHeight; // reflow
+    tray.style.border = '1px solid var(--pink)';
+    setTimeout(() => { tray.style.border = ''; }, 600);
+  }
+
+  // ─── CUSTOM URL ───────────────────────────────────
+  function addCustomUrl() {
+    const input = document.getElementById('url-input');
+    const url = input.value.trim();
+    if (!url) return;
+
+    const id = 'custom-' + Date.now();
+    const title = url.replace(/^https?:\/\/(www\.)?/, '').split('/')[0];
+
+    added.set(id, { title, meta: 'Custom URL', emoji: '🔗' });
+    addTrayCard(id, title, 'Custom URL', '🔗');
+    input.value = '';
+    updateUI();
+  }
+
+  // ─── CATEGORY FILTER ─────────────────────────────
+  function filterCat(btn, cat) {
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    document.querySelectorAll('.rolodex-card').forEach(card => {
+      if (card.id === 'rolodex-empty') return;
+      const show = cat === 'all' || card.dataset.cat === cat;
+      card.classList.toggle('hidden', !show);
+    });
+
+    checkEmpty();
+  }
+
+  // ─── SEARCH ──────────────────────────────────────
+  function searchRolodex(q) {
+    const lq = q.toLowerCase().trim();
+    document.querySelectorAll('.rolodex-card:not(#rolodex-empty)').forEach(card => {
+      const match = !lq
+        || card.dataset.title.toLowerCase().includes(lq)
+        || card.dataset.meta.toLowerCase().includes(lq)
+        || card.querySelectorAll('.rc-tag').length && [...card.querySelectorAll('.rc-tag')].some(t => t.textContent.toLowerCase().includes(lq));
+      card.classList.toggle('hidden', !match);
+    });
+    checkEmpty();
+  }
+
+  function checkEmpty() {
+    const visible = [...document.querySelectorAll('.rolodex-card:not(#rolodex-empty)')].some(c => !c.classList.contains('hidden'));
+    document.getElementById('rolodex-empty').style.display = visible ? 'none' : 'block';
+  }
+
+  // ─── UI UPDATE ───────────────────────────────────
+  function updateUI() {
+    const count = added.size;
+    const pct = (count / MAX) * 100;
+
+    // Counter
+    const counterEl = document.getElementById('counter-nums');
+    counterEl.textContent = `${count} / ${MAX}`;
+    counterEl.style.color = count >= 5 ? 'var(--green)' : count > 0 ? 'var(--orange)' : 'var(--text-muted)';
+
+    document.getElementById('counter-fill').style.width = pct + '%';
+
+    // Footer / validation
+    const btn = document.getElementById('next-btn');
+    const status = document.getElementById('footer-status');
+    const dot = document.getElementById('val-dot');
+    const valText = document.getElementById('val-text');
+
+    if (count === 0) {
+      btn.classList.remove('ready');
+      status.textContent = 'No references added yet';
+      status.style.color = 'var(--text-muted)';
+      dot.style.background = 'var(--orange)';
+      valText.textContent = 'Add at least 1 reference to continue';
+      valText.style.color = 'var(--orange)';
+    } else if (count < 5) {
+      btn.classList.add('ready');
+      status.textContent = `${count} reference${count > 1 ? 's' : ''} added — add more for better matches`;
+      status.style.color = 'var(--orange)';
+      dot.style.background = 'var(--orange)';
+      valText.textContent = `${count} of 10 added — 5–10 recommended for best matching accuracy`;
+      valText.style.color = 'var(--orange)';
+    } else {
+      btn.classList.add('ready');
+      status.textContent = `✅ ${count} references added`;
+      status.style.color = 'var(--green)';
+      dot.style.background = 'var(--green)';
+      valText.textContent = count === MAX ? 'Maximum 10 references reached' : `${count} references — great set of references`;
+      valText.style.color = 'var(--green)';
+    }
+  }
+
+  function goNext() {
+    if (added.size > 0) alert('Proceeding to Technical Requirements…');
+  }
+
+  // Init
+  switchTab('rolodex');
+</script>
+
+</body>
+</html>

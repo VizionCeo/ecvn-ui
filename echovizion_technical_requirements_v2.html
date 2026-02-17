@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EchoVizion – Technical Requirements</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0d0b1a;
+    --sidebar-bg: #120f24;
+    --card-bg: #1a1630;
+    --purple: #a78bfa;
+    --purple-dark: #7c3aed;
+    --pink: #f472b6;
+    --green: #10b981;
+    --orange: #f59e0b;
+    --teal: #06b6d4;
+    --red: #ef4444;
+    --border: #2a2448;
+    --text-primary: #f1f0ff;
+    --text-secondary: #9ca3af;
+    --text-muted: #6b7280;
+  }
+
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; }
+
+  /* NAV */
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 0 32px; height: 56px; background: rgba(13,11,26,0.95); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(12px); }
+  .logo { display: flex; align-items: center; gap: 10px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 18px; }
+  .logo-icon { width: 30px; height: 30px; background: linear-gradient(135deg, var(--purple-dark), var(--pink)); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 14px; font-weight: 500; }
+  .nav-links a.active { color: var(--text-primary); border-bottom: 2px solid var(--purple); padding-bottom: 2px; }
+  .nav-right { display: flex; align-items: center; gap: 16px; }
+  .notif { width: 32px; height: 32px; border-radius: 50%; background: var(--card-bg); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 14px; position: relative; cursor: pointer; }
+  .notif-dot { position: absolute; top: 6px; right: 6px; width: 6px; height: 6px; border-radius: 50%; background: var(--pink); }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--purple-dark), var(--pink)); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: white; }
+
+  /* LAYOUT */
+  .layout { display: flex; flex: 1; }
+
+  /* SIDEBAR */
+  .sidebar { width: 240px; background: var(--sidebar-bg); border-right: 1px solid var(--border); padding: 24px 16px; position: sticky; top: 56px; height: calc(100vh - 56px); overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+  .sidebar-proj-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); font-weight: 500; margin-bottom: 2px; }
+  .sidebar-step-label { font-size: 13px; color: var(--purple); font-weight: 600; font-family: 'Syne', sans-serif; margin-bottom: 10px; }
+  .progress-bar-wrap { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; margin-bottom: 6px; }
+  .progress-bar-fill { height: 100%; width: 60%; background: linear-gradient(90deg, var(--purple-dark), var(--pink)); border-radius: 2px; }
+  .progress-pct { font-size: 12px; color: var(--text-muted); }
+  .progress-pct strong { color: var(--text-secondary); font-weight: 500; }
+  .steps-list { display: flex; flex-direction: column; gap: 2px; }
+  .step-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; cursor: pointer; transition: all 0.15s; border: 1px solid transparent; }
+  .step-item.active { background: rgba(124,58,237,0.15); border-color: rgba(167,139,250,0.3); }
+  .step-item.completed .step-num { background: var(--purple-dark); color: white; }
+  .step-item.completed .step-name { color: var(--text-secondary); }
+  .step-num { width: 22px; height: 22px; border-radius: 50%; background: var(--border); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: var(--text-muted); flex-shrink: 0; }
+  .step-item.active .step-num { background: linear-gradient(135deg, var(--purple-dark), var(--purple)); color: white; }
+  .step-name { font-size: 13px; color: var(--text-muted); }
+  .step-item.active .step-name { color: var(--text-primary); font-weight: 500; }
+  .sidebar-help { margin-top: auto; padding: 14px; background: var(--card-bg); border-radius: 10px; border: 1px solid var(--border); }
+  .sidebar-help p { font-size: 12px; color: var(--text-secondary); margin-bottom: 10px; line-height: 1.5; }
+  .help-btn { width: 100%; padding: 8px; background: linear-gradient(135deg, var(--purple-dark), #9333ea); border: none; border-radius: 8px; color: white; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+
+  /* MAIN */
+  .main { flex: 1; padding: 36px 48px 140px; max-width: 940px; }
+
+  /* PAGE HEADER */
+  .page-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 10px; }
+  .page-header-icon { width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, var(--purple-dark), var(--pink)); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  .step-meta { font-size: 12px; color: var(--purple); font-weight: 500; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.08em; }
+  .step-title { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; color: var(--text-primary); }
+  .step-subtitle { font-size: 13px; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.7; max-width: 680px; }
+
+  /* OPTIONAL BANNER */
+  .optional-banner {
+    display: flex; align-items: flex-start; gap: 14px;
+    background: rgba(16,185,129,0.06);
+    border: 1px solid rgba(16,185,129,0.2);
+    border-radius: 12px; padding: 18px 20px; margin-bottom: 20px;
+  }
+  .opt-icon { width: 34px; height: 34px; border-radius: 9px; background: rgba(16,185,129,0.15); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .opt-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 3px; }
+  .opt-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+
+  /* SELECTED SUMMARY */
+  .selected-summary {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--card-bg); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px 18px; margin-bottom: 16px;
+    transition: border-color 0.3s;
+  }
+  .selected-summary.has-items { border-color: rgba(167,139,250,0.35); }
+  .summary-left { display: flex; align-items: center; gap: 10px; }
+  .summary-icon { font-size: 16px; }
+  .summary-text { font-size: 13px; font-weight: 500; color: var(--text-secondary); }
+  .summary-text strong { color: var(--purple); font-family: 'Syne', sans-serif; }
+  .summary-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .summary-pill { padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 500; background: rgba(124,58,237,0.12); border: 1px solid rgba(167,139,250,0.3); color: var(--purple); display: flex; align-items: center; gap: 5px; animation: pillIn 0.15s ease; }
+  @keyframes pillIn { from { opacity:0; transform:scale(0.85); } to { opacity:1; transform:scale(1); } }
+  .summary-pill button { background: none; border: none; color: rgba(167,139,250,0.5); font-size: 13px; cursor: pointer; line-height: 1; padding: 0; transition: color 0.15s; }
+  .summary-pill button:hover { color: var(--pink); }
+
+  /* CATEGORY SECTION */
+  .cat-section { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 24px; margin-bottom: 14px; }
+  .cat-header { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
+  .cat-icon { width: 28px; height: 28px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+  .cat-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--text-primary); }
+  .cat-subtitle { font-size: 12px; color: var(--text-muted); margin-bottom: 18px; padding-left: 38px; }
+
+  /* TECH CARDS GRID */
+  .tech-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .tech-card {
+    background: rgba(255,255,255,0.02);
+    border: 1.5px solid var(--border);
+    border-radius: 12px; padding: 16px 18px;
+    cursor: pointer; transition: all 0.2s;
+    display: flex; flex-direction: column; gap: 0;
+    position: relative; overflow: hidden;
+  }
+
+  .tech-card::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(124,58,237,0.06), rgba(167,139,250,0.03));
+    opacity: 0; transition: opacity 0.2s;
+  }
+
+  .tech-card:hover { border-color: rgba(167,139,250,0.4); transform: translateY(-1px); }
+  .tech-card:hover::before { opacity: 1; }
+
+  .tech-card.selected {
+    border-color: var(--purple);
+    background: rgba(124,58,237,0.1);
+  }
+
+  .tech-card.selected::before { opacity: 1; }
+
+  .tech-card-header { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 8px; }
+
+  .tech-card-icon {
+    width: 34px; height: 34px; border-radius: 9px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 17px;
+    background: rgba(124,58,237,0.12);
+    border: 1px solid rgba(167,139,250,0.2);
+    transition: all 0.2s;
+  }
+
+  .tech-card.selected .tech-card-icon {
+    background: rgba(124,58,237,0.25);
+    border-color: var(--purple);
+  }
+
+  .tech-card-text { flex: 1; min-width: 0; }
+  .tech-card-name { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 3px; font-family: 'Syne', sans-serif; }
+  .tech-card-desc { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+
+  .tech-card-check {
+    width: 20px; height: 20px; border-radius: 50%;
+    border: 2px solid var(--border); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s; margin-left: auto; margin-top: 2px;
+  }
+
+  .tech-card.selected .tech-card-check {
+    background: var(--purple-dark);
+    border-color: var(--purple-dark);
+  }
+
+  .tech-card.selected .tech-card-check::after {
+    content: '✓'; font-size: 10px; color: white; font-weight: 700;
+  }
+
+  /* OTHER REQUIREMENTS EXPAND */
+  .other-expand {
+    display: none; margin-top: 12px; padding-top: 12px;
+    border-top: 1px solid rgba(167,139,250,0.2);
+  }
+
+  .tech-card.selected .other-expand { display: block; }
+
+  .other-textarea {
+    width: 100%; min-height: 80px;
+    background: rgba(255,255,255,0.04);
+    border: 1.5px solid rgba(167,139,250,0.25);
+    border-radius: 8px; color: var(--text-primary);
+    font-size: 12px; font-family: 'DM Sans', sans-serif;
+    padding: 10px 12px; outline: none; resize: vertical; line-height: 1.6;
+    transition: all 0.2s;
+  }
+
+  .other-textarea::placeholder { color: var(--text-muted); font-style: italic; }
+  .other-textarea:focus { border-color: var(--purple); background: rgba(167,139,250,0.06); box-shadow: 0 0 0 3px rgba(167,139,250,0.1); }
+
+  /* HOW THIS AFFECTS MATCHING */
+  .match-section { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 24px; margin-bottom: 14px; }
+  .match-header { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
+  .match-header-icon { width: 28px; height: 28px; border-radius: 7px; background: rgba(124,58,237,0.15); display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .match-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--text-primary); }
+  .match-desc { font-size: 12px; color: var(--text-secondary); margin-bottom: 14px; line-height: 1.6; padding-left: 38px; }
+  .match-tip { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: var(--teal); background: rgba(6,182,212,0.08); border: 1px solid rgba(6,182,212,0.2); border-radius: 6px; padding: 5px 12px; margin-left: 38px; }
+
+  /* VALIDATION */
+  .validation-note { display: flex; align-items: center; gap: 8px; font-size: 12px; margin-bottom: 24px; margin-top: 8px; }
+  .validation-dot { width: 6px; height: 6px; border-radius: 50%; }
+
+  /* FOOTER */
+  .form-footer { display: flex; align-items: center; justify-content: space-between; padding: 20px 48px; background: rgba(13,11,26,0.95); border-top: 1px solid var(--border); backdrop-filter: blur(12px); position: fixed; bottom: 0; width: calc(100% - 240px); margin-left: 240px; z-index: 50; }
+  .btn-draft { display: flex; align-items: center; gap: 8px; padding: 10px 18px; background: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .btn-draft:hover { border-color: var(--purple); color: var(--purple); }
+  .footer-right { display: flex; gap: 12px; align-items: center; }
+  .btn-back { padding: 10px 24px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .btn-back:hover { color: var(--text-primary); }
+  .btn-next { padding: 12px 28px; background: linear-gradient(135deg, var(--purple-dark), #9333ea); border: none; border-radius: 8px; color: white; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; display: flex; align-items: center; gap: 8px; transition: all 0.25s; box-shadow: 0 4px 14px rgba(124,58,237,0.35); }
+  .btn-next:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(124,58,237,0.45); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">
+    <div class="logo-icon">🎵</div>
+    EchoVizion
+  </div>
+  <ul class="nav-links">
+    <li><a href="#">Projects</a></li>
+    <li><a href="#" class="active">Create Project</a></li>
+    <li><a href="#">Messages</a></li>
+    <li><a href="#">Profile</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="notif">🔔<div class="notif-dot"></div></div>
+    <div class="avatar">V</div>
+  </div>
+</nav>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div>
+      <div class="sidebar-proj-label">Project Creation</div>
+      <div class="sidebar-step-label">Step 6/10</div>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill"></div></div>
+      <div class="progress-pct"><strong>60% Complete</strong></div>
+    </div>
+
+    <div class="steps-list">
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Project Details</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Budget Definition</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Creative Direction</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Visual Style Selection</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Inspiration References</span></div>
+      <div class="step-item active"><div class="step-num">6</div><span class="step-name">Technical Requirements</span></div>
+      <div class="step-item"><div class="step-num">7</div><span class="step-name">Talent & Crew Needs</span></div>
+      <div class="step-item"><div class="step-num">8</div><span class="step-name">Collaboration Style</span></div>
+      <div class="step-item"><div class="step-num">9</div><span class="step-name">Usage Rights</span></div>
+      <div class="step-item"><div class="step-num">10</div><span class="step-name">Review & Submit</span></div>
+    </div>
+
+    <div class="sidebar-help">
+      <p>Our team is here to guide you through the project creation process.</p>
+      <button class="help-btn">💬 Contact Support</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="page-header">
+      <div class="page-header-icon">🎛️</div>
+      <div>
+        <div class="step-meta">Step 6 of 10</div>
+        <h1 class="step-title">Technical Requirements</h1>
+      </div>
+    </div>
+
+    <p class="step-subtitle">Select any technical specifications you need for your project. These optional requirements help refine creative matching by finding professionals with specific technical expertise. You can skip this section entirely.</p>
+
+    <!-- OPTIONAL BANNER -->
+    <div class="optional-banner">
+      <div class="opt-icon">ℹ️</div>
+      <div>
+        <div class="opt-title">Optional Section</div>
+        <div class="opt-desc">Technical requirements are completely optional. They refine your creative matches but won't exclude qualified professionals who can deliver your vision with different equipment. Be flexible on specs to see more creative possibilities.</div>
+      </div>
+    </div>
+
+    <!-- SELECTED SUMMARY -->
+    <div class="selected-summary" id="selected-summary">
+      <div style="width:100%;">
+        <div class="summary-left">
+          <span class="summary-icon">✅</span>
+          <span class="summary-text" id="summary-text">No technical requirements selected — <strong>this step is optional</strong></span>
+        </div>
+        <div class="summary-pills" id="summary-pills" style="display:none;"></div>
+      </div>
+    </div>
+
+    <!-- ── CATEGORY 1: PRODUCTION & EQUIPMENT ─────────── -->
+    <div class="cat-section">
+      <div class="cat-header">
+        <div class="cat-icon" style="background:rgba(244,114,182,0.12);border:1px solid rgba(244,114,182,0.2);">📹</div>
+        <div class="cat-title">Production & Equipment</div>
+      </div>
+      <div class="cat-subtitle">Select any technical capabilities you need for your project</div>
+
+      <div class="tech-grid">
+
+        <div class="tech-card" onclick="toggleCard(this, '4k-resolution', '4K Resolution')">
+          <div class="tech-card-header">
+            <div class="tech-card-icon">📺</div>
+            <div class="tech-card-text">
+              <div class="tech-card-name">4K Resolution</div>
+              <div class="tech-card-desc">Ultra high-definition video capture (3840×2160) for maximum detail and future-proof delivery across all platforms</div>
+            </div>
+            <div class="tech-card-check"></div>
+          </div>
+        </div>
+
+        <div class="tech-card" onclick="toggleCard(this, 'drone-footage', 'Drone Footage')">
+          <div class="tech-card-header">
+            <div class="tech-card-icon">🚁</div>
+            <div class="tech-card-text">
+              <div class="tech-card-name">Drone Footage</div>
+              <div class="tech-card-desc">Aerial cinematography for sweeping establishing shots, dynamic perspectives, and expansive landscape coverage</div>
+            </div>
+            <div class="tech-card-check"></div>
+          </div>
+        </div>
+
+        <div class="tech-card" onclick="toggleCard(this, 'vfx-cgi', 'VFX & CGI')">
+          <div class="tech-card-header">
+            <div class="tech-card-icon">✨</div>
+            <div class="tech-card-text">
+              <div class="tech-card-name">VFX & CGI</div>
+              <div class="tech-card-desc">Visual effects and computer-generated imagery for creative enhancement, surreal elements, and impossible visuals</div>
+            </div>
+            <div class="tech-card-check"></div>
+          </div>
+        </div>
+
+        <div class="tech-card" onclick="toggleCard(this, 'multi-camera', 'Multi-Camera Setup')">
+          <div class="tech-card-header">
+            <div class="tech-card-icon">📷</div>
+            <div class="tech-card-text">
+              <div class="tech-card-name">Multi-Camera Setup</div>
+              <div class="tech-card-desc">Multiple camera angles simultaneously for dynamic coverage, performance footage, and maximum editing flexibility</div>
+            </div>
+            <div class="tech-card-check"></div>
+          </div>
+        </div>
+
+        <div class="tech-card" onclick="toggleCard(this, 'pro-lighting', 'Professional Lighting')">
+          <div class="tech-card-header">
+            <div class="tech-card-icon">💡</div>
+            <div class="tech-card-text">
+              <div class="tech-card-name">Professional Lighting</div>
+              <div class="tech-card-desc">Advanced lighting setups for cinematic mood and visual control — studio rigs, practicals, or on-location setups</div>
+            </div>
+            <div class="tech-card-check"></div>
+          </div>
+        </div>
+
+        <div class="tech-card" onclick="toggleCard(this, 'color-grading', 'Color Grading')">
+          <div class="tech-card-header">
+            <div class="tech-card-icon">🎨</div>
+            <div class="tech-card-text">
+              <div class="tech-card-name">Color Grading</div>
+              <div class="tech-card-desc">Professional color correction and grading for a polished, cinematic look with intentional color palette treatment</div>
+            </div>
+            <div class="tech-card-check"></div>
+          </div>
+        </div>
+
+        <div class="tech-card" onclick="toggleCard(this, 'motion-graphics', 'Motion Graphics')">
+          <div class="tech-card-header">
+            <div class="tech-card-icon">🎞️</div>
+            <div class="tech-card-text">
+              <div class="tech-card-name">Motion Graphics</div>
+              <div class="tech-card-desc">Animated graphics, text overlays, 2D/3D motion design elements, and kinetic typography integrated into the video</div>
+            </div>
+            <div class="tech-card-check"></div>
+          </div>
+        </div>
+
+        <div class="tech-card" onclick="toggleCard(this, 'slow-motion', 'Slow Motion')">
+          <div class="tech-card-header">
+            <div class="tech-card-icon">⏱️</div>
+            <div class="tech-card-text">
+              <div class="tech-card-name">Slow Motion</div>
+              <div class="tech-card-desc">High frame rate capture (120fps+) for dramatic slow motion sequences that emphasize emotion and movement detail</div>
+            </div>
+            <div class="tech-card-check"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── CATEGORY 2: POST-PRODUCTION ─────────────────── -->
+    <div class="cat-section">
+      <div class="cat-header">
+        <div class="cat-icon" style="background:rgba(6,182,212,0.12);border:1px solid rgba(6,182,212,0.2);">🖥️</div>
+        <div class="cat-title">Post-Production</div>
+      </div>
+      <div class="cat-subtitle">Editing, finishing, and delivery requirements</div>
+
+      <div class="tech-grid">
+
+        <div class="tech-card" onclick="toggleCard(this, 'sound-design', 'Sound Design')">
+          <div class="tech-card-header">
+            <div class="tech-card-icon">🔊</div>
+            <div class="tech-card-text">
+              <div class="tech-card-name">Sound Design</div>
+              <div class="tech-card-desc">Custom audio design, foley, and sound effects layered over the music to enhance the visual narrative</div>
+            </div>
+            <div class="tech-card-check"></div>
+          </div>
+        </div>
+
+        <div class="tech-card" onclick="toggleCard(this, 'subtitles', 'Subtitles / Captions')">
+          <div class="tech-card-header">
+            <div class="tech-card-icon">💬</div>
+            <div class="tech-card-text">
+              <div class="tech-card-name">Subtitles / Captions</div>
+              <div class="tech-card-desc">Styled lyric subtitles or accessibility captions burned in or delivered as a separate file for platform upload</div>
+            </div>
+            <div class="tech-card-check"></div>
+          </div>
+        </div>
+
+
+        <div class="tech-card" onclick="toggleCard(this, 'raw-footage', 'Raw Footage Delivery')">
+          <div class="tech-card-header">
+            <div class="tech-card-icon">💾</div>
+            <div class="tech-card-text">
+              <div class="tech-card-name">Raw Footage Delivery</div>
+              <div class="tech-card-desc">Receive unedited raw camera files alongside the final edit for future use, remixes, or additional content creation</div>
+            </div>
+            <div class="tech-card-check"></div>
+          </div>
+        </div>
+
+        <div class="tech-card" onclick="toggleCard(this, 'hdr', 'HDR Delivery')">
+          <div class="tech-card-header">
+            <div class="tech-card-icon">🌟</div>
+            <div class="tech-card-text">
+              <div class="tech-card-name">HDR Delivery</div>
+              <div class="tech-card-desc">High Dynamic Range mastering for YouTube HDR and streaming platforms, maximizing visual impact on modern displays</div>
+            </div>
+            <div class="tech-card-check"></div>
+          </div>
+        </div>
+
+        <div class="tech-card" onclick="toggleCard(this, 'behind-scenes', 'Behind the Scenes')">
+          <div class="tech-card-header">
+            <div class="tech-card-icon">🎬</div>
+            <div class="tech-card-text">
+              <div class="tech-card-name">Behind the Scenes</div>
+              <div class="tech-card-desc">Dedicated BTS content captured during production for social media, press, and fan engagement use</div>
+            </div>
+            <div class="tech-card-check"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- ── OTHER REQUIREMENTS ────────────────────────────── -->
+    <div class="cat-section">
+      <div class="cat-header">
+        <div class="cat-icon" style="background:rgba(167,139,250,0.12);border:1px solid rgba(167,139,250,0.2);">⚙️</div>
+        <div class="cat-title">Other Requirements</div>
+      </div>
+      <div class="cat-subtitle">Specify any additional technical needs not listed above</div>
+
+      <div class="tech-card" style="display:block;" onclick="focusOtherTextarea(event)">
+        <div class="tech-card-header" style="cursor:pointer;">
+          <div class="tech-card-icon">✏️</div>
+          <div class="tech-card-text">
+            <div class="tech-card-name">Custom Technical Requirements</div>
+            <div class="tech-card-desc">Describe any specific technical needs, equipment, software, or production capabilities not covered above</div>
+          </div>
+        </div>
+        <div style="margin-top:12px;">
+          <textarea
+            class="other-textarea"
+            id="other-textarea"
+            placeholder="e.g., I need the director to have experience with underwater cinematography, or I need a specific camera brand like ARRI or RED…"
+            rows="3"
+            onclick="event.stopPropagation()"
+          ></textarea>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:6px;">This text will be included in your project brief and visible to all matched creatives</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HOW THIS AFFECTS MATCHING -->
+    <div class="match-section">
+      <div class="match-header">
+        <div class="match-header-icon">📈</div>
+        <div class="match-title">How This Affects Matching</div>
+      </div>
+      <div class="match-desc">Technical requirements refine your creative matches by prioritizing professionals with proven expertise in these areas. However, we may still suggest talented creatives who can deliver your vision through different but equally effective approaches — the final decision is always yours.</div>
+      <div class="match-tip">💡 Tip: Be flexible on technical specs to see more creative possibilities</div>
+    </div>
+
+    <!-- VALIDATION -->
+    <div class="validation-note">
+      <div class="validation-dot" id="val-dot" style="background:var(--green);"></div>
+      <span id="val-text" style="color:var(--green);">This step is optional — you can continue at any time</span>
+    </div>
+
+    <div style="height:40px;"></div>
+  </main>
+</div>
+
+<!-- FOOTER -->
+<div class="form-footer">
+  <button class="btn-draft">💾 Save as Draft</button>
+  <div class="footer-right">
+    <span id="footer-status" style="font-size:13px;color:var(--text-muted);">Optional — 0 requirements selected</span>
+    <button class="btn-back">← Back</button>
+    <button class="btn-next" onclick="goNext()">Next: Talent & Crew Needs →</button>
+  </div>
+</div>
+
+<script>
+  const selected = new Map(); // id → label
+
+  function toggleCard(card, id, label) {
+    // Don't fire if clicking inside a textarea
+    if (event.target.tagName === 'TEXTAREA') return;
+
+    if (selected.has(id)) {
+      selected.delete(id);
+      card.classList.remove('selected');
+      removeSummaryPill(id);
+    } else {
+      selected.set(id, label);
+      card.classList.add('selected');
+      addSummaryPill(id, label);
+    }
+    updateUI();
+  }
+
+  function focusOtherTextarea(e) {
+    if (e.target.tagName !== 'TEXTAREA') {
+      document.getElementById('other-textarea').focus();
+    }
+  }
+
+  // ─── SUMMARY PILLS ────────────────────────────────
+  function addSummaryPill(id, label) {
+    const container = document.getElementById('summary-pills');
+    const pill = document.createElement('span');
+    pill.className = 'summary-pill';
+    pill.id = 'pill-' + id;
+    pill.innerHTML = `${label} <button onclick="removePillById('${id}');event.stopPropagation()">×</button>`;
+    container.appendChild(pill);
+    container.style.display = 'flex';
+    document.getElementById('selected-summary').classList.add('has-items');
+  }
+
+  function removeSummaryPill(id) {
+    const el = document.getElementById('pill-' + id);
+    if (el) el.remove();
+    if (selected.size === 0) {
+      document.getElementById('summary-pills').style.display = 'none';
+      document.getElementById('selected-summary').classList.remove('has-items');
+    }
+  }
+
+  function removePillById(id) {
+    selected.delete(id);
+    removeSummaryPill(id);
+    // deselect card
+    const cards = document.querySelectorAll('.tech-card');
+    cards.forEach(card => {
+      if (card.getAttribute('onclick') && card.getAttribute('onclick').includes(`'${id}'`)) {
+        card.classList.remove('selected');
+      }
+    });
+    updateUI();
+  }
+
+  // ─── UI ───────────────────────────────────────────
+  function updateUI() {
+    const count = selected.size;
+    const statusEl = document.getElementById('footer-status');
+    const textEl = document.getElementById('summary-text');
+
+    if (count === 0) {
+      statusEl.textContent = 'Optional — 0 requirements selected';
+      statusEl.style.color = 'var(--text-muted)';
+      textEl.innerHTML = 'No technical requirements selected — <strong>this step is optional</strong>';
+    } else {
+      statusEl.textContent = `${count} requirement${count > 1 ? 's' : ''} selected`;
+      statusEl.style.color = 'var(--purple)';
+      textEl.innerHTML = `<strong style="color:var(--purple);">${count} requirement${count > 1 ? 's' : ''} selected</strong> — these will be included in your project brief`;
+    }
+  }
+
+  function goNext() {
+    alert('Proceeding to Talent & Crew Needs…');
+  }
+</script>
+
+</body>
+</html>

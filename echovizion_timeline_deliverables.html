@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EchoVizion – Timeline & Deliverables</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #0d0b1a; --sidebar-bg: #120f24; --card-bg: #1a1630;
+    --purple: #a78bfa; --purple-dark: #7c3aed; --pink: #f472b6;
+    --green: #10b981; --orange: #f59e0b; --teal: #06b6d4;
+    --border: #2a2448; --text-primary: #f1f0ff;
+    --text-secondary: #9ca3af; --text-muted: #6b7280;
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; }
+
+  /* NAV */
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 0 32px; height: 56px; background: rgba(13,11,26,0.95); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(12px); }
+  .logo { display: flex; align-items: center; gap: 10px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 18px; }
+  .logo-icon { width: 30px; height: 30px; background: linear-gradient(135deg, var(--purple-dark), var(--pink)); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 14px; font-weight: 500; }
+  .nav-links a.active { color: var(--text-primary); border-bottom: 2px solid var(--purple); padding-bottom: 2px; }
+  .nav-right { display: flex; align-items: center; gap: 16px; }
+  .notif { width: 32px; height: 32px; border-radius: 50%; background: var(--card-bg); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 14px; position: relative; cursor: pointer; }
+  .notif-dot { position: absolute; top: 6px; right: 6px; width: 6px; height: 6px; border-radius: 50%; background: var(--pink); }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--purple-dark), var(--pink)); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: white; }
+
+  .layout { display: flex; flex: 1; }
+
+  /* SIDEBAR */
+  .sidebar { width: 240px; background: var(--sidebar-bg); border-right: 1px solid var(--border); padding: 24px 16px; position: sticky; top: 56px; height: calc(100vh - 56px); overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+  .sidebar-proj-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); font-weight: 500; margin-bottom: 2px; }
+  .sidebar-step-label { font-size: 13px; color: var(--purple); font-weight: 600; font-family: 'Syne', sans-serif; margin-bottom: 10px; }
+  .progress-bar-wrap { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; margin-bottom: 6px; }
+  .progress-bar-fill { height: 100%; width: 72%; background: linear-gradient(90deg, var(--purple-dark), var(--pink)); border-radius: 2px; }
+  .progress-pct { font-size: 12px; color: var(--text-muted); }
+  .progress-pct strong { color: var(--text-secondary); font-weight: 500; }
+  .steps-list { display: flex; flex-direction: column; gap: 2px; }
+  .step-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; cursor: pointer; border: 1px solid transparent; transition: all 0.15s; }
+  .step-item.active { background: rgba(124,58,237,0.15); border-color: rgba(167,139,250,0.3); }
+  .step-item.completed .step-num { background: var(--purple-dark); color: white; }
+  .step-item.completed .step-name { color: var(--text-secondary); }
+  .step-num { width: 22px; height: 22px; border-radius: 50%; background: var(--border); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: var(--text-muted); flex-shrink: 0; }
+  .step-item.active .step-num { background: linear-gradient(135deg, var(--purple-dark), var(--purple)); color: white; }
+  .step-name { font-size: 13px; color: var(--text-muted); }
+  .step-item.active .step-name { color: var(--text-primary); font-weight: 500; }
+  .sidebar-help { margin-top: auto; padding: 14px; background: var(--card-bg); border-radius: 10px; border: 1px solid var(--border); }
+  .sidebar-help p { font-size: 12px; color: var(--text-secondary); margin-bottom: 10px; line-height: 1.5; }
+  .help-btn { width: 100%; padding: 8px; background: linear-gradient(135deg, var(--purple-dark), #9333ea); border: none; border-radius: 8px; color: white; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+
+  /* MAIN */
+  .main { flex: 1; padding: 36px 48px 140px; max-width: 860px; }
+  .step-meta { font-size: 12px; color: var(--purple); font-weight: 500; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.08em; }
+  .step-title { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; color: var(--text-primary); margin-bottom: 6px; }
+  .step-subtitle { font-size: 13px; color: var(--text-secondary); margin-bottom: 28px; line-height: 1.7; max-width: 620px; }
+
+  /* ── SECTION CARD ─────────────────────────── */
+  .section-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 24px; margin-bottom: 14px; }
+  .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
+  .section-icon { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
+  .section-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: var(--text-primary); }
+  .section-badge { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.06em; }
+  .badge-required { background: rgba(244,114,182,0.12); color: var(--pink); border: 1px solid rgba(244,114,182,0.25); }
+  .badge-optional { background: rgba(107,114,128,0.1); color: var(--text-muted); border: 1px solid rgba(107,114,128,0.2); }
+  .section-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 20px; padding-left: 40px; line-height: 1.6; }
+
+  /* ── URGENCY TOGGLE ───────────────────────── */
+  .urgency-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 0; }
+  .urgency-card {
+    border: 2px solid var(--border); border-radius: 12px; padding: 16px 14px;
+    cursor: pointer; transition: all 0.2s; text-align: center; position: relative;
+  }
+  .urgency-card:hover { border-color: rgba(167,139,250,0.35); }
+  .urgency-card.selected-flex    { border-color: var(--green);  background: rgba(16,185,129,0.07);  }
+  .urgency-card.selected-standard { border-color: var(--purple); background: rgba(124,58,237,0.08); }
+  .urgency-card.selected-urgent  { border-color: var(--orange); background: rgba(245,158,11,0.07); }
+  .urgency-icon { font-size: 22px; margin-bottom: 7px; }
+  .urgency-name { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 3px; }
+  .urgency-desc { font-size: 11px; color: var(--text-muted); line-height: 1.5; margin-bottom: 8px; }
+  .urgency-note { font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 4px; display: inline-block; }
+  .urgency-card.selected-flex .urgency-note    { background: rgba(16,185,129,0.12); color: var(--green); }
+  .urgency-card.selected-standard .urgency-note { background: rgba(167,139,250,0.12); color: var(--purple); }
+  .urgency-card.selected-urgent .urgency-note  { background: rgba(245,158,11,0.1); color: var(--orange); }
+  .urgency-radio { position: absolute; top: 12px; right: 12px; width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--border); transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+  .urgency-card.selected-flex .urgency-radio    { border-color: var(--green);  background: rgba(16,185,129,0.8); }
+  .urgency-card.selected-standard .urgency-radio { border-color: var(--purple); background: var(--purple-dark); }
+  .urgency-card.selected-urgent .urgency-radio  { border-color: var(--orange); background: rgba(245,158,11,0.8); }
+  .urgency-card[class*="selected"] .urgency-radio::after { content: ''; width: 6px; height: 6px; border-radius: 50%; background: white; }
+
+  /* ── DATE INPUTS ──────────────────────────── */
+  .date-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .date-field { display: flex; flex-direction: column; gap: 6px; }
+  .date-label { font-size: 12px; font-weight: 500; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; }
+  .date-required { font-size: 10px; color: var(--pink); font-weight: 600; }
+  .date-optional { font-size: 10px; color: var(--text-muted); }
+  .date-input {
+    padding: 11px 14px; background: rgba(255,255,255,0.04);
+    border: 1.5px solid var(--border); border-radius: 10px;
+    color: var(--text-primary); font-size: 14px; font-family: 'DM Sans', sans-serif;
+    outline: none; transition: all 0.2s;
+    color-scheme: dark;
+  }
+  .date-input:focus { border-color: var(--purple); background: rgba(167,139,250,0.06); }
+  .date-input:valid { border-color: rgba(16,185,129,0.5); }
+  .date-hint { font-size: 11px; color: var(--text-muted); }
+
+  /* ── VISUAL TIMELINE ──────────────────────── */
+  .timeline-visual {
+    display: none; margin-top: 18px; padding: 16px 18px;
+    background: rgba(124,58,237,0.06); border: 1px solid rgba(167,139,250,0.15);
+    border-radius: 10px;
+  }
+  .timeline-visual.visible { display: block; }
+  .tl-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 12px; }
+  .tl-track { display: flex; align-items: center; gap: 0; position: relative; }
+  .tl-milestone { display: flex; flex-direction: column; align-items: center; gap: 5px; flex: 1; }
+  .tl-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--purple); flex-shrink: 0; }
+  .tl-dot.start { background: var(--green); }
+  .tl-dot.end { background: var(--pink); }
+  .tl-line { flex: 1; height: 2px; background: linear-gradient(90deg, rgba(167,139,250,0.4), rgba(244,114,182,0.3)); margin: 0 -1px; align-self: flex-start; margin-top: 5px; }
+  .tl-name { font-size: 10px; color: var(--text-muted); text-align: center; max-width: 60px; line-height: 1.4; }
+  .tl-date { font-size: 10px; color: var(--purple); font-weight: 500; }
+  .tl-duration { text-align: center; margin-top: 12px; font-size: 12px; color: var(--text-secondary); }
+  .tl-duration strong { color: var(--text-primary); }
+  .tl-warning { display: flex; align-items: center; gap: 8px; margin-top: 10px; padding: 8px 12px; background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2); border-radius: 8px; font-size: 12px; color: var(--orange); }
+
+  /* ── MILESTONES ───────────────────────────── */
+  .milestone-grid { display: flex; flex-direction: column; gap: 8px; }
+  .milestone-row {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 16px; border-radius: 10px;
+    border: 1.5px solid var(--border); background: rgba(255,255,255,0.02);
+    cursor: pointer; transition: all 0.2s; user-select: none;
+  }
+  .milestone-row:hover { border-color: rgba(167,139,250,0.3); }
+  .milestone-row.checked { border-color: var(--purple); background: rgba(124,58,237,0.08); }
+  .milestone-checkbox { width: 20px; height: 20px; border-radius: 6px; border: 2px solid var(--border); flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+  .milestone-row.checked .milestone-checkbox { background: var(--purple-dark); border-color: var(--purple-dark); }
+  .milestone-row.checked .milestone-checkbox::after { content: '✓'; font-size: 11px; color: white; font-weight: 700; }
+  .milestone-icon { font-size: 18px; flex-shrink: 0; }
+  .milestone-body { flex: 1; }
+  .milestone-name { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
+  .milestone-desc { font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+  .milestone-weeks {
+    font-size: 11px; color: var(--text-muted); padding: 3px 10px;
+    border-radius: 20px; background: var(--card-bg); border: 1px solid var(--border);
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .milestone-row.checked .milestone-weeks { color: var(--purple); border-color: rgba(167,139,250,0.3); background: rgba(124,58,237,0.08); }
+
+  /* ── DELIVERABLES GRID ────────────────────── */
+  .deliverables-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .deliverable-card {
+    border: 1.5px solid var(--border); border-radius: 12px; padding: 14px 16px;
+    cursor: pointer; transition: all 0.2s; background: rgba(255,255,255,0.02);
+    display: flex; align-items: flex-start; gap: 12px; user-select: none;
+  }
+  .deliverable-card:hover { border-color: rgba(167,139,250,0.35); }
+  .deliverable-card.locked { opacity: 0.5; cursor: default; }
+  .deliverable-card.auto-included { border-color: rgba(16,185,129,0.4); background: rgba(16,185,129,0.05); cursor: default; }
+  .deliverable-card.checked { border-color: var(--purple); background: rgba(124,58,237,0.08); }
+  .deliv-checkbox { width: 20px; height: 20px; border-radius: 6px; border: 2px solid var(--border); flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.2s; margin-top: 1px; }
+  .deliverable-card.auto-included .deliv-checkbox { background: var(--green); border-color: var(--green); }
+  .deliverable-card.auto-included .deliv-checkbox::after { content: '✓'; font-size: 11px; color: white; font-weight: 700; }
+  .deliverable-card.checked .deliv-checkbox { background: var(--purple-dark); border-color: var(--purple-dark); }
+  .deliverable-card.checked .deliv-checkbox::after { content: '✓'; font-size: 11px; color: white; font-weight: 700; }
+  .deliv-icon { font-size: 20px; flex-shrink: 0; }
+  .deliv-body { flex: 1; }
+  .deliv-name { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
+  .deliv-desc { font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+  .deliv-tag { display: inline-block; margin-top: 5px; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px; }
+  .tag-auto { background: rgba(16,185,129,0.1); color: var(--green); border: 1px solid rgba(16,185,129,0.25); }
+  .tag-spec { background: rgba(6,182,212,0.1); color: var(--teal); border: 1px solid rgba(6,182,212,0.25); }
+
+  /* FORMAT OPTIONS — shown when master file selected */
+  .format-options {
+    display: none; padding: 12px 16px 14px;
+    border-top: 1px solid rgba(167,139,250,0.15);
+    animation: fadeIn 0.2s ease;
+  }
+  .deliverable-card.checked + .format-options { display: block; }
+  @keyframes fadeIn { from { opacity:0;transform:translateY(-4px); } to { opacity:1;transform:translateY(0); } }
+  .format-label { font-size: 11px; color: var(--text-muted); font-weight: 500; margin-bottom: 8px; }
+  .format-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+  .format-pill { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 500; border: 1.5px solid var(--border); color: var(--text-muted); cursor: pointer; transition: all 0.15s; font-family: 'DM Sans', sans-serif; background: none; }
+  .format-pill.active { border-color: var(--purple); color: var(--purple); background: rgba(124,58,237,0.1); }
+
+  /* DELIVERABLE SUMMARY */
+  .deliv-summary {
+    margin-top: 14px; padding: 12px 16px;
+    background: rgba(124,58,237,0.06); border: 1px solid rgba(167,139,250,0.15);
+    border-radius: 10px; display: none;
+  }
+  .deliv-summary.visible { display: flex; align-items: center; gap: 10px; }
+  .deliv-summary-text { font-size: 12px; color: var(--text-secondary); }
+  .deliv-summary-text strong { color: var(--purple); }
+
+  /* PRICING IMPACT NOTE */
+  .pricing-note {
+    display: flex; align-items: flex-start; gap: 12px;
+    background: rgba(245,158,11,0.06); border: 1px solid rgba(245,158,11,0.2);
+    border-radius: 12px; padding: 16px 18px; margin-bottom: 14px;
+  }
+  .pricing-note-icon { font-size: 20px; flex-shrink: 0; }
+  .pricing-note-text { font-size: 12px; color: var(--text-secondary); line-height: 1.7; }
+  .pricing-note-text strong { color: var(--orange); }
+
+  /* VALIDATION */
+  .validation-note { display: flex; align-items: center; gap: 8px; font-size: 12px; margin-bottom: 20px; }
+  .validation-dot { width: 6px; height: 6px; border-radius: 50%; }
+
+  /* FOOTER */
+  .form-footer { display: flex; align-items: center; justify-content: space-between; padding: 20px 48px; background: rgba(13,11,26,0.95); border-top: 1px solid var(--border); backdrop-filter: blur(12px); position: fixed; bottom: 0; width: calc(100% - 240px); margin-left: 240px; z-index: 50; }
+  .btn-draft { display: flex; align-items: center; gap: 8px; padding: 10px 18px; background: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .btn-draft:hover { border-color: var(--purple); color: var(--purple); }
+  .footer-right { display: flex; gap: 12px; align-items: center; }
+  .btn-back { padding: 10px 24px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .btn-back:hover { color: var(--text-primary); }
+  .btn-next { padding: 12px 28px; background: linear-gradient(135deg, var(--purple-dark), #9333ea); border: none; border-radius: 8px; color: white; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; display: flex; align-items: center; gap: 8px; transition: all 0.25s; box-shadow: 0 4px 14px rgba(124,58,237,0.35); opacity: 0.45; pointer-events: none; }
+  .btn-next.ready { opacity: 1; pointer-events: all; }
+  .btn-next.ready:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(124,58,237,0.45); }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo"><div class="logo-icon">🎵</div>EchoVizion</div>
+  <ul class="nav-links">
+    <li><a href="#">Projects</a></li>
+    <li><a href="#" class="active">Create Project</a></li>
+    <li><a href="#">Messages</a></li>
+    <li><a href="#">Profile</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="notif">🔔<div class="notif-dot"></div></div>
+    <div class="avatar">V</div>
+  </div>
+</nav>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div>
+      <div class="sidebar-proj-label">Project Creation</div>
+      <div class="sidebar-step-label">Step 8/11</div>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill"></div></div>
+      <div class="progress-pct"><strong>72% Complete</strong></div>
+    </div>
+    <div class="steps-list">
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Project Details</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Budget Definition</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Creative Roles</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Creative Direction</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Visual Style</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Inspiration References</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Technical Requirements</span></div>
+      <div class="step-item active"><div class="step-num">8</div><span class="step-name">Timeline & Deliverables</span></div>
+      <div class="step-item"><div class="step-num">9</div><span class="step-name">Talent & Crew Needs</span></div>
+      <div class="step-item"><div class="step-num">10</div><span class="step-name">Collaboration Style</span></div>
+      <div class="step-item"><div class="step-num">11</div><span class="step-name">Review & Submit</span></div>
+    </div>
+    <div class="sidebar-help">
+      <p>Tight deadlines narrow your creative pool — be realistic about your timeline to get the best matches.</p>
+      <button class="help-btn">💬 Contact Support</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="step-meta">Step 8 of 11</div>
+    <h1 class="step-title">Timeline & Deliverables</h1>
+    <p class="step-subtitle">Set your project timeline and specify exactly what you need delivered. This helps creatives scope and price their proposals accurately — and filters out anyone who can't meet your deadline.</p>
+
+    <!-- ── SECTION 1: URGENCY ─────────────────── -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="section-icon" style="background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.25);">⚡</div>
+        <div class="section-title">Project Urgency</div>
+        <span class="section-badge badge-required">Required</span>
+      </div>
+      <div class="section-sub">Sets expectations on timeline flexibility — affects which creatives will be able to take your project</div>
+
+      <div class="urgency-row">
+        <div class="urgency-card" id="urg-flex" onclick="selectUrgency('flex')">
+          <div class="urgency-radio" id="uradio-flex"></div>
+          <div class="urgency-icon">🌱</div>
+          <div class="urgency-name">Flexible</div>
+          <div class="urgency-desc">No hard deadline — timeline is open for discussion with the creative</div>
+          <span class="urgency-note">Largest match pool</span>
+        </div>
+        <div class="urgency-card" id="urg-standard" onclick="selectUrgency('standard')">
+          <div class="urgency-radio" id="uradio-standard"></div>
+          <div class="urgency-icon">📅</div>
+          <div class="urgency-name">Standard</div>
+          <div class="urgency-desc">Specific deadline in mind — standard production timeline of 4–8 weeks</div>
+          <span class="urgency-note">Recommended</span>
+        </div>
+        <div class="urgency-card" id="urg-urgent" onclick="selectUrgency('urgent')">
+          <div class="urgency-radio" id="uradio-urgent"></div>
+          <div class="urgency-icon">🔥</div>
+          <div class="urgency-name">Urgent</div>
+          <div class="urgency-desc">Need delivery within 3 weeks — rush rates may apply</div>
+          <span class="urgency-note">Smaller pool · Rush rates</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECTION 2: DATES ───────────────────── -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="section-icon" style="background:rgba(167,139,250,0.12);border:1px solid rgba(167,139,250,0.25);">📅</div>
+        <div class="section-title">Project Dates</div>
+        <span class="section-badge badge-required">Required</span>
+      </div>
+      <div class="section-sub">Your target dates — creatives will confirm availability and adjust in their proposal if needed</div>
+
+      <div class="date-grid">
+        <div class="date-field">
+          <div class="date-label">Earliest Start Date <span class="date-required">Required</span></div>
+          <input type="date" class="date-input" id="start-date" onchange="updateTimeline()" min="2026-02-17">
+          <div class="date-hint">When you're ready to begin — pre-production, concept meetings, etc.</div>
+        </div>
+        <div class="date-field">
+          <div class="date-label">Final Delivery Deadline <span class="date-required">Required</span></div>
+          <input type="date" class="date-input" id="end-date" onchange="updateTimeline()" min="2026-02-17">
+          <div class="date-hint">When you need the final deliverable in your hands</div>
+        </div>
+      </div>
+
+      <!-- VISUAL TIMELINE — appears when both dates set -->
+      <div class="timeline-visual" id="timeline-visual">
+        <div class="tl-label">Your Production Window</div>
+        <div class="tl-track" id="tl-track">
+          <div class="tl-milestone">
+            <div class="tl-dot start"></div>
+            <div class="tl-name">Kick-off</div>
+            <div class="tl-date" id="tl-start-date">—</div>
+          </div>
+          <div class="tl-line"></div>
+          <div class="tl-milestone">
+            <div class="tl-dot"></div>
+            <div class="tl-name">Pre-pro</div>
+            <div class="tl-date" id="tl-prepro-date">—</div>
+          </div>
+          <div class="tl-line"></div>
+          <div class="tl-milestone">
+            <div class="tl-dot"></div>
+            <div class="tl-name">Shoot</div>
+            <div class="tl-date" id="tl-shoot-date">—</div>
+          </div>
+          <div class="tl-line"></div>
+          <div class="tl-milestone">
+            <div class="tl-dot"></div>
+            <div class="tl-name">Rough Cut</div>
+            <div class="tl-date" id="tl-rough-date">—</div>
+          </div>
+          <div class="tl-line"></div>
+          <div class="tl-milestone">
+            <div class="tl-dot end"></div>
+            <div class="tl-name">Final Delivery</div>
+            <div class="tl-date" id="tl-end-date">—</div>
+          </div>
+        </div>
+        <div class="tl-duration" id="tl-duration"></div>
+        <div class="tl-warning" id="tl-warning" style="display:none;">
+          ⚠️ <strong>Tight timeline</strong> — less than 3 weeks may limit available creatives. Consider marking this as Urgent.
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECTION 3: MILESTONES ─────────────── -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="section-icon" style="background:rgba(6,182,212,0.12);border:1px solid rgba(6,182,212,0.25);">🏁</div>
+        <div class="section-title">Key Milestones</div>
+        <span class="section-badge badge-optional">Optional</span>
+      </div>
+      <div class="section-sub">Check-in points you'd like included in the project scope — creatives factor these into their production plan</div>
+
+      <div class="milestone-grid">
+        <div class="milestone-row" onclick="toggleMilestone(this)">
+          <div class="milestone-checkbox"></div>
+          <div class="milestone-icon">📋</div>
+          <div class="milestone-body">
+            <div class="milestone-name">Pre-Production Meeting</div>
+            <div class="milestone-desc">Concept review, shot list, location scouting, casting decisions</div>
+          </div>
+          <div class="milestone-weeks">~Week 1–2</div>
+        </div>
+        <div class="milestone-row" onclick="toggleMilestone(this)">
+          <div class="milestone-checkbox"></div>
+          <div class="milestone-icon">🎬</div>
+          <div class="milestone-body">
+            <div class="milestone-name">Shoot Day(s) Sign-off</div>
+            <div class="milestone-desc">Approval of final schedule, location, and talent before cameras roll</div>
+          </div>
+          <div class="milestone-weeks">~Week 2–3</div>
+        </div>
+        <div class="milestone-row" onclick="toggleMilestone(this)">
+          <div class="milestone-checkbox"></div>
+          <div class="milestone-icon">✂️</div>
+          <div class="milestone-body">
+            <div class="milestone-name">Rough Cut Review</div>
+            <div class="milestone-desc">First assembly cut — review pacing, structure, and narrative before color and finishing</div>
+          </div>
+          <div class="milestone-weeks">~Week 4–5</div>
+        </div>
+        <div class="milestone-row" onclick="toggleMilestone(this)">
+          <div class="milestone-checkbox"></div>
+          <div class="milestone-icon">🎨</div>
+          <div class="milestone-body">
+            <div class="milestone-name">Color & Sound Review</div>
+            <div class="milestone-desc">Review graded picture with sound design and music sync before final export</div>
+          </div>
+          <div class="milestone-weeks">~Week 6</div>
+        </div>
+        <div class="milestone-row" onclick="toggleMilestone(this)">
+          <div class="milestone-checkbox"></div>
+          <div class="milestone-icon">🔄</div>
+          <div class="milestone-body">
+            <div class="milestone-name">Revision Round(s)</div>
+            <div class="milestone-desc">Structured feedback cycles — specify how many rounds you expect</div>
+          </div>
+          <div class="milestone-weeks">1–2 rounds</div>
+        </div>
+        <div class="milestone-row" onclick="toggleMilestone(this)">
+          <div class="milestone-checkbox"></div>
+          <div class="milestone-icon">✅</div>
+          <div class="milestone-body">
+            <div class="milestone-name">Final Approval</div>
+            <div class="milestone-desc">Formal sign-off before file delivery and payment release</div>
+          </div>
+          <div class="milestone-weeks">~Week 7–8</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECTION 4: DELIVERABLES ────────────── -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="section-icon" style="background:rgba(244,114,182,0.12);border:1px solid rgba(244,114,182,0.25);">📦</div>
+        <div class="section-title">Deliverables</div>
+        <span class="section-badge badge-required">At least one required</span>
+      </div>
+      <div class="section-sub">Exactly what you need handed over at the end — this becomes part of the brief creatives price against</div>
+
+      <div class="deliverables-grid">
+
+        <!-- MASTER FILE — auto included from Technical Requirements -->
+        <div class="deliverable-card auto-included" style="grid-column:1/-1;">
+          <div class="deliv-checkbox"></div>
+          <div class="deliv-icon">🎬</div>
+          <div class="deliv-body">
+            <div class="deliv-name">Final Master File</div>
+            <div class="deliv-desc">Primary video deliverable — format pulled from your Technical Requirements</div>
+            <span class="deliv-tag tag-auto">Auto-included from Step 7 · 4K / H.264</span>
+          </div>
+        </div>
+
+        <div class="deliverable-card" id="deliv-raw" onclick="toggleDeliverable(this, 'raw')">
+          <div class="deliv-checkbox"></div>
+          <div class="deliv-icon">💾</div>
+          <div class="deliv-body">
+            <div class="deliv-name">Raw Footage</div>
+            <div class="deliv-desc">All original unedited camera files from shoot day(s)</div>
+          </div>
+        </div>
+
+        <div class="deliverable-card" id="deliv-color" onclick="toggleDeliverable(this, 'color')">
+          <div class="deliv-checkbox"></div>
+          <div class="deliv-icon">🎨</div>
+          <div class="deliv-body">
+            <div class="deliv-name">Color Graded Master</div>
+            <div class="deliv-desc">Separate graded export at full resolution — ProRes or DCI format</div>
+            <span class="deliv-tag tag-spec">From Technical Requirements</span>
+          </div>
+        </div>
+
+        <div class="deliverable-card" id="deliv-square" onclick="toggleDeliverable(this, 'square')">
+          <div class="deliv-checkbox"></div>
+          <div class="deliv-icon">📱</div>
+          <div class="deliv-body">
+            <div class="deliv-name">Social Media Cuts</div>
+            <div class="deliv-desc">Reformatted versions for Instagram, TikTok, YouTube Shorts</div>
+          </div>
+        </div>
+
+        <div class="deliverable-card" id="deliv-bts" onclick="toggleDeliverable(this, 'bts')">
+          <div class="deliv-checkbox"></div>
+          <div class="deliv-icon">🎥</div>
+          <div class="deliv-body">
+            <div class="deliv-name">Behind The Scenes</div>
+            <div class="deliv-desc">BTS footage from shoot day — separate edit or raw clips</div>
+          </div>
+        </div>
+
+        <div class="deliverable-card" id="deliv-thumb" onclick="toggleDeliverable(this, 'thumb')">
+          <div class="deliv-checkbox"></div>
+          <div class="deliv-icon">🖼️</div>
+          <div class="deliv-body">
+            <div class="deliv-name">Thumbnail / Key Art</div>
+            <div class="deliv-desc">Still frames or custom graphics for YouTube, streaming platforms</div>
+          </div>
+        </div>
+
+        <div class="deliverable-card" id="deliv-subs" onclick="toggleDeliverable(this, 'subs')">
+          <div class="deliv-checkbox"></div>
+          <div class="deliv-icon">💬</div>
+          <div class="deliv-body">
+            <div class="deliv-name">Subtitled Version</div>
+            <div class="deliv-desc">Captioned export for accessibility and social media auto-play</div>
+          </div>
+        </div>
+
+        <div class="deliverable-card" id="deliv-stems" onclick="toggleDeliverable(this, 'stems')">
+          <div class="deliv-checkbox"></div>
+          <div class="deliv-icon">🔊</div>
+          <div class="deliv-body">
+            <div class="deliv-name">Audio / Sound Design Files</div>
+            <div class="deliv-desc">Separate audio stems, SFX, or sound design exports</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SOCIAL CUTS FORMAT OPTIONS — revealed when social cuts selected -->
+      <div id="social-cuts-options" style="display:none;margin-top:10px;padding:14px 16px;background:rgba(167,139,250,0.05);border:1px solid rgba(167,139,250,0.15);border-radius:10px;">
+        <div class="format-label" style="font-size:12px;color:var(--text-secondary);font-weight:500;margin-bottom:10px;">Which social formats do you need?</div>
+        <div class="format-pills">
+          <button class="format-pill" onclick="toggleFormat(this)">1:1 Square</button>
+          <button class="format-pill" onclick="toggleFormat(this)">9:16 Vertical</button>
+          <button class="format-pill" onclick="toggleFormat(this)">16:9 Standard</button>
+          <button class="format-pill" onclick="toggleFormat(this)">60s Cut</button>
+          <button class="format-pill" onclick="toggleFormat(this)">30s Cut</button>
+          <button class="format-pill" onclick="toggleFormat(this)">15s Cut</button>
+        </div>
+      </div>
+
+      <div class="deliv-summary" id="deliv-summary">
+        <span style="font-size:18px;">📦</span>
+        <div class="deliv-summary-text">
+          <strong id="deliv-count">1</strong> deliverable<span id="deliv-plural"></span> selected — <span id="deliv-list">Final Master File</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRICING IMPACT NOTE -->
+    <div class="pricing-note">
+      <div class="pricing-note-icon">💡</div>
+      <div class="pricing-note-text">
+        <strong>Deliverables directly affect proposal pricing.</strong> Raw footage, multiple social cuts, and BTS edits add post-production time. Creatives will price against this list — only include what you genuinely need so proposals stay accurate.
+      </div>
+    </div>
+
+    <!-- VALIDATION -->
+    <div class="validation-note">
+      <div class="validation-dot" id="val-dot" style="background:var(--orange);"></div>
+      <span id="val-text" style="color:var(--orange);">Select urgency and set your project dates to continue</span>
+    </div>
+
+    <div style="height:40px;"></div>
+  </main>
+</div>
+
+<!-- FOOTER -->
+<div class="form-footer">
+  <button class="btn-draft">💾 Save as Draft</button>
+  <div class="footer-right">
+    <span id="footer-status" style="font-size:13px;color:var(--text-muted);">Set timeline to continue</span>
+    <button class="btn-back">← Back</button>
+    <button class="btn-next" id="next-btn">Next: Talent & Crew →</button>
+  </div>
+</div>
+
+<script>
+  // ── URGENCY ──────────────────────────────────
+  let urgency = null;
+  function selectUrgency(level) {
+    if (urgency) document.getElementById(`urg-${urgency}`).className = 'urgency-card';
+    urgency = level;
+    document.getElementById(`urg-${level}`).classList.add(`selected-${level}`);
+    checkValidation();
+  }
+
+  // ── DATES & TIMELINE ─────────────────────────
+  function updateTimeline() {
+    const start = document.getElementById('start-date').value;
+    const end = document.getElementById('end-date').value;
+    if (!start || !end) return;
+
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+    if (endDate <= startDate) return;
+
+    const totalDays = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24));
+    const totalWeeks = Math.round(totalDays / 7);
+
+    // Approximate milestone dates
+    const prepro = new Date(startDate.getTime() + totalDays * 0.15 * 86400000);
+    const shoot  = new Date(startDate.getTime() + totalDays * 0.35 * 86400000);
+    const rough  = new Date(startDate.getTime() + totalDays * 0.65 * 86400000);
+
+    const fmt = d => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+    document.getElementById('tl-start-date').textContent = fmt(startDate);
+    document.getElementById('tl-prepro-date').textContent = fmt(prepro);
+    document.getElementById('tl-shoot-date').textContent = fmt(shoot);
+    document.getElementById('tl-rough-date').textContent = fmt(rough);
+    document.getElementById('tl-end-date').textContent = fmt(endDate);
+    document.getElementById('tl-duration').innerHTML = `Total production window: <strong>${totalWeeks} week${totalWeeks !== 1 ? 's' : ''}</strong> (${totalDays} days)`;
+
+    // Warning for tight timelines
+    const warning = document.getElementById('tl-warning');
+    warning.style.display = totalDays < 21 ? 'flex' : 'none';
+
+    document.getElementById('timeline-visual').classList.add('visible');
+    checkValidation();
+  }
+
+  // ── MILESTONES ───────────────────────────────
+  function toggleMilestone(row) {
+    row.classList.toggle('checked');
+  }
+
+  // ── DELIVERABLES ─────────────────────────────
+  const deliverableSelected = new Set();
+
+  function toggleDeliverable(card, key) {
+    if (card.classList.contains('auto-included')) return;
+    card.classList.toggle('checked');
+
+    if (card.classList.contains('checked')) {
+      deliverableSelected.add(key);
+    } else {
+      deliverableSelected.delete(key);
+    }
+
+    // Show social format options
+    const socialOpts = document.getElementById('social-cuts-options');
+    socialOpts.style.display = deliverableSelected.has('square') ? 'block' : 'none';
+
+    updateDeliverableSummary();
+    checkValidation();
+  }
+
+  function updateDeliverableSummary() {
+    const total = deliverableSelected.size + 1; // +1 for auto-included master
+    const summary = document.getElementById('deliv-summary');
+    const countEl = document.getElementById('deliv-count');
+    const pluralEl = document.getElementById('deliv-plural');
+    const listEl = document.getElementById('deliv-list');
+
+    countEl.textContent = total;
+    pluralEl.textContent = total > 1 ? 's' : '';
+
+    const names = { raw:'Raw Footage', color:'Color Master', square:'Social Cuts', bts:'BTS', thumb:'Thumbnail/Key Art', subs:'Subtitled Version', stems:'Audio Stems' };
+    const selected = ['Final Master File', ...Array.from(deliverableSelected).map(k => names[k])];
+    listEl.textContent = selected.join(', ');
+    summary.classList.add('visible');
+  }
+
+  function toggleFormat(btn) {
+    btn.classList.toggle('active');
+  }
+
+  // ── VALIDATION ───────────────────────────────
+  function checkValidation() {
+    const start = document.getElementById('start-date').value;
+    const end = document.getElementById('end-date').value;
+    const hasUrgency = urgency !== null;
+    const hasDates = start && end && new Date(end) > new Date(start);
+
+    const btn = document.getElementById('next-btn');
+    const dot = document.getElementById('val-dot');
+    const valText = document.getElementById('val-text');
+    const status = document.getElementById('footer-status');
+
+    const ready = hasUrgency && hasDates;
+    btn.classList.toggle('ready', ready);
+
+    if (ready) {
+      dot.style.background = 'var(--green)';
+      valText.textContent = '✅ Timeline set — you\'re ready to continue';
+      valText.style.color = 'var(--green)';
+      status.textContent = `${urgency.charAt(0).toUpperCase() + urgency.slice(1)} · ${deliverableSelected.size + 1} deliverable${deliverableSelected.size > 0 ? 's' : ''} selected`;
+      status.style.color = 'var(--green)';
+    } else if (!hasUrgency) {
+      dot.style.background = 'var(--orange)';
+      valText.textContent = 'Select a project urgency level';
+      valText.style.color = 'var(--orange)';
+    } else if (!hasDates) {
+      dot.style.background = 'var(--orange)';
+      valText.textContent = 'Set your start and delivery dates';
+      valText.style.color = 'var(--orange)';
+    }
+  }
+</script>
+
+</body>
+</html>

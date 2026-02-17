@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EchoVizion – Creative Roles Needed</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d0b18;
+    --surface: #13101f;
+    --surface2: #1a1630;
+    --border: #2a2545;
+    --purple: #a855f7;
+    --purple-dim: #7c3aed;
+    --purple-glow: rgba(168,85,247,0.15);
+    --pink: #ec4899;
+    --green: #10b981;
+    --yellow: #f59e0b;
+    --text: #f1f0f7;
+    --text-muted: #8b87a8;
+    --text-dim: #5a5680;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* NAV */
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    height: 60px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 18px;
+    color: var(--text);
+  }
+  .logo-icon {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--purple), var(--pink));
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .nav-links { display: flex; gap: 32px; }
+  .nav-links a {
+    font-size: 14px; color: var(--text-muted); text-decoration: none;
+    font-weight: 500;
+  }
+  .nav-links a.active { color: var(--text); border-bottom: 2px solid var(--purple); padding-bottom: 2px; }
+  .nav-right { display: flex; align-items: center; gap: 16px; }
+  .avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: linear-gradient(135deg, #6366f1, var(--purple));
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 13px;
+  }
+  .bell { font-size: 18px; color: var(--text-muted); cursor: pointer; }
+
+  /* LAYOUT */
+  .layout { display: flex; flex: 1; }
+
+  /* SIDEBAR */
+  aside {
+    width: 240px;
+    min-height: calc(100vh - 60px);
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 24px 16px;
+    position: sticky;
+    top: 60px;
+    height: calc(100vh - 60px);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .aside-header {
+    padding: 0 8px 16px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 8px;
+  }
+  .aside-header p { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+  .progress-bar {
+    width: 100%; height: 4px;
+    background: var(--border);
+    border-radius: 99px; margin: 8px 0;
+  }
+  .progress-fill {
+    height: 100%; width: 27%;
+    background: linear-gradient(90deg, var(--purple-dim), var(--purple));
+    border-radius: 99px;
+  }
+  .progress-label { font-size: 12px; color: var(--purple); font-weight: 600; }
+
+  .step-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: 10px;
+    cursor: pointer; transition: background 0.2s;
+    position: relative;
+  }
+  .step-item:hover { background: var(--surface2); }
+  .step-item.active { background: var(--purple-glow); }
+  .step-item.done .step-num { background: var(--green); color: white; }
+  .step-item.active .step-num { background: var(--purple); color: white; }
+  .step-num {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--surface2); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: var(--text-muted);
+    flex-shrink: 0;
+  }
+  .step-label { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+  .step-item.active .step-label { color: var(--text); font-weight: 600; }
+  .step-item.done .step-label { color: var(--text-muted); }
+
+  .aside-footer {
+    margin-top: auto;
+    padding: 16px 8px 0;
+    border-top: 1px solid var(--border);
+  }
+  .help-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+  }
+  .help-card p { font-size: 12px; color: var(--text-muted); margin: 4px 0 10px; }
+  .help-card strong { font-size: 13px; color: var(--text); }
+  .help-btn {
+    width: 100%; padding: 8px;
+    background: var(--purple-glow);
+    border: 1px solid var(--purple);
+    color: var(--purple);
+    border-radius: 8px;
+    font-size: 12px; font-weight: 600;
+    cursor: pointer; font-family: inherit;
+  }
+
+  /* MAIN */
+  main {
+    flex: 1;
+    padding: 40px 48px;
+    max-width: 800px;
+  }
+
+  .step-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--purple-glow);
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    padding: 4px 12px;
+    font-size: 12px; color: var(--purple); font-weight: 600;
+    margin-bottom: 16px;
+  }
+  .step-icon {
+    width: 20px; height: 20px;
+    background: linear-gradient(135deg, var(--purple-dim), var(--purple));
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px; font-weight: 800;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+  .subtitle { font-size: 15px; color: var(--text-muted); margin-bottom: 36px; line-height: 1.5; }
+
+  /* TOGGLE */
+  .toggle-section { margin-bottom: 32px; }
+  .toggle-label { font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 12px; }
+  .toggle-group { display: flex; gap: 12px; }
+  .toggle-btn {
+    padding: 10px 20px;
+    border-radius: 99px;
+    border: 1.5px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 14px; font-weight: 500;
+    cursor: pointer; font-family: inherit;
+    transition: all 0.2s;
+  }
+  .toggle-btn.active {
+    background: var(--purple-glow);
+    border-color: var(--purple);
+    color: var(--purple);
+    font-weight: 600;
+  }
+
+  /* SECTION TITLE */
+  .section-title {
+    font-size: 16px; font-weight: 700; color: var(--text);
+    margin-bottom: 6px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-subtitle { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+  .required-badge {
+    font-size: 11px; padding: 2px 8px;
+    background: rgba(239,68,68,0.1); color: #f87171;
+    border-radius: 99px; font-weight: 600;
+  }
+  .optional-badge {
+    font-size: 11px; padding: 2px 8px;
+    background: rgba(168,85,247,0.1); color: var(--purple);
+    border-radius: 99px; font-weight: 600;
+  }
+
+  /* PRIMARY ROLE */
+  .primary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 36px;
+  }
+  .primary-card {
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    border-radius: 14px;
+    padding: 18px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    text-align: center;
+  }
+  .primary-card:hover {
+    border-color: var(--purple);
+    background: var(--surface2);
+    transform: translateY(-2px);
+  }
+  .primary-card.selected {
+    border-color: var(--purple);
+    background: var(--purple-glow);
+    box-shadow: 0 0 0 1px var(--purple);
+  }
+  .primary-card .radio {
+    position: absolute; top: 12px; right: 12px;
+    width: 18px; height: 18px; border-radius: 50%;
+    border: 2px solid var(--border);
+    background: transparent;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .primary-card.selected .radio {
+    border-color: var(--purple);
+    background: var(--purple);
+  }
+  .primary-card.selected .radio::after {
+    content: '';
+    width: 6px; height: 6px;
+    background: white; border-radius: 50%;
+  }
+  .role-icon { font-size: 28px; margin-bottom: 10px; }
+  .role-name { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .role-desc { font-size: 11px; color: var(--text-muted); line-height: 1.4; }
+  .rate-tag {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 11px; font-weight: 600;
+    color: var(--green);
+    background: rgba(16,185,129,0.1);
+    padding: 2px 8px; border-radius: 99px;
+  }
+
+  /* SKILLS */
+  .skills-section { margin-bottom: 36px; }
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .skill-card {
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .skill-card:hover { border-color: var(--purple-dim); background: var(--surface2); }
+  .skill-card.selected {
+    border-color: var(--purple);
+    background: var(--purple-glow);
+  }
+  .skill-check {
+    width: 20px; height: 20px; border-radius: 6px;
+    border: 2px solid var(--border);
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    transition: all 0.2s;
+  }
+  .skill-card.selected .skill-check {
+    background: var(--purple);
+    border-color: var(--purple);
+    color: white;
+  }
+  .skill-info {}
+  .skill-name { font-size: 13px; font-weight: 600; color: var(--text); }
+  .skill-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .boost-tag {
+    margin-left: auto;
+    font-size: 10px; color: var(--purple); font-weight: 600;
+    background: var(--purple-glow); padding: 2px 6px; border-radius: 99px;
+    white-space: nowrap; flex-shrink: 0;
+  }
+
+  /* MATCH IMPACT */
+  .match-impact {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 24px;
+    margin-bottom: 36px;
+    display: flex; align-items: flex-start; gap: 16px;
+  }
+  .impact-icon { font-size: 24px; flex-shrink: 0; margin-top: 2px; }
+  .impact-text h4 { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+  .impact-text p { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+  .impact-bars { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  .impact-bar {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px; color: var(--text-muted);
+  }
+  .bar-fill {
+    height: 6px; border-radius: 99px;
+    background: linear-gradient(90deg, var(--purple-dim), var(--purple));
+  }
+
+  /* INFO BANNER */
+  .info-banner {
+    background: rgba(245,158,11,0.08);
+    border: 1px solid rgba(245,158,11,0.25);
+    border-radius: 12px;
+    padding: 14px 18px;
+    display: flex; align-items: flex-start; gap: 12px;
+    margin-bottom: 36px;
+  }
+  .info-banner span { font-size: 18px; flex-shrink: 0; }
+  .info-banner p { font-size: 13px; color: #fbbf24; line-height: 1.5; }
+  .info-banner strong { color: #fde68a; }
+
+  /* FOOTER */
+  .page-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 48px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    position: sticky; bottom: 0;
+  }
+  .draft-btn {
+    display: flex; align-items: center; gap: 8px;
+    background: transparent; border: 1px solid var(--border);
+    color: var(--text-muted); padding: 12px 20px;
+    border-radius: 10px; font-size: 14px; font-weight: 500;
+    cursor: pointer; font-family: inherit;
+    transition: all 0.2s;
+  }
+  .draft-btn:hover { border-color: var(--purple); color: var(--text); }
+  .footer-right { display: flex; align-items: center; gap: 12px; }
+  .back-btn {
+    display: flex; align-items: center; gap: 6px;
+    background: transparent; border: 1px solid var(--border);
+    color: var(--text-muted); padding: 12px 20px;
+    border-radius: 10px; font-size: 14px; font-weight: 500;
+    cursor: pointer; font-family: inherit;
+    transition: all 0.2s;
+  }
+  .back-btn:hover { color: var(--text); border-color: var(--text-muted); }
+  .next-btn {
+    display: flex; align-items: center; gap: 8px;
+    background: linear-gradient(135deg, var(--purple-dim), var(--purple));
+    border: none; color: white;
+    padding: 12px 28px; border-radius: 10px;
+    font-size: 14px; font-weight: 700;
+    cursor: pointer; font-family: inherit;
+    box-shadow: 0 4px 20px rgba(168,85,247,0.3);
+    transition: all 0.2s;
+  }
+  .next-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(168,85,247,0.4); }
+
+  /* DIVIDER */
+  .divider {
+    height: 1px; background: var(--border);
+    margin: 32px 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">
+    <div class="logo-icon">🎬</div>
+    EchoVizion
+  </div>
+  <div class="nav-links">
+    <a href="#">Dashboard</a>
+    <a href="#" class="active">Projects</a>
+    <a href="#">Messages</a>
+    <a href="#">Community</a>
+  </div>
+  <div class="nav-right">
+    <span class="bell">🔔</span>
+    <div class="avatar">A</div>
+  </div>
+</nav>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside>
+    <div class="aside-header">
+      <p>Project Creation · Step 3 of 11</p>
+      <div class="progress-bar"><div class="progress-fill"></div></div>
+      <div class="progress-label">27% Complete</div>
+    </div>
+
+    <div class="step-item done">
+      <div class="step-num">✓</div>
+      <span class="step-label">Service Selection</span>
+    </div>
+    <div class="step-item done">
+      <div class="step-num">✓</div>
+      <span class="step-label">Project Details</span>
+    </div>
+    <div class="step-item active">
+      <div class="step-num" style="background:var(--purple);color:white;">3</div>
+      <span class="step-label">Creative Roles</span>
+    </div>
+    <div class="step-item">
+      <div class="step-num">4</div>
+      <span class="step-label">Budget Definition</span>
+    </div>
+    <div class="step-item">
+      <div class="step-num">5</div>
+      <span class="step-label">Experience & Location</span>
+    </div>
+    <div class="step-item">
+      <div class="step-num">6</div>
+      <span class="step-label">Creative Direction</span>
+    </div>
+    <div class="step-item">
+      <div class="step-num">7</div>
+      <span class="step-label">Visual Style Selection</span>
+    </div>
+    <div class="step-item">
+      <div class="step-num">8</div>
+      <span class="step-label">Inspiration References</span>
+    </div>
+    <div class="step-item">
+      <div class="step-num">9</div>
+      <span class="step-label">Timeline & Deliverables</span>
+    </div>
+    <div class="step-item">
+      <div class="step-num">10</div>
+      <span class="step-label">Usage Rights</span>
+    </div>
+    <div class="step-item">
+      <div class="step-num">11</div>
+      <span class="step-label">Review & Submit</span>
+    </div>
+
+    <div class="aside-footer">
+      <div class="help-card">
+        <strong>Need Help?</strong>
+        <p>Our team can guide you through the project creation process.</p>
+        <button class="help-btn">Contact Support</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main>
+    <div class="step-badge">
+      <div class="step-icon">🎭</div>
+      Step 3 of 11
+    </div>
+
+    <h1>Creative Roles Needed</h1>
+    <p class="subtitle">Tell us who you need. We'll find one creative who covers all your requirements — or comes closest and prices accordingly.</p>
+
+    <!-- TOGGLE -->
+    <div class="toggle-section">
+      <div class="toggle-label">I'm looking for</div>
+      <div class="toggle-group">
+        <button class="toggle-btn active">One creative who handles everything</button>
+        <button class="toggle-btn">Multiple specialists</button>
+      </div>
+    </div>
+
+    <!-- PRIMARY ROLE -->
+    <div class="section-title">
+      Primary Role
+      <span class="required-badge">Required · Pick one</span>
+    </div>
+    <p class="section-subtitle">Who is the lead creative you're hiring? This is the main role we'll match you against.</p>
+
+    <div class="primary-grid">
+      <div class="primary-card selected">
+        <div class="radio"></div>
+        <div class="role-icon">🎬</div>
+        <div class="role-name">Director</div>
+        <div class="role-desc">Leads the full creative vision from concept to delivery</div>
+        <div class="rate-tag">$50–150/hr</div>
+      </div>
+      <div class="primary-card">
+        <div class="radio"></div>
+        <div class="role-icon">📷</div>
+        <div class="role-name">Cinematographer</div>
+        <div class="role-desc">Camera operation, lighting and shot composition</div>
+        <div class="rate-tag">$40–120/hr</div>
+      </div>
+      <div class="primary-card">
+        <div class="radio"></div>
+        <div class="role-icon">✂️</div>
+        <div class="role-name">Editor</div>
+        <div class="role-desc">Post-production, cuts, pacing and final delivery</div>
+        <div class="rate-tag">$35–100/hr</div>
+      </div>
+      <div class="primary-card">
+        <div class="radio"></div>
+        <div class="role-icon">✨</div>
+        <div class="role-name">VFX Artist</div>
+        <div class="role-desc">Visual effects, compositing and motion design</div>
+        <div class="rate-tag">$50–130/hr</div>
+      </div>
+      <div class="primary-card">
+        <div class="radio"></div>
+        <div class="role-icon">🎨</div>
+        <div class="role-name">Animator</div>
+        <div class="role-desc">2D or 3D character and scene animation</div>
+        <div class="rate-tag">$45–120/hr</div>
+      </div>
+      <div class="primary-card">
+        <div class="radio"></div>
+        <div class="role-icon">📱</div>
+        <div class="role-name">Content Creator</div>
+        <div class="role-desc">Short-form vertical content for TikTok, Reels, Shorts</div>
+        <div class="rate-tag">$25–75/hr</div>
+      </div>
+      <div class="primary-card">
+        <div class="radio"></div>
+        <div class="role-icon">🎞️</div>
+        <div class="role-name">Colorist</div>
+        <div class="role-desc">Color grading and visual tone refinement</div>
+        <div class="rate-tag">$35–90/hr</div>
+      </div>
+      <div class="primary-card">
+        <div class="radio"></div>
+        <div class="role-icon">🖥️</div>
+        <div class="role-name">Motion Designer</div>
+        <div class="role-desc">Animated graphics, typography and transitions</div>
+        <div class="rate-tag">$40–110/hr</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- INFO BANNER -->
+    <div class="info-banner">
+      <span>💡</span>
+      <p><strong>How this works:</strong> You're hiring one creative. The additional skills below boost their match score — the more skills they cover, the higher they rank in your results. A creative who covers all your skills will always appear above one who covers fewer.</p>
+    </div>
+
+    <!-- ADDITIONAL SKILLS -->
+    <div class="skills-section">
+      <div class="section-title">
+        Additional Skills Needed
+        <span class="optional-badge">Optional · Select all that apply</span>
+      </div>
+      <p class="section-subtitle">Each selected skill boosts the match score of creatives who cover it. Creatives who don't cover a skill may note they'll subcontract it.</p>
+
+      <div class="skills-grid">
+        <div class="skill-card selected">
+          <div class="skill-check">✓</div>
+          <div class="skill-info">
+            <div class="skill-name">Video Editing</div>
+            <div class="skill-sub">Final cut, pacing, transitions</div>
+          </div>
+          <div class="boost-tag">+10% match</div>
+        </div>
+        <div class="skill-card selected">
+          <div class="skill-check">✓</div>
+          <div class="skill-info">
+            <div class="skill-name">Color Grading</div>
+            <div class="skill-sub">Visual tone and color correction</div>
+          </div>
+          <div class="boost-tag">+10% match</div>
+        </div>
+        <div class="skill-card">
+          <div class="skill-check"></div>
+          <div class="skill-info">
+            <div class="skill-name">VFX / Compositing</div>
+            <div class="skill-sub">Effects, overlays, green screen</div>
+          </div>
+          <div class="boost-tag">+10% match</div>
+        </div>
+        <div class="skill-card">
+          <div class="skill-check"></div>
+          <div class="skill-info">
+            <div class="skill-name">Motion Graphics</div>
+            <div class="skill-sub">Animated text, graphics, intros</div>
+          </div>
+          <div class="boost-tag">+10% match</div>
+        </div>
+        <div class="skill-card">
+          <div class="skill-check"></div>
+          <div class="skill-info">
+            <div class="skill-name">3D Animation</div>
+            <div class="skill-sub">Cinema 4D, Blender, Octane</div>
+          </div>
+          <div class="boost-tag">+10% match</div>
+        </div>
+        <div class="skill-card">
+          <div class="skill-check"></div>
+          <div class="skill-info">
+            <div class="skill-name">Cinematography</div>
+            <div class="skill-sub">On-set camera and lighting</div>
+          </div>
+          <div class="boost-tag">+10% match</div>
+        </div>
+        <div class="skill-card">
+          <div class="skill-check"></div>
+          <div class="skill-info">
+            <div class="skill-name">Drone Operation</div>
+            <div class="skill-sub">Licensed aerial videography</div>
+          </div>
+          <div class="boost-tag">+10% match</div>
+        </div>
+        <div class="skill-card">
+          <div class="skill-check"></div>
+          <div class="skill-info">
+            <div class="skill-name">Sound Design</div>
+            <div class="skill-sub">Audio sync, SFX, mixing</div>
+          </div>
+          <div class="boost-tag">+10% match</div>
+        </div>
+        <div class="skill-card">
+          <div class="skill-check"></div>
+          <div class="skill-info">
+            <div class="skill-name">Storyboarding</div>
+            <div class="skill-sub">Pre-production visual planning</div>
+          </div>
+          <div class="boost-tag">+10% match</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MATCH IMPACT PREVIEW -->
+    <div class="match-impact">
+      <div class="impact-icon">📊</div>
+      <div class="impact-text">
+        <h4>How your selections affect matching</h4>
+        <p>You selected <strong style="color:var(--text)">Director</strong> as your primary role with <strong style="color:var(--text)">2 additional skills</strong>. Creatives who cover all 3 will rank highest in your results.</p>
+        <div class="impact-bars">
+          <div class="impact-bar">
+            <div class="bar-fill" style="width:60px;"></div>
+            <span>Director only → Base match</span>
+          </div>
+          <div class="impact-bar">
+            <div class="bar-fill" style="width:90px;"></div>
+            <span>+ Editing → +10% score</span>
+          </div>
+          <div class="impact-bar">
+            <div class="bar-fill" style="width:120px;"></div>
+            <span>+ Color Grading → +10% score</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- FOOTER NAV -->
+<div class="page-footer">
+  <button class="draft-btn">💾 Save as Draft</button>
+  <div class="footer-right">
+    <button class="back-btn">← Back</button>
+    <button class="next-btn">Next: Budget Definition →</button>
+  </div>
+</div>
+
+</body>
+</html>

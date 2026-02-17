@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EchoVizion – Usage Rights</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0d0b1a;
+    --sidebar-bg: #120f24;
+    --card-bg: #1a1630;
+    --purple: #a78bfa;
+    --purple-dark: #7c3aed;
+    --pink: #f472b6;
+    --green: #10b981;
+    --orange: #f59e0b;
+    --teal: #06b6d4;
+    --border: #2a2448;
+    --text-primary: #f1f0ff;
+    --text-secondary: #9ca3af;
+    --text-muted: #6b7280;
+  }
+
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; }
+
+  /* NAV */
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 0 32px; height: 56px; background: rgba(13,11,26,0.95); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(12px); }
+  .logo { display: flex; align-items: center; gap: 10px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 18px; }
+  .logo-icon { width: 30px; height: 30px; background: linear-gradient(135deg, var(--purple-dark), var(--pink)); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 14px; font-weight: 500; }
+  .nav-links a.active { color: var(--text-primary); border-bottom: 2px solid var(--purple); padding-bottom: 2px; }
+  .nav-right { display: flex; align-items: center; gap: 16px; }
+  .notif { width: 32px; height: 32px; border-radius: 50%; background: var(--card-bg); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 14px; position: relative; cursor: pointer; }
+  .notif-dot { position: absolute; top: 6px; right: 6px; width: 6px; height: 6px; border-radius: 50%; background: var(--pink); }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--purple-dark), var(--pink)); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: white; }
+
+  .layout { display: flex; flex: 1; }
+
+  /* SIDEBAR */
+  .sidebar { width: 240px; background: var(--sidebar-bg); border-right: 1px solid var(--border); padding: 24px 16px; position: sticky; top: 56px; height: calc(100vh - 56px); overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+  .sidebar-proj-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); font-weight: 500; margin-bottom: 2px; }
+  .sidebar-step-label { font-size: 13px; color: var(--purple); font-weight: 600; font-family: 'Syne', sans-serif; margin-bottom: 10px; }
+  .progress-bar-wrap { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; margin-bottom: 6px; }
+  .progress-bar-fill { height: 100%; width: 80%; background: linear-gradient(90deg, var(--purple-dark), var(--pink)); border-radius: 2px; }
+  .progress-pct { font-size: 12px; color: var(--text-muted); }
+  .progress-pct strong { color: var(--text-secondary); font-weight: 500; }
+  .steps-list { display: flex; flex-direction: column; gap: 2px; }
+  .step-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; cursor: pointer; border: 1px solid transparent; transition: all 0.15s; }
+  .step-item.active { background: rgba(124,58,237,0.15); border-color: rgba(167,139,250,0.3); }
+  .step-item.completed .step-num { background: var(--purple-dark); color: white; }
+  .step-item.completed .step-name { color: var(--text-secondary); }
+  .step-num { width: 22px; height: 22px; border-radius: 50%; background: var(--border); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: var(--text-muted); flex-shrink: 0; }
+  .step-item.active .step-num { background: linear-gradient(135deg, var(--purple-dark), var(--purple)); color: white; }
+  .step-name { font-size: 13px; color: var(--text-muted); }
+  .step-item.active .step-name { color: var(--text-primary); font-weight: 500; }
+  .sidebar-help { margin-top: auto; padding: 14px; background: var(--card-bg); border-radius: 10px; border: 1px solid var(--border); }
+  .sidebar-help p { font-size: 12px; color: var(--text-secondary); margin-bottom: 10px; line-height: 1.5; }
+  .help-btn { width: 100%; padding: 8px; background: linear-gradient(135deg, var(--purple-dark), #9333ea); border: none; border-radius: 8px; color: white; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+
+  /* MAIN */
+  .main { flex: 1; padding: 36px 48px 140px; max-width: 860px; }
+
+  .page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
+  .page-header-left { display: flex; align-items: flex-start; gap: 16px; }
+  .page-header-icon { width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, var(--purple-dark), var(--pink)); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  .step-meta { font-size: 12px; color: var(--purple); font-weight: 500; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.08em; }
+  .step-title { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; color: var(--text-primary); }
+  .step-subtitle { font-size: 13px; color: var(--text-secondary); margin-bottom: 28px; line-height: 1.7; max-width: 600px; }
+
+  /* LEARN MORE TRIGGER */
+  .learn-more-btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 500;
+    background: rgba(167,139,250,0.08); border: 1px solid rgba(167,139,250,0.25);
+    color: var(--purple); cursor: pointer; font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s; white-space: nowrap; margin-top: 4px;
+  }
+  .learn-more-btn:hover { background: rgba(167,139,250,0.15); border-color: var(--purple); }
+
+  /* ─── TIER GRID ──────────────────────────────── */
+  .tier-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 12px; margin-bottom: 20px;
+  }
+
+  .tier-card {
+    background: var(--card-bg); border: 2px solid var(--border);
+    border-radius: 14px; padding: 22px 22px 18px;
+    cursor: pointer; transition: all 0.2s; position: relative;
+    display: flex; flex-direction: column; gap: 0;
+    overflow: hidden;
+  }
+
+  .tier-card::before {
+    content: ''; position: absolute; inset: 0; opacity: 0;
+    transition: opacity 0.2s; pointer-events: none;
+  }
+
+  .tier-card:hover { transform: translateY(-2px); }
+  .tier-card:hover::before { opacity: 1; }
+
+  /* Per-tier colors */
+  .tier-card[data-tier="organic"]    { }
+  .tier-card[data-tier="paid"]       { }
+  .tier-card[data-tier="broadcast"]  { }
+  .tier-card[data-tier="all"]        { }
+
+  .tier-card[data-tier="organic"]::before   { background: linear-gradient(135deg, rgba(16,185,129,0.07), transparent); }
+  .tier-card[data-tier="paid"]::before      { background: linear-gradient(135deg, rgba(167,139,250,0.09), transparent); }
+  .tier-card[data-tier="broadcast"]::before { background: linear-gradient(135deg, rgba(6,182,212,0.08), transparent); }
+  .tier-card[data-tier="all"]::before       { background: linear-gradient(135deg, rgba(245,158,11,0.08), transparent); }
+
+  .tier-card[data-tier="organic"]:hover   { border-color: rgba(16,185,129,0.45); }
+  .tier-card[data-tier="paid"]:hover      { border-color: rgba(167,139,250,0.5); }
+  .tier-card[data-tier="broadcast"]:hover { border-color: rgba(6,182,212,0.45); }
+  .tier-card[data-tier="all"]:hover       { border-color: rgba(245,158,11,0.45); }
+
+  /* Selected states */
+  .tier-card[data-tier="organic"].selected    { border-color: var(--green);   box-shadow: 0 0 0 1px rgba(16,185,129,0.2), 0 8px 28px rgba(16,185,129,0.12); }
+  .tier-card[data-tier="paid"].selected       { border-color: var(--purple);  box-shadow: 0 0 0 1px rgba(167,139,250,0.2), 0 8px 28px rgba(124,58,237,0.15); }
+  .tier-card[data-tier="broadcast"].selected  { border-color: var(--teal);    box-shadow: 0 0 0 1px rgba(6,182,212,0.2),   0 8px 28px rgba(6,182,212,0.12);   }
+  .tier-card[data-tier="all"].selected        { border-color: var(--orange);  box-shadow: 0 0 0 1px rgba(245,158,11,0.2),  0 8px 28px rgba(245,158,11,0.1);   }
+
+  .tier-card.selected { transform: none; }
+  .tier-card.selected::before { opacity: 1; }
+
+  /* TIER HEADER */
+  .tier-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 14px; }
+  .tier-header-left { display: flex; align-items: center; gap: 10px; }
+
+  .tier-icon {
+    width: 38px; height: 38px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; font-size: 18px;
+    flex-shrink: 0; transition: all 0.2s;
+  }
+  .tier-card[data-tier="organic"] .tier-icon    { background: rgba(16,185,129,0.12);  border: 1px solid rgba(16,185,129,0.25);  }
+  .tier-card[data-tier="paid"] .tier-icon       { background: rgba(167,139,250,0.12); border: 1px solid rgba(167,139,250,0.25); }
+  .tier-card[data-tier="broadcast"] .tier-icon  { background: rgba(6,182,212,0.1);    border: 1px solid rgba(6,182,212,0.25);   }
+  .tier-card[data-tier="all"] .tier-icon        { background: rgba(245,158,11,0.1);   border: 1px solid rgba(245,158,11,0.25);  }
+
+  .tier-card[data-tier="organic"].selected .tier-icon    { background: rgba(16,185,129,0.22);  border-color: var(--green);  }
+  .tier-card[data-tier="paid"].selected .tier-icon       { background: rgba(167,139,250,0.22); border-color: var(--purple); }
+  .tier-card[data-tier="broadcast"].selected .tier-icon  { background: rgba(6,182,212,0.2);    border-color: var(--teal);   }
+  .tier-card[data-tier="all"].selected .tier-icon        { background: rgba(245,158,11,0.2);   border-color: var(--orange); }
+
+  .tier-name-col { flex: 1; }
+  .tier-name { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 800; color: var(--text-primary); margin-bottom: 1px; }
+  .tier-badge {
+    display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 7px;
+    border-radius: 4px; text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .tier-badge.popular   { background: rgba(167,139,250,0.15); color: var(--purple); border: 1px solid rgba(167,139,250,0.3); }
+  .tier-badge.common    { background: rgba(16,185,129,0.1);   color: var(--green);  border: 1px solid rgba(16,185,129,0.25);  }
+
+  /* RADIO */
+  .tier-radio {
+    width: 22px; height: 22px; border-radius: 50%;
+    border: 2px solid var(--border); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .tier-card[data-tier="organic"].selected .tier-radio    { border-color: var(--green);  background: rgba(16,185,129,0.8);  }
+  .tier-card[data-tier="paid"].selected .tier-radio       { border-color: var(--purple); background: var(--purple-dark);    }
+  .tier-card[data-tier="broadcast"].selected .tier-radio  { border-color: var(--teal);   background: rgba(6,182,212,0.75);  }
+  .tier-card[data-tier="all"].selected .tier-radio        { border-color: var(--orange); background: rgba(245,158,11,0.75); }
+  .tier-card.selected .tier-radio::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: white; }
+
+  /* INCLUDES LIST */
+  .tier-includes { display: flex; flex-direction: column; gap: 7px; margin-bottom: 16px; }
+  .tier-include-row { display: flex; align-items: flex-start; gap: 8px; }
+
+  .tier-check {
+    width: 16px; height: 16px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 9px;
+    margin-top: 1px; font-weight: 700; transition: all 0.2s;
+  }
+  .tier-card[data-tier="organic"] .tier-check    { background: rgba(16,185,129,0.15);  color: var(--green);  border: 1px solid rgba(16,185,129,0.3);  }
+  .tier-card[data-tier="paid"] .tier-check       { background: rgba(167,139,250,0.12); color: var(--purple); border: 1px solid rgba(167,139,250,0.3); }
+  .tier-card[data-tier="broadcast"] .tier-check  { background: rgba(6,182,212,0.1);    color: var(--teal);   border: 1px solid rgba(6,182,212,0.3);   }
+  .tier-card[data-tier="all"] .tier-check        { background: rgba(245,158,11,0.1);   color: var(--orange); border: 1px solid rgba(245,158,11,0.3);  }
+
+  .tier-include-text { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+
+  /* PRICING NOTE */
+  .tier-pricing {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 12px; border-radius: 8px; margin-top: auto;
+    font-size: 12px; font-weight: 500;
+  }
+  .tier-card[data-tier="organic"] .tier-pricing    { background: rgba(16,185,129,0.07);  color: var(--green);  border: 1px solid rgba(16,185,129,0.18);  }
+  .tier-card[data-tier="paid"] .tier-pricing       { background: rgba(167,139,250,0.07); color: var(--purple); border: 1px solid rgba(167,139,250,0.2);  }
+  .tier-card[data-tier="broadcast"] .tier-pricing  { background: rgba(6,182,212,0.06);   color: var(--teal);   border: 1px solid rgba(6,182,212,0.18);   }
+  .tier-card[data-tier="all"] .tier-pricing        { background: rgba(245,158,11,0.07);  color: var(--orange); border: 1px solid rgba(245,158,11,0.18);  }
+
+  /* NOT SURE ROW */
+  .not-sure-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 14px 18px; background: var(--card-bg);
+    border: 1px solid var(--border); border-radius: 12px;
+    margin-bottom: 24px;
+  }
+  .not-sure-icon { font-size: 18px; }
+  .not-sure-text { font-size: 13px; color: var(--text-secondary); flex: 1; }
+  .not-sure-link {
+    font-size: 13px; font-weight: 600; color: var(--purple);
+    cursor: pointer; text-decoration: none; white-space: nowrap;
+    display: flex; align-items: center; gap: 5px;
+    background: none; border: none; font-family: 'DM Sans', sans-serif;
+    transition: color 0.15s;
+  }
+  .not-sure-link:hover { color: var(--pink); }
+
+  /* VALIDATION */
+  .validation-note { display: flex; align-items: center; gap: 8px; font-size: 12px; margin-bottom: 24px; margin-top: 4px; }
+  .validation-dot { width: 6px; height: 6px; border-radius: 50%; }
+
+  /* FOOTER */
+  .form-footer { display: flex; align-items: center; justify-content: space-between; padding: 20px 48px; background: rgba(13,11,26,0.95); border-top: 1px solid var(--border); backdrop-filter: blur(12px); position: fixed; bottom: 0; width: calc(100% - 240px); margin-left: 240px; z-index: 50; }
+  .btn-draft { display: flex; align-items: center; gap: 8px; padding: 10px 18px; background: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .btn-draft:hover { border-color: var(--purple); color: var(--purple); }
+  .footer-right { display: flex; gap: 12px; align-items: center; }
+  .btn-back { padding: 10px 24px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .btn-back:hover { color: var(--text-primary); }
+  .btn-next { padding: 12px 28px; background: linear-gradient(135deg, var(--purple-dark), #9333ea); border: none; border-radius: 8px; color: white; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; display: flex; align-items: center; gap: 8px; transition: all 0.25s; box-shadow: 0 4px 14px rgba(124,58,237,0.35); opacity: 0.45; pointer-events: none; }
+  .btn-next.ready { opacity: 1; pointer-events: all; }
+  .btn-next.ready:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(124,58,237,0.45); }
+
+  /* ═══ MODAL ═══════════════════════════════════ */
+  .modal-backdrop {
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(0,0,0,0.7); backdrop-filter: blur(6px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px; opacity: 0; pointer-events: none;
+    transition: opacity 0.25s;
+  }
+  .modal-backdrop.open { opacity: 1; pointer-events: all; }
+
+  .modal {
+    background: var(--card-bg); border: 1px solid rgba(167,139,250,0.25);
+    border-radius: 16px; width: 100%; max-width: 660px;
+    max-height: 85vh; overflow-y: auto;
+    transform: translateY(20px); transition: transform 0.3s ease;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+  }
+  .modal-backdrop.open .modal { transform: translateY(0); }
+
+  .modal-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 22px 26px 20px; border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; background: var(--card-bg); z-index: 1;
+    border-radius: 16px 16px 0 0;
+  }
+  .modal-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; color: var(--text-primary); }
+  .modal-close {
+    width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border); color: var(--text-muted); font-size: 16px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Sans', sans-serif; transition: all 0.15s;
+  }
+  .modal-close:hover { background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.3); color: #ef4444; }
+
+  .modal-body { padding: 24px 26px; }
+
+  .modal-section { margin-bottom: 28px; }
+  .modal-section-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+  .modal-section-body { font-size: 13px; color: var(--text-secondary); line-height: 1.75; }
+
+  /* Benchmark table */
+  .bench-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+  .bench-table th { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--border); color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; font-weight: 600; }
+  .bench-table td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--text-secondary); vertical-align: top; }
+  .bench-table tr:last-child td { border-bottom: none; }
+  .bench-table td:first-child { color: var(--text-primary); font-weight: 500; }
+
+  /* FAQ */
+  .faq-item { border-bottom: 1px solid var(--border); padding: 14px 0; }
+  .faq-item:last-child { border-bottom: none; }
+  .faq-q { font-size: 13px; font-weight: 600; color: var(--text-primary); cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .faq-q .faq-arrow { color: var(--text-muted); transition: transform 0.2s; }
+  .faq-q.open .faq-arrow { transform: rotate(180deg); }
+  .faq-a { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-top: 10px; display: none; }
+  .faq-a.visible { display: block; }
+
+  .modal-footer {
+    padding: 18px 26px; border-top: 1px solid var(--border);
+    display: flex; justify-content: flex-end;
+    position: sticky; bottom: 0; background: var(--card-bg);
+    border-radius: 0 0 16px 16px;
+  }
+  .got-it-btn {
+    padding: 11px 28px; background: linear-gradient(135deg, var(--purple-dark), #9333ea);
+    border: none; border-radius: 8px; color: white; font-size: 14px; font-weight: 600;
+    cursor: pointer; font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s; box-shadow: 0 4px 14px rgba(124,58,237,0.3);
+  }
+  .got-it-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(124,58,237,0.4); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">
+    <div class="logo-icon">🎵</div>
+    EchoVizion
+  </div>
+  <ul class="nav-links">
+    <li><a href="#">Projects</a></li>
+    <li><a href="#" class="active">Create Project</a></li>
+    <li><a href="#">Messages</a></li>
+    <li><a href="#">Profile</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="notif">🔔<div class="notif-dot"></div></div>
+    <div class="avatar">V</div>
+  </div>
+</nav>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div>
+      <div class="sidebar-proj-label">Project Creation</div>
+      <div class="sidebar-step-label">Step 9/10</div>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill"></div></div>
+      <div class="progress-pct"><strong>80% Complete</strong></div>
+    </div>
+    <div class="steps-list">
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Project Details</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Budget Definition</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Creative Direction</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Visual Style Selection</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Inspiration References</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Technical Requirements</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Talent & Crew Needs</span></div>
+      <div class="step-item completed"><div class="step-num">✓</div><span class="step-name">Collaboration Style</span></div>
+      <div class="step-item active"><div class="step-num">9</div><span class="step-name">Usage Rights</span></div>
+      <div class="step-item"><div class="step-num">10</div><span class="step-name">Review & Submit</span></div>
+    </div>
+    <div class="sidebar-help">
+      <p>Not sure which tier to pick? Most indie music videos use Organic Social only.</p>
+      <button class="help-btn">💬 Contact Support</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="page-header">
+      <div class="page-header-left">
+        <div class="page-header-icon">📋</div>
+        <div>
+          <div class="step-meta">Step 9 of 10</div>
+          <h1 class="step-title">Usage Rights</h1>
+        </div>
+      </div>
+      <button class="learn-more-btn" onclick="openModal()">❓ Learn More</button>
+    </div>
+
+    <p class="step-subtitle">How will this content be used? This helps creatives price their proposals correctly — it doesn't change your budget, it sets the right expectations for both sides.</p>
+
+    <!-- TIER GRID -->
+    <div class="tier-grid">
+
+      <!-- ORGANIC SOCIAL -->
+      <div class="tier-card" data-tier="organic" id="tier-organic" onclick="selectTier('organic')">
+        <div class="tier-header">
+          <div class="tier-header-left">
+            <div class="tier-icon">📱</div>
+            <div class="tier-name-col">
+              <div class="tier-name">Organic Social Media</div>
+              <span class="tier-badge common">Most Common</span>
+            </div>
+          </div>
+          <div class="tier-radio" id="radio-organic"></div>
+        </div>
+        <div class="tier-includes">
+          <div class="tier-include-row"><div class="tier-check">✓</div><div class="tier-include-text">Instagram, TikTok, YouTube posts</div></div>
+          <div class="tier-include-row"><div class="tier-check">✓</div><div class="tier-include-text">Your personal website & Linktree</div></div>
+          <div class="tier-include-row"><div class="tier-check">✓</div><div class="tier-include-text">Press & editorial coverage</div></div>
+          <div class="tier-include-row"><div class="tier-check">✓</div><div class="tier-include-text">Streaming platforms (Spotify, Apple)</div></div>
+        </div>
+        <div class="tier-pricing">💵 Standard rates — no usage premium</div>
+      </div>
+
+      <!-- PAID ADVERTISING -->
+      <div class="tier-card" data-tier="paid" id="tier-paid" onclick="selectTier('paid')">
+        <div class="tier-header">
+          <div class="tier-header-left">
+            <div class="tier-icon">💰</div>
+            <div class="tier-name-col">
+              <div class="tier-name">Paid Advertising</div>
+              <span class="tier-badge popular">Popular</span>
+            </div>
+          </div>
+          <div class="tier-radio" id="radio-paid"></div>
+        </div>
+        <div class="tier-includes">
+          <div class="tier-include-row"><div class="tier-check">✓</div><div class="tier-include-text">Everything in Organic +</div></div>
+          <div class="tier-include-row"><div class="tier-check">✓</div><div class="tier-include-text">Sponsored / boosted posts</div></div>
+          <div class="tier-include-row"><div class="tier-check">✓</div><div class="tier-include-text">Paid digital ad campaigns</div></div>
+          <div class="tier-include-row"><div class="tier-check">✓</div><div class="tier-include-text">Brand partnership promotions</div></div>
+        </div>
+        <div class="tier-pricing">💵 +20–40% above standard rates</div>
+      </div>
+
+      <!-- BROADCAST -->
+      <div class="tier-card" data-tier="broadcast" id="tier-broadcast" onclick="selectTier('broadcast')">
+        <div class="tier-header">
+          <div class="tier-header-left">
+            <div class="tier-icon">📺</div>
+            <div class="tier-name-col">
+              <div class="tier-name">Broadcast & Traditional</div>
+            </div>
+          </div>
+          <div class="tier-radio" id="radio-broadcast"></div>
+        </div>
+        <div class="tier-includes">
+          <div class="tier-include-row"><div class="tier-check">✓</div><div class="tier-include-text">Everything in Paid Advertising +</div></div>
+          <div class="tier-include-row"><div class="tier-check">✓</div><div class="tier-include-text">TV commercials & network broadcast</div></div>
+          <div class="tier-include-row"><div class="tier-check">✓</div><div class="tier-include-text">Cinema / theatrical release</div></div>
+          <div class="tier-include-row"><div class="tier-check">✓</div><div class="tier-include-text">Out-of-home (billboards, signage)</div></div>
+        </div>
+        <div class="tier-pricing">💵 +50–100% above standard rates</div>
+      </div>
+
+      <!-- ALL RIGHTS -->
+      <div class="tier-card" data-tier="all" id="tier-all" onclick="selectTier('all')">
+        <div class="tier-header">
+          <div class="tier-header-left">
+            <div class="tier-icon">🌐</div>
+            <div class="tier-name-col">
+              <div class="tier-name">All Rights & Commercial</div>
+            </div>
+          </div>
+          <div class="tier-radio" id="radio-all"></div>
+        </div>
+        <div class="tier-includes">
+          <div class="tier-include-row"><div class="tier-check">✓</div><div class="tier-include-text">Full ownership — all platforms & uses</div></div>
+          <div class="tier-include-row"><div class="tier-check">✓</div><div class="tier-include-text">License to third parties & brands</div></div>
+          <div class="tier-include-row"><div class="tier-check">✓</div><div class="tier-include-text">Sell or sublicense footage</div></div>
+          <div class="tier-include-row"><div class="tier-check">✓</div><div class="tier-include-text">NFT, metaverse & emerging formats</div></div>
+        </div>
+        <div class="tier-pricing">💵 Negotiated flat fee or buyout</div>
+      </div>
+
+    </div>
+
+    <!-- NOT SURE ROW -->
+    <div class="not-sure-row">
+      <span class="not-sure-icon">💡</span>
+      <span class="not-sure-text">Not sure which to choose? Most indie artists start with Organic Social.</span>
+      <button class="not-sure-link" onclick="openModal()">See how usage rights affect pricing →</button>
+    </div>
+
+    <!-- VALIDATION -->
+    <div class="validation-note">
+      <div class="validation-dot" id="val-dot" style="background:var(--orange);"></div>
+      <span id="val-text" style="color:var(--orange);">Select a usage tier to continue</span>
+    </div>
+
+    <div style="height: 40px;"></div>
+  </main>
+</div>
+
+<!-- FOOTER -->
+<div class="form-footer">
+  <button class="btn-draft">💾 Save as Draft</button>
+  <div class="footer-right">
+    <span id="footer-status" style="font-size:13px;color:var(--text-muted);">No tier selected yet</span>
+    <button class="btn-back">← Back</button>
+    <button class="btn-next" id="next-btn" onclick="goNext()">Next: Review & Submit →</button>
+  </div>
+</div>
+
+<!-- ═══ LEARN MORE MODAL ═══════════════════════ -->
+<div class="modal-backdrop" id="modal-backdrop" onclick="handleBackdropClick(event)">
+  <div class="modal" id="modal">
+
+    <div class="modal-header">
+      <span class="modal-title">📋 Understanding Usage Rights</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- WHY IT MATTERS -->
+      <div class="modal-section">
+        <div class="modal-section-title">💡 Why Usage Rights Matter</div>
+        <div class="modal-section-body">
+          Usage rights determine where and how a creative's work can be shown after delivery. Creatives price their work partly based on how broadly it will be used — a video shown to your 5K Instagram followers requires less licensing value than one running as a national TV ad. Being upfront about your intended use ensures both sides agree on fair compensation and avoids disputes after delivery.
+        </div>
+      </div>
+
+      <!-- HOW THIS AFFECTS PRICING -->
+      <div class="modal-section">
+        <div class="modal-section-title">💰 How This Affects Pricing Negotiations</div>
+        <div class="modal-section-body" style="margin-bottom:10px;">
+          Usage rights are separate from production fees. A creative might charge $3,000 to produce your video, but the <em>license</em> to use that footage for paid advertising is an additional fee on top. Here's how that typically plays out:
+        </div>
+        <table class="bench-table">
+          <thead>
+            <tr>
+              <th>Usage Tier</th>
+              <th>Typical Rate Impact</th>
+              <th>Common Scenario</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>📱 Organic Social</td>
+              <td>Standard — no premium</td>
+              <td>Release video on your own channels</td>
+            </tr>
+            <tr>
+              <td>💰 Paid Advertising</td>
+              <td>+20–40% above base</td>
+              <td>Running IG or YouTube ads with the video</td>
+            </tr>
+            <tr>
+              <td>📺 Broadcast & Traditional</td>
+              <td>+50–100% above base</td>
+              <td>TV spot, cinema trailer, billboard</td>
+            </tr>
+            <tr>
+              <td>🌐 All Rights & Commercial</td>
+              <td>Flat fee / buyout negotiated</td>
+              <td>Brand deal, licensing footage to third parties</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- FAQ -->
+      <div class="modal-section">
+        <div class="modal-section-title">❓ Frequently Asked Questions</div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            What if my plans change after I post the project?
+            <span class="faq-arrow">▾</span>
+          </div>
+          <div class="faq-a">You can update your usage tier at any time before agreeing to a proposal. If your plans change mid-production, you'll need to renegotiate usage terms with your creative — most professionals handle this routinely through a simple contract amendment.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            I'm not planning to run ads now, but might later. Which do I choose?
+            <span class="faq-arrow">▾</span>
+          </div>
+          <div class="faq-a">Choose Organic Social for now and negotiate a usage upgrade option in your contract. Many creatives will include a clause like "Paid advertising rights available for an additional 25% of the production fee if exercised within 12 months." This gives you flexibility without paying upfront for rights you may not use.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            Does this affect who owns the final video?
+            <span class="faq-arrow">▾</span>
+          </div>
+          <div class="faq-a">Usage rights and ownership are different. Unless your contract specifically states a full buyout or transfer of copyright, the creative typically retains copyright and grants you a license to use the work. "All Rights & Commercial" tiers often come with a copyright transfer or buyout — confirm this explicitly in your contract. Always have contracts reviewed by a music industry lawyer for high-value projects.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            What about using the video as part of a brand partnership or sync deal?
+            <span class="faq-arrow">▾</span>
+          </div>
+          <div class="faq-a">If a brand is funding or co-sponsoring your video, or if you plan to license the music video to another brand, you'll need at least the Paid Advertising tier. If the video will be used in commercials or licensed to third parties beyond your direct use, select All Rights & Commercial and negotiate a full scope of use in your contract.</div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button class="got-it-btn" onclick="closeModal()">Got it →</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const tierLabels = {
+    organic: 'Organic Social Media',
+    paid: 'Paid Advertising',
+    broadcast: 'Broadcast & Traditional',
+    all: 'All Rights & Commercial'
+  };
+
+  let selected = null;
+
+  function selectTier(tier) {
+    if (selected) {
+      document.getElementById(`tier-${selected}`).classList.remove('selected');
+    }
+    if (selected === tier) {
+      selected = null;
+      updateUI(null);
+      return;
+    }
+    selected = tier;
+    document.getElementById(`tier-${tier}`).classList.add('selected');
+    updateUI(tier);
+  }
+
+  function updateUI(tier) {
+    const btn = document.getElementById('next-btn');
+    const status = document.getElementById('footer-status');
+    const dot = document.getElementById('val-dot');
+    const valText = document.getElementById('val-text');
+
+    if (tier) {
+      btn.classList.add('ready');
+      status.textContent = `✅ ${tierLabels[tier]}`;
+      status.style.color = 'var(--green)';
+      dot.style.background = 'var(--green)';
+      valText.textContent = `"${tierLabels[tier]}" selected — ready to continue`;
+      valText.style.color = 'var(--green)';
+    } else {
+      btn.classList.remove('ready');
+      status.textContent = 'No tier selected yet';
+      status.style.color = 'var(--text-muted)';
+      dot.style.background = 'var(--orange)';
+      valText.textContent = 'Select a usage tier to continue';
+      valText.style.color = 'var(--orange)';
+    }
+  }
+
+  // ─── MODAL ─────────────────────────────────────
+  function openModal() {
+    document.getElementById('modal-backdrop').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    document.getElementById('modal-backdrop').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function handleBackdropClick(e) {
+    if (e.target === document.getElementById('modal-backdrop')) closeModal();
+  }
+
+  // ─── FAQ ───────────────────────────────────────
+  function toggleFaq(el) {
+    el.classList.toggle('open');
+    const answer = el.nextElementSibling;
+    answer.classList.toggle('visible');
+  }
+
+  // ─── ESC KEY ───────────────────────────────────
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeModal();
+  });
+
+  function goNext() {
+    if (selected) alert(`Saved: "${tierLabels[selected]}" — proceeding to Review & Submit…`);
+  }
+</script>
+
+</body>
+</html>
